@@ -33,24 +33,23 @@ while(True):
         for y in range(0, vidRes-cropSize, int(vidRes/gridSize)):
             crop = dst[y:y+cropSize, x:x+cropSize]
             # draw rects with mean value of color
-            # meanCol = cv2.mean(crop)
-            b, g, r, _ = np.uint8(cv2.mean(crop))
+            meanCol = cv2.mean(crop)
+            b, g, r, _ = np.uint8(meanCol)
             mCol = np.uint8([[[b, g, r]]])
             scannerCol = MODULES.colorSelect(mCol, x, y)
             thisColor = colors[str(scannerCol)]
-            print(thisColor)
+
             # draw rects with frame colored by range result
             cv2.rectangle(dst, (x-1, y-1), (x+cropSize + 1, y+cropSize + 1),
                           thisColor, 1)
 
-            # # draw the mean color itself
-            # cv2.rectangle(dst, (x, y), (x+cropSize,
-            #                             y+cropSize), meanCol, -1)
+            # draw the mean color itself
+            cv2.rectangle(dst, (x, y), (x+cropSize,
+                                        y+cropSize), meanCol, -1)
 
             # add colors to array for type analysis
             # np.append(colorArr, meanCol)
-    # print the output
-    # print('\n', colorArr)
+
     # draw the video to screen
     cv2.imshow("vid", dst)
 
