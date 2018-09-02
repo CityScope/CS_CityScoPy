@@ -1,10 +1,7 @@
 import math
 import numpy as np
 import cv2
-
-# define range of  color in HSV
-ORANGE_MIN = np.array([5, 50, 50], np.uint8)
-ORANGE_MAX = np.array([15, 255, 255], np.uint8)
+import MODULES
 
 # load the keystone data from file
 M = np.loadtxt('keystone.txt')
@@ -27,32 +24,35 @@ while(True):
     dst = cv2.warpPerspective(
         frame, M, (vidRes, vidRes))
 
+    # if needed, implement max_rgb_filter
+    # dst = MODULES.max_rgb_filter(dst)
+
     for x in range(0, vidRes-cropSize, int(vidRes/gridSize)):
         for y in range(0, vidRes-cropSize, int(vidRes/gridSize)):
             crop = dst[y:y+cropSize, x:x+cropSize]
             # draw rects with mean value of color
-            meanCol = cv2.mean(crop)
-            cropOne = dst[y:y+1, x:x+1]
-            bgrToHsv = cv2.cvtColor(cropOne, cv2.COLOR_BGR2HSV)
-            inRange = cv2.inRange(bgrToHsv, ORANGE_MIN, ORANGE_MAX)
-            inRange = int(inRange)
-            # print(inRange, type(inRange))
-            #########
+            # meanCol = cv2.mean(crop)
+            b, g, r, _ = np.uint8(cv2.mean(crop))
+            mCol = np.uint8([[[b, g, r]]])
+            thisColor = MODULES.colorSelect(mCol, x, y)
+            # # draw rects with frame colored by range result
             cv2.rectangle(dst, (x-1, y-1), (x+cropSize + 1, y+cropSize + 1),
-                          (inRange, inRange, inRange), 1)
-            # then draw the mean color itself
-            cv2.rectangle(dst, (x, y), (x+cropSize,
-                                        y+cropSize), meanCol, -1)
-            np.append(colorArr, meanCol)
+                          (thisColor, thisColor, thisColor), 1)
+            # # draw the mean color itself
+            # cv2.rectangle(dst, (x, y), (x+cropSize,
+            #                             y+cropSize), meanCol, -1)
 
+            # add colors to array for type analysis
+            # np.append(colorArr, meanCol)
+    # print the output
     # print('\n', colorArr)
     # draw the video to screen
     cv2.imshow("vid", dst)
 
+    # break video loop by pressing ESC
     key = cv2.waitKey(10) & 0xFF
     if key == 27:
         break
-
 
 webcam.release()
 cv2.destroyAllWindows()
