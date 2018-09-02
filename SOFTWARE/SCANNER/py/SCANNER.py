@@ -18,6 +18,8 @@ cropSize = 10
 # array to collect the scanners
 colorArr = np.tile(np.array([0.]), (gridSize, gridSize))
 
+colors = MODULES.colDict
+
 # run the video loop forever
 while(True):
     _, frame = webcam.read()
@@ -34,10 +36,13 @@ while(True):
             # meanCol = cv2.mean(crop)
             b, g, r, _ = np.uint8(cv2.mean(crop))
             mCol = np.uint8([[[b, g, r]]])
-            thisColor = MODULES.colorSelect(mCol, x, y)
-            # # draw rects with frame colored by range result
+            scannerCol = MODULES.colorSelect(mCol, x, y)
+            thisColor = colors[str(scannerCol)]
+            print(thisColor)
+            # draw rects with frame colored by range result
             cv2.rectangle(dst, (x-1, y-1), (x+cropSize + 1, y+cropSize + 1),
-                          (thisColor, thisColor, thisColor), 1)
+                          thisColor, 1)
+
             # # draw the mean color itself
             # cv2.rectangle(dst, (x, y), (x+cropSize,
             #                             y+cropSize), meanCol, -1)
