@@ -42,8 +42,8 @@ M = np.loadtxt('keystone.txt')
 # define the video
 webcam = cv2.VideoCapture(0)
 # define the video window
-cv2.namedWindow('vid')
 # set res. for vid
+cv2.namedWindow('vid')
 videoRes = 800
 # define the number of grid scanners
 gridSize = 20
