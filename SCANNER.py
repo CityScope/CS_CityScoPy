@@ -89,10 +89,16 @@ while(True):
             colorArr[counter] = scannerCol
             counter += 1
 
-    print('\n', '//////////////////////////////////', '\n',
-          colorArr.reshape(gridSize, gridSize).transpose())
+    # print the output colors array
+    resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
+    resultColorArray = resultColorArray.copy(order='C')
+
+    # send result over UDP
+    MODULES.sendOverUDP(resultColorArray)
+
     # draw the video to screen
     cv2.imshow("vid", dst)
+
     # break video loop by pressing ESC
     key = cv2.waitKey(10) & 0xFF
     if key == 27:

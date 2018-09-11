@@ -2,6 +2,7 @@
 import numpy as np
 import argparse
 import cv2
+import socket
 
 
 colRangeDict = {0: [np.array([0, 70, 50], np.uint8),  # red down
@@ -17,7 +18,6 @@ colDict = {0: (0, 0, 255),  # red
 
 
 def colorSelect(meanColor):
-
     # convert color to hsv for oclidian distance
     bgrToHsv = cv2.cvtColor(meanColor, cv2.COLOR_BGR2HSV)
     bgrToGray = cv2.cvtColor(meanColor, cv2.COLOR_BGR2GRAY)
@@ -47,3 +47,13 @@ def max_rgb_filter(image):
     B[B < M] = 0
     # merge the channels back together and return the image
     return cv2.merge([B, G, R])
+
+
+def sendOverUDP(udpPacket):
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 5005
+    # convert to string and encode the packet
+    udpPacket = str(udpPacket).encode()
+    print('\n', "UDP message:", '\n', udpPacket)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(udpPacket, (UDP_IP, UDP_PORT))
