@@ -10,4 +10,4 @@
 
 ## Advanced
 
-- Tweak UDP end points or scanned colors under `MODULES.py`
+- Tweak UDP endpoints or scanned colors under `MODULES.py`
