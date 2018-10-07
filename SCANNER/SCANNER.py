@@ -38,17 +38,17 @@ import cv2
 import MODULES
 
 # load the keystone data from file
-M = np.loadtxt('keystone.txt')
+M = np.loadtxt('../KEYSTONE/keystone.txt')
 # define the video
 webcam = cv2.VideoCapture(0)
 # define the video window
 # set res. for vid
 cv2.namedWindow('vid')
-videoRes = 800
-# define the number of grid scanners
+videoRes = 600
+# define the number of grid pixel scanners
 gridSize = 20
 # define the size for each scanner
-cropSize = 10
+cropSize = int(0.25 * videoRes/gridSize)
 # array to collect the scanners
 colorArr = np.zeros((gridSize*gridSize), dtype=np.int64)
 colors = MODULES.colDict

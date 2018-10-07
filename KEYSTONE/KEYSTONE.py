@@ -33,6 +33,8 @@ import numpy as np
 import cv2
 
 webcam = cv2.VideoCapture(0)
+print('Webcam found at:', '\n', webcam)
+
 cv2.namedWindow('image')
 webcam.set(3, 800)
 webcam.set(4, 600)
@@ -45,7 +47,7 @@ mousePos = (0, 0)
 # Aspect ratio
 ASPECT_RATIO = (600, 600)
 pts2 = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
-                  ASPECT_RATIO[1], ASPECT_RATIO[0]]])
+    ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
 
 def selectFourPoints():
