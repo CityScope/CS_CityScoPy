@@ -57,9 +57,9 @@ webcam = cv2.VideoCapture(0)
 # define the video window
 # set res. for vid
 cv2.namedWindow('vid')
-videoRes = 600
+videoRes = 800
 # define the number of grid pixel scanners
-gridSize = 24
+gridSize = 64
 # define the size for each scanner
 cropSize = int(0.25 * videoRes/gridSize)
 # array to collect the scanners
@@ -80,6 +80,7 @@ while(True):
     step = int(videoRes/gridSize)
     for x in range(int(step/2), videoRes, step):
         for y in range(int(step/2), videoRes, step):
+            # set scanner crop box size
             crop = dst[y:y+cropSize, x:x+cropSize]
             # draw rects with mean value of color
             meanCol = cv2.mean(crop)
@@ -95,27 +96,30 @@ while(True):
             # draw the mean color itself
             cv2.rectangle(dst, (x, y), (x+cropSize,
                                         y+cropSize), meanCol, -1)
-
-            cv2.putText(dst, str([counter, scannerCol]),
+            # create text display on bricks
+            cv2.putText(dst, str(scannerCol),
                         (x-2, y-2), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.2, (0, 0, 0), lineType=cv2.LINE_AA)
+                        0.3, (0, 0, 0), lineType=cv2.LINE_AA)
             # add colors to array for type analysis
             colorArr[counter] = scannerCol
             counter += 1
 
     # print the output colors array
-    resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
+    # resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
     # print('\n', resultColorArray)
 
     # pseudo code here:
     # if no change to results array, do nothing
     # else, compse the sliced submatrix of X*Y for each grid cell
+    # print('NEW____________________________NEW')
+    # cc = 0
+    # for i in range(0, gridSize, 3):
+    #     for j in range(0, gridSize, 3):
+    #         # subMatrix = np.array(resultColorArray[:, i, :, j]).flatten()
+    #         subMatrix = resultColorArray[i:(i+3), j:(j+3)]
 
-    for i in range(3, 24, 3):
-        for j in range(3, 24, 3):
-            mat_slice = np.array(resultColorArray[i, j]).flatten()
-            print('\n', i, j, mat_slice, '\n')
-
+    #         print('\n', cc, '\n', subMatrix)
+    #         cc += 1
     # resultColorArray = resultColorArray.copy(order='C')
 
     # send result over UDP
