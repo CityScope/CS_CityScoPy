@@ -54,6 +54,8 @@ def sendOverUDP(udpPacket):
     UDP_PORT = 5005
     # convert to string and encode the packet
     udpPacket = str(udpPacket).encode()
+    # debug
     print('\n', "UDP message:", '\n', udpPacket)
+    # open UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(udpPacket, (UDP_IP, UDP_PORT))

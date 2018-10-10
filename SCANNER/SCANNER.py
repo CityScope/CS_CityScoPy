@@ -37,8 +37,21 @@ import numpy as np
 import cv2
 import MODULES
 
+
+'''
+# Debug only!
+import sys
+sys.exit()
+'''
+
+
+# load the tags text file
+tagsArray = np.loadtxt('tags.txt', dtype=str)
+
+print(tagsArray)
+
 # load the keystone data from file
-M = np.loadtxt('../KEYSTONE/keystone.txt')
+keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
 # define the video
 webcam = cv2.VideoCapture(0)
 # define the video window
@@ -46,7 +59,7 @@ webcam = cv2.VideoCapture(0)
 cv2.namedWindow('vid')
 videoRes = 600
 # define the number of grid pixel scanners
-gridSize = 20
+gridSize = 24
 # define the size for each scanner
 cropSize = int(0.25 * videoRes/gridSize)
 # array to collect the scanners
@@ -59,10 +72,11 @@ while(True):
     counter = 0
     _, frame = webcam.read()
     dst = cv2.warpPerspective(
-        frame, M, (videoRes, videoRes))
+        frame, keyStoneData, (videoRes, videoRes))
 
     # if needed, implement max_rgb_filter
     # dst = MODULES.max_rgb_filter(dst)
+
     step = int(videoRes/gridSize)
     for x in range(int(step/2), videoRes, step):
         for y in range(int(step/2), videoRes, step):
@@ -91,10 +105,22 @@ while(True):
 
     # print the output colors array
     resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
-    resultColorArray = resultColorArray.copy(order='C')
+    # print('\n', resultColorArray)
+
+    # pseudo code here:
+    # if no change to results array, do nothing
+    # else, compse the sliced submatrix of X*Y for each grid cell
+
+    for i in range(3, 24, 3):
+        for j in range(3, 24, 3):
+            mat_slice = np.array(resultColorArray[i, j]).flatten()
+            print('\n', i, j, mat_slice, '\n')
+
+    # resultColorArray = resultColorArray.copy(order='C')
 
     # send result over UDP
-    MODULES.sendOverUDP(resultColorArray)
+
+    # MODULES.sendOverUDP(mat_slice)
 
     # draw the video to screen
     cv2.imshow("vid", dst)
