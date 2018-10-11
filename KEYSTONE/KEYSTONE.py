@@ -32,14 +32,11 @@
 import numpy as np
 import cv2
 
+# make webcam
 webcam = cv2.VideoCapture(0)
 print('Webcam found at:', '\n', webcam)
-
+# video winodw
 cv2.namedWindow('canvas')
-
-
-# Load an test image in grayscale
-thisTestImg = cv2.imread('../MISC/test.png', 0)
 
 
 # top left, top right, bottom left, bottom right
@@ -61,23 +58,20 @@ def selectFourPoints():
 	top left, top right, bottom left, bottom right.")
     while(pointIndex != 4):
 
-        cv2.imshow('thisTestImg', thisTestImg)
-
         # wait for clicks
-        # cv2.setMouseCallback('canvas', saveThisPoint)
-        cv2.setMouseCallback('thisTestImg', saveThisPoint)
+        cv2.setMouseCallback('canvas', saveThisPoint)
 
         # read the webcam frames
         _, frame = webcam.read()
 
         # draw mouse pos
-        cv2.circle(thisTestImg, mousePos, 10, (0, 0, 255), 1)
+        cv2.circle(frame, mousePos, 10, (0, 0, 255), 1)
 
         # draw clicked points
         for pt in pts:
-            cv2.circle(thisTestImg, pt, 10, (255, 0, 0), 1)
+            cv2.circle(frame, pt, 10, (255, 0, 0), 1)
         # show the video
-        # cv2.imshow('canvas', frame)
+        cv2.imshow('canvas', frame)
 
         key = cv2.waitKey(20) & 0xFF
         if key == 27:
@@ -114,7 +108,7 @@ if(selectFourPoints()):
 # perform the transformation
     M = cv2.getPerspectiveTransform(pts1, pts2)
     print("np array keystone pts", M)
-    np.savetxt("KEYSTONE/keystone.txt", M)
+    np.savetxt("../KEYSTONE/keystone.txt", M)
 
 webcam.release()
 cv2.destroyAllWindows()

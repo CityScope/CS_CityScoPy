@@ -48,17 +48,9 @@ webcam = cv2.VideoCapture(0)
 # define the video window
 cv2.namedWindow('vid')
 
-# Load an test image in grayscale
-thisTestImg = cv2.imread('../MISC/test.png', 0)
-r = 100.0 / thisTestImg.shape[1]
-dim = (500, int(thisTestImg.shape[0] * r))
-
-# perform the actual resizing of the image and show it
-thisTestImg = cv2.resize(thisTestImg, dim, interpolation=cv2.INTER_AREA)
-
 # set res. for vid
-videoResX = 1200
-videoResY = 1200
+videoResX = 800
+videoResY = 400
 
 # define the grid size
 gridX = 6
@@ -88,7 +80,7 @@ while(True):
     _, thisFrame = webcam.read()
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
-        thisTestImg, keyStoneData, (videoResX, videoResY))
+        thisFrame, keyStoneData, (videoResX, videoResY))
 
     # if needed, implement max_rgb_filter
     # dst = MODULES.max_rgb_filter(dst)
