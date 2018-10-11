@@ -49,8 +49,8 @@ webcam = cv2.VideoCapture(0)
 cv2.namedWindow('vid')
 
 # set res. for vid
-videoResX = 800
-videoResY = 400
+videoResX = 1000
+videoResY = 500
 
 # define the grid size
 gridX = 6

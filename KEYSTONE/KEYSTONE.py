@@ -44,8 +44,13 @@ pts = [(0, 0), (0, 0), (0, 0), (0, 0)]
 pointIndex = 0
 mousePos = (0, 0)
 
-# Aspect ratio
-ASPECT_RATIO = (600, 600)
+''' 
+NOTE: Aspect ratio is fliped than in scanner
+so that ASPECT_RATIO[0,1] will be ASPECT_RATIO[1,0]
+in SCANNER tool
+'''
+
+ASPECT_RATIO = (500, 1000)
 pts2 = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
     ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
@@ -107,8 +112,9 @@ if(selectFourPoints()):
 
 # perform the transformation
     M = cv2.getPerspectiveTransform(pts1, pts2)
-    print("np array keystone pts", M)
-    np.savetxt("../KEYSTONE/keystone.txt", M)
+    filePath = "../KEYSTONE/keystone.txt"
+    np.savetxt(filePath, M)
+    print("np array keystone pts was saved in ", filePath)
 
 webcam.release()
 cv2.destroyAllWindows()
