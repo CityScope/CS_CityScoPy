@@ -136,7 +136,8 @@ def makeGridOrigins(videoResX, videoResY):
                 scannersLocationsArr.append([x, y])
             # count
             c += 1
-    print('\n', scannersLocationsArr, len(scannersLocationsArr))
+    print("Init scanner array: ", scannersLocationsArr,
+          '\n', len(scannersLocationsArr))
     return scannersLocationsArr
 
 

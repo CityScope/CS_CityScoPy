@@ -95,11 +95,11 @@ while(True):
     # dst = MODULES.max_rgb_filter(dst)
 
     ########
-    for i in scanLocArr:
+    for loc in scanLocArr:
 
         # set x and y from locations array
-        x = i[0]
-        y = i[1]
+        x = loc[0]
+        y = loc[1]
 
         # set scanner crop box size and position
         # at x,y + crop box size
