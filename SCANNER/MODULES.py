@@ -1,9 +1,10 @@
-# import the necessary packages
+# imports packages
 import numpy as np
 import argparse
 import cv2
 import socket
 
+##################################################
 
 colRangeDict = {0: [np.array([0, 70, 50], np.uint8),  # red down
                     np.array([10, 255, 255], np.uint8)],  # red up
@@ -15,6 +16,8 @@ colRangeDict = {0: [np.array([0, 70, 50], np.uint8),  # red down
 colDict = {0: (0, 0, 255),  # red
            1: (0, 0, 0),  # black
            2: (255, 255, 255)}  # white
+
+##################################################
 
 
 def colorSelect(meanColor):
@@ -34,6 +37,8 @@ def colorSelect(meanColor):
             colResult = 2
     return colResult
 
+##################################################
+
 
 def max_rgb_filter(image):
     # split the image into its BGR components
@@ -48,6 +53,8 @@ def max_rgb_filter(image):
     # merge the channels back together and return the image
     return cv2.merge([B, G, R])
 
+##################################################
+
 
 def sendOverUDP(udpPacket):
     UDP_IP = "127.0.0.1"
@@ -59,3 +66,45 @@ def sendOverUDP(udpPacket):
     # open UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(udpPacket, (UDP_IP, UDP_PORT))
+
+
+##################################################
+
+def checkForNewGrid():
+    '''
+pseudo code here:
+if no change to results array, do nothing
+else, compse the sliced submatrix of X*Y for each grid cell
+
+import numpy as np
+    a = np.reshape(np.arange(162), (18, 9))
+    print(a)
+    b = a[0: 3, 0: 3]
+    print(b)
+
+'''
+
+##################################################
+
+
+def findType(meanColor):
+    print('########################################################')
+    cc = 0
+    for i in range(0, gridX*3, 3):
+        for j in range(0, gridY*3, 3):
+            # make submatrix of 3x3
+            subMatrix = resultColorArray[i:(i+3), j:(j+3)].flatten()
+            # print it
+            print('\n', cc, '\n', subMatrix)
+            cc += 1
+
+##################################################
+
+
+def sendToUDP(UDPpacket):
+    resultColorArray = resultColorArray.copy(order='C')
+    # send result over UDP
+    MODULES.sendOverUDP(mat_slice)
+
+
+##################################################

@@ -45,12 +45,19 @@ keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
 # define the video
 webcam = cv2.VideoCapture(0)
 
+# hardcode the locations of the scanners
+scannersLocationArr = [
+    15, 43, 85, 113, 155, 183,
+    18, 46, 88, 116, 158, 186,
+    21, 49, 91, 119, 161, 189
+]
+
 # define the video window
 cv2.namedWindow('vid')
 
 # set res. for vid
-videoResX = 1000
-videoResY = 500
+videoResX = 1200
+videoResY = 600
 
 # define the grid size
 gridX = 6
@@ -64,7 +71,6 @@ cropSize = int(0.25 * videoResX/gridSize)
 
 # array to collect the scanners
 colorArr = np.zeros((gridSize*gridSize), dtype=np.int64)
-print(len(colorArr))
 
 # call colors dictionary
 colors = MODULES.colDict
@@ -72,8 +78,47 @@ colors = MODULES.colDict
 # equal divide of canvas
 step = int(videoResX/gridSize)
 
+
+def makeGridOrigins():
+
+    # read video frames
+    _, thisFrame = webcam.read()
+    # warp the video based on keystone info
+    distortVid = cv2.warpPerspective(
+        thisFrame, keyStoneData, (videoResX, videoResY))
+
+    c = 0
+    for x in range(0, videoResX - int(videoResX/14), int(videoResX/14)):
+        for y in range(0, videoResX-int(videoResX/8), int(videoResY/8)):
+            #
+            # check if this poistion is in hardcoded locations
+            # array and if so get its position
+            #
+            if c in scannersLocationArr:
+                cv2.circle(distortVid, (x, y), 20, (255, 0, 0),
+                           thickness=1, lineType=8, shift=0)
+
+                # create text display on bricks
+                cv2.putText(distortVid, str(c),
+                            (x-2, y), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.3, (0, 0, 255))
+
+            c += 1
+    # draw the video to screen
+    cv2.imshow("vid", distortVid)
+
+
+
 # run the video loop forever
 while(True):
+    makeGridOrigins()
+    # break video loop by pressing ESC
+    key = cv2.waitKey(10) & 0xFF
+    if key == 27:
+        break
+
+
+'''
     # init counter for populating colors array
     counter = 0
     # read video frames
@@ -90,12 +135,18 @@ while(True):
     for x in range(0, gridX*step*3, step):
         for y in range(0, gridY*step*3, step):
 
-            # set scanner crop box size
+            # set scanner crop box size and position
+            # at x,y + crop box size
             crop = distortVid[y:y+cropSize, x:x+cropSize]
+
             # draw rects with mean value of color
             meanCol = cv2.mean(crop)
+
+            # convert colors to rgb
             b, g, r, _ = np.uint8(meanCol)
             mCol = np.uint8([[[b, g, r]]])
+
+            # select the right color based on sample
             scannerCol = MODULES.colorSelect(mCol)
             thisColor = colors[scannerCol]
 
@@ -112,44 +163,14 @@ while(True):
             # create text display on bricks
             cv2.putText(distortVid, str(scannerCol),
                         (x + int(cropSize/3), y+cropSize), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.3, (0, 0, 0), lineType=cv2.LINE_AA)
+                        0.3, (0, 0, 0))
 
             # add colors to array for type analysis
             colorArr[counter] = scannerCol
             counter += 1
 
-    # print the output colors array
+    # create the output colors array
     resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
-    # print('\n', resultColorArray)
-
-    '''
-    pseudo code here:
-    if no change to results array, do nothing
-    else, compse the sliced submatrix of X*Y for each grid cell
-
-
-    import numpy as np
-        a = np.reshape(np.arange(162), (18, 9))
-        print(a)
-        b = a[0: 3, 0: 3]
-        print(b)
-
-    '''
-
-    print('########################################################3')
-    cc = 0
-    for i in range(0, gridX*3, 3):
-        for j in range(0, gridY*3, 3):
-            # subMatrix = np.array(resultColorArray[:, i, :, j]).flatten()
-            subMatrix = resultColorArray[i:(i+3), j:(j+3)].flatten()
-
-            print('\n', cc, '\n', subMatrix)
-            cc += 1
-    # resultColorArray = resultColorArray.copy(order='C')
-
-    # send result over UDP
-
-    # MODULES.sendOverUDP(mat_slice)
 
     # draw the video to screen
     cv2.imshow("vid", distortVid)
@@ -158,6 +179,8 @@ while(True):
     key = cv2.waitKey(10) & 0xFF
     if key == 27:
         break
+'''
+
 
 webcam.release()
 cv2.destroyAllWindows()
