@@ -50,7 +50,7 @@ so that ASPECT_RATIO[0,1] will be ASPECT_RATIO[1,0]
 in SCANNER tool
 '''
 
-ASPECT_RATIO = (600, 1200)
+ASPECT_RATIO = (800, 1600)
 pts2 = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
     ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 

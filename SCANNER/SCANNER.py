@@ -49,8 +49,8 @@ webcam = cv2.VideoCapture(0)
 cv2.namedWindow('webcamWindow')
 
 # set res. for webcamWindow
-videoResX = 1200
-videoResY = 600
+videoResX = 1600
+videoResY = 800
 
 # define the grid size
 gridX = 6
@@ -71,9 +71,7 @@ colors = MODULES.colDict
 # equal divide of canvas
 step = int(videoResX/gridSize)
 
-
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
-
 
 # run the video loop forever
 while(True):
@@ -87,12 +85,16 @@ while(True):
     counter = 0
     # read video frames
     _, thisFrame = webcam.read()
+
+    # BW conversion
+    # thisFrame = cv2.cvtColor(thisFrame, cv2.COLOR_BGR2GRAY)
+
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
         thisFrame, keyStoneData, (videoResX, videoResY))
 
     # if needed, implement max_rgb_filter
-    # dst = MODULES.max_rgb_filter(dst)
+    # distortVid = MODULES.max_rgb_filter(distortVid)
 
     ########
     for loc in scanLocArr:
@@ -117,14 +119,14 @@ while(True):
         thisColor = colors[scannerCol]
 
         # draw rects with frame colored by range result
-        cv2.rectangle(distortVid, (x-1, y-1),
-                      (x+cropSize + 1, y+cropSize + 1),
+        cv2.rectangle(distortVid, (x, y),
+                      (x+cropSize, y+cropSize),
                       thisColor, 1)
 
         # draw the mean color itself
-        cv2.rectangle(distortVid, (x, y),
-                      (x+cropSize, y+cropSize),
-                      meanCol, -1)
+        # cv2.rectangle(distortVid, (x, y),
+        #               (x+cropSize, y+cropSize),
+        #               meanCol, -1)
 
         # add colors to array for type analysis
         colorArr[counter] = scannerCol

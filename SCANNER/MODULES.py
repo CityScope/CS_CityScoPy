@@ -6,16 +6,15 @@ import socket
 
 ##################################################
 
-colRangeDict = {0: [np.array([0, 70, 50], np.uint8),  # red down
-                    np.array([10, 255, 255], np.uint8)],  # red up
-                1: [np.array([0, 0, 0], np.uint8),  # black d
-                    np.array([0, 0, 50], np.uint8)],  # black u
-                2: [np.array([0, 0, 50], np.uint8),  # white d
-                    np.array([0, 0, 100], np.uint8)]}  # wihte u
+colRangeDict = {
+    0: [np.array([0, 0, 0], np.uint8),  # black d
+        np.array([0, 0, 50], np.uint8)],  # black u
+    1: [np.array([0, 0, 50], np.uint8),  # white d
+        np.array([0, 0, 100], np.uint8)]}  # wihte u
 
-colDict = {0: (0, 0, 255),  # red
-           1: (0, 0, 0),  # black
-           2: (255, 255, 255)}  # white
+colDict = {
+    0: (0, 0, 0),  # black
+    1: (255, 255, 255)}  # white
 
 ##################################################
 
@@ -24,17 +23,16 @@ def colorSelect(meanColor):
     # convert color to hsv for oclidian distance
     bgrToHsv = cv2.cvtColor(meanColor, cv2.COLOR_BGR2HSV)
     bgrToGray = cv2.cvtColor(meanColor, cv2.COLOR_BGR2GRAY)
-    # # try to find if this color is in range [0 or 255]
 
-    colRange = int(cv2.inRange(
-        bgrToHsv, colRangeDict[0][0], colRangeDict[0][1]))
-    if colRange == 255:
+    #  try to find if this color is in range [0 or 255]
+    # colRange = int(cv2.inRange(
+    #     bgrToHsv, colRangeDict[0][0], colRangeDict[0][1]))
+
+    if int(bgrToGray) < 125:
         colResult = 0
-    elif colRange != 255:
-        if int(bgrToGray) < 125:
-            colResult = 1
-        else:
-            colResult = 2
+    else:
+        colResult = 1
+
     return colResult
 
 ##################################################
@@ -114,8 +112,13 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
 
     # actual locations of scanners
     scannersLocationsArr = []
+
     # zreo the counter
     c = 0
+
+    # gap
+    gap = 10
+
     for x in range(0, videoResX - int(videoResX/14), int(videoResX/14)):
         for y in range(0, videoResX-int(videoResX/8), int(videoResY/8)):
             # check if this poistion is in hardcoded locations
@@ -126,8 +129,8 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
                     for j in range(0, 3):
 
                         # append 3x3 loctions to array for scanners
-                        scannersLocationsArr.append([x + (i*cropSize),
-                                                     y+(j*cropSize)])
+                        scannersLocationsArr.append([x-25 + i*(cropSize + gap),
+                                                     y-25 + j*(cropSize + gap)])
             # count
             c += 1
     print("Init scanner array: ", scannersLocationsArr,
