@@ -53,6 +53,7 @@ def max_rgb_filter(image):
     # merge the channels back together and return the image
     return cv2.merge([B, G, R])
 
+
 ##################################################
 
 
@@ -101,10 +102,92 @@ def findType(meanColor):
 ##################################################
 
 
-def sendToUDP(UDPpacket):
-    resultColorArray = resultColorArray.copy(order='C')
-    # send result over UDP
-    MODULES.sendOverUDP(mat_slice)
+# hardcode the locations of the scanners
+scannersHardcodeList = [
+    15, 43, 85, 113, 155, 183,
+    18, 46, 88, 116, 158, 186,
+    21, 49, 91, 119, 161, 189
+]
 
 
-##################################################
+def makeGridOrigins(videoResX, videoResY):
+
+    # actual locations of scanners
+    scannersLocationsArr = []
+    # zreo the counter
+    c = 0
+    for x in range(0, videoResX - int(videoResX/14), int(videoResX/14)):
+        for y in range(0, videoResX-int(videoResX/8), int(videoResY/8)):
+
+            #
+            # check if this poistion is in hardcoded locations
+            # array and if so get its position
+            #
+            if c in scannersHardcodeList:
+                # cv2.circle(distortVid, (x, y), 20, (255, 0, 0),
+                #            thickness=1, lineType=8, shift=0)
+
+                # # create text display on bricks
+                # cv2.putText(distortVid, str(c),
+                #             (x-2, y), cv2.FONT_HERSHEY_SIMPLEX,
+                #             0.3, (0, 0, 255))
+
+                # append this loction to array for scanners
+                scannersLocationsArr.append([x, y])
+            # count
+            c += 1
+    print('\n', scannersLocationsArr, len(scannersLocationsArr))
+    return scannersLocationsArr
+
+
+'''
+
+for x in range(0, gridX*step*3, step):
+        for y in range(0, gridY*step*3, step):
+
+            # set scanner crop box size and position
+            # at x,y + crop box size
+            crop = distortVid[y:y+cropSize, x:x+cropSize]
+
+            # draw rects with mean value of color
+            meanCol = cv2.mean(crop)
+
+            # convert colors to rgb
+            b, g, r, _ = np.uint8(meanCol)
+            mCol = np.uint8([[[b, g, r]]])
+
+            # select the right color based on sample
+            scannerCol = MODULES.colorSelect(mCol)
+            thisColor = colors[scannerCol]
+
+            # draw rects with frame colored by range result
+            cv2.rectangle(distortVid, (x-1, y-1),
+                          (x+cropSize + 1, y+cropSize + 1),
+                          thisColor, 1)
+
+            # draw the mean color itself
+            cv2.rectangle(distortVid, (x, y),
+                          (x+cropSize, y+cropSize),
+                          meanCol, -1)
+
+            # create text display on bricks
+            cv2.putText(distortVid, str(scannerCol),
+                        (x + int(cropSize/3), y+cropSize), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.3, (0, 0, 0))
+
+            # add colors to array for type analysis
+            colorArr[counter] = scannerCol
+            counter += 1
+
+    # create the output colors array
+    resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
+
+    # draw the video to screen
+    cv2.imshow("webcamWindow", distortVid)
+
+    # break video loop by pressing ESC
+    key = cv2.waitKey(10) & 0xFF
+    if key == 27:
+        break
+
+        '''
