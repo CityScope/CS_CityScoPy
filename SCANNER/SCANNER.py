@@ -103,14 +103,7 @@ while(True):
 
         # set scanner crop box size and position
         # at x,y + crop box size
-        crop = distortVid[
-            # the x axis
-            x:
-            x+cropSize,
-            # the y axis of the box
-            y:
-            y+cropSize
-        ]
+        crop = distortVid[y:y+cropSize, x:x+cropSize]
 
         # draw rects with mean value of color
         meanCol = cv2.mean(crop)
