@@ -35,9 +35,12 @@ import cv2
 webcam = cv2.VideoCapture(0)
 print('Webcam found at:', '\n', webcam)
 
-cv2.namedWindow('image')
-webcam.set(3, 800)
-webcam.set(4, 600)
+cv2.namedWindow('canvas')
+
+
+# Load an test image in grayscale
+thisTestImg = cv2.imread('../MISC/test.png', 0)
+
 
 # top left, top right, bottom left, bottom right
 pts = [(0, 0), (0, 0), (0, 0), (0, 0)]
@@ -57,15 +60,25 @@ def selectFourPoints():
     print("select 4 points, by double clicking on each of them in the order: \n\
 	top left, top right, bottom left, bottom right.")
     while(pointIndex != 4):
+
+        cv2.imshow('thisTestImg', thisTestImg)
+
         # wait for clicks
-        cv2.setMouseCallback('image', saveThisPoint)
+        # cv2.setMouseCallback('canvas', saveThisPoint)
+        cv2.setMouseCallback('thisTestImg', saveThisPoint)
+
+        # read the webcam frames
         _, frame = webcam.read()
+
         # draw mouse pos
-        cv2.circle(frame, mousePos, 10, (0, 0, 255), 1)
+        cv2.circle(thisTestImg, mousePos, 10, (0, 0, 255), 1)
+
         # draw clicked points
         for pt in pts:
-            cv2.circle(frame, pt, 10, (255, 0, 0), 1)
-        cv2.imshow('image', frame)
+            cv2.circle(thisTestImg, pt, 10, (255, 0, 0), 1)
+        # show the video
+        # cv2.imshow('canvas', frame)
+
         key = cv2.waitKey(20) & 0xFF
         if key == 27:
             return False
@@ -91,7 +104,7 @@ def saveThisPoint(event, x, y, flags, param):
 
 # checks if finished selecting the 4 corners
 if(selectFourPoints()):
-    # The four points in the image
+    # The four points in the canvas
     pts1 = np.float32([
         [pts[0][0], pts[0][1]],
         [pts[1][0], pts[1][1]],
@@ -101,7 +114,7 @@ if(selectFourPoints()):
 # perform the transformation
     M = cv2.getPerspectiveTransform(pts1, pts2)
     print("np array keystone pts", M)
-    np.savetxt("keystone.txt", M)
+    np.savetxt("KEYSTONE/keystone.txt", M)
 
 webcam.release()
 cv2.destroyAllWindows()

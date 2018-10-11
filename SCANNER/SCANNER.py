@@ -28,9 +28,7 @@
 # "https://www.linkedin.com/", "http://twitter.com/relno",
 # https://github.com/RELNO]
 
-
 # raise SystemExit(0)
-
 
 import math
 import numpy as np
@@ -38,50 +36,70 @@ import cv2
 import MODULES
 
 
-'''
-# Debug only!
-import sys
-sys.exit()
-'''
-
-
 # load the tags text file
 tagsArray = np.loadtxt('tags.txt', dtype=str)
 
-print(tagsArray)
-
 # load the keystone data from file
 keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
+
 # define the video
 webcam = cv2.VideoCapture(0)
+
 # define the video window
-# set res. for vid
 cv2.namedWindow('vid')
-videoRes = 800
+
+# Load an test image in grayscale
+thisTestImg = cv2.imread('../MISC/test.png', 0)
+r = 100.0 / thisTestImg.shape[1]
+dim = (500, int(thisTestImg.shape[0] * r))
+
+# perform the actual resizing of the image and show it
+thisTestImg = cv2.resize(thisTestImg, dim, interpolation=cv2.INTER_AREA)
+
+# set res. for vid
+videoResX = 1200
+videoResY = 1200
+
+# define the grid size
+gridX = 6
+gridY = 3
+
 # define the number of grid pixel scanners
-gridSize = 64
+gridSize = gridX*gridY
+
 # define the size for each scanner
-cropSize = int(0.25 * videoRes/gridSize)
+cropSize = int(0.25 * videoResX/gridSize)
+
 # array to collect the scanners
 colorArr = np.zeros((gridSize*gridSize), dtype=np.int64)
+print(len(colorArr))
+
+# call colors dictionary
 colors = MODULES.colDict
 
+# equal divide of canvas
+step = int(videoResX/gridSize)
 
 # run the video loop forever
 while(True):
+    # init counter for populating colors array
     counter = 0
-    _, frame = webcam.read()
-    dst = cv2.warpPerspective(
-        frame, keyStoneData, (videoRes, videoRes))
+    # read video frames
+    _, thisFrame = webcam.read()
+    # warp the video based on keystone info
+    distortVid = cv2.warpPerspective(
+        thisTestImg, keyStoneData, (videoResX, videoResY))
 
     # if needed, implement max_rgb_filter
     # dst = MODULES.max_rgb_filter(dst)
 
-    step = int(videoRes/gridSize)
-    for x in range(int(step/2), videoRes, step):
-        for y in range(int(step/2), videoRes, step):
+    ########
+
+    for x in range(0, gridX*step*3, step):
+        for y in range(0, gridY*step*3, step):
+
             # set scanner crop box size
-            crop = dst[y:y+cropSize, x:x+cropSize]
+            crop = distortVid[y:y+cropSize, x:x+cropSize]
             # draw rects with mean value of color
             meanCol = cv2.mean(crop)
             b, g, r, _ = np.uint8(meanCol)
@@ -90,36 +108,51 @@ while(True):
             thisColor = colors[scannerCol]
 
             # draw rects with frame colored by range result
-            cv2.rectangle(dst, (x-1, y-1), (x+cropSize + 1, y+cropSize + 1),
+            cv2.rectangle(distortVid, (x-1, y-1),
+                          (x+cropSize + 1, y+cropSize + 1),
                           thisColor, 1)
 
             # draw the mean color itself
-            cv2.rectangle(dst, (x, y), (x+cropSize,
-                                        y+cropSize), meanCol, -1)
+            cv2.rectangle(distortVid, (x, y),
+                          (x+cropSize, y+cropSize),
+                          meanCol, -1)
+
             # create text display on bricks
-            cv2.putText(dst, str(scannerCol),
-                        (x-2, y-2), cv2.FONT_HERSHEY_SIMPLEX,
+            cv2.putText(distortVid, str(scannerCol),
+                        (x + int(cropSize/3), y+cropSize), cv2.FONT_HERSHEY_SIMPLEX,
                         0.3, (0, 0, 0), lineType=cv2.LINE_AA)
+
             # add colors to array for type analysis
             colorArr[counter] = scannerCol
             counter += 1
 
     # print the output colors array
-    # resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
+    resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
     # print('\n', resultColorArray)
 
-    # pseudo code here:
-    # if no change to results array, do nothing
-    # else, compse the sliced submatrix of X*Y for each grid cell
-    # print('NEW____________________________NEW')
-    # cc = 0
-    # for i in range(0, gridSize, 3):
-    #     for j in range(0, gridSize, 3):
-    #         # subMatrix = np.array(resultColorArray[:, i, :, j]).flatten()
-    #         subMatrix = resultColorArray[i:(i+3), j:(j+3)]
+    '''
+    pseudo code here:
+    if no change to results array, do nothing
+    else, compse the sliced submatrix of X*Y for each grid cell
 
-    #         print('\n', cc, '\n', subMatrix)
-    #         cc += 1
+
+    import numpy as np
+        a = np.reshape(np.arange(162), (18, 9))
+        print(a)
+        b = a[0: 3, 0: 3]
+        print(b)
+
+    '''
+
+    print('########################################################3')
+    cc = 0
+    for i in range(0, gridX*3, 3):
+        for j in range(0, gridY*3, 3):
+            # subMatrix = np.array(resultColorArray[:, i, :, j]).flatten()
+            subMatrix = resultColorArray[i:(i+3), j:(j+3)].flatten()
+
+            print('\n', cc, '\n', subMatrix)
+            cc += 1
     # resultColorArray = resultColorArray.copy(order='C')
 
     # send result over UDP
@@ -127,7 +160,7 @@ while(True):
     # MODULES.sendOverUDP(mat_slice)
 
     # draw the video to screen
-    cv2.imshow("vid", dst)
+    cv2.imshow("vid", distortVid)
 
     # break video loop by pressing ESC
     key = cv2.waitKey(10) & 0xFF
