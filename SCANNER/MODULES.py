@@ -110,7 +110,7 @@ scannersHardcodeList = [
 ]
 
 
-def makeGridOrigins(videoResX, videoResY):
+def makeGridOrigins(videoResX, videoResY, cropSize):
 
     # actual locations of scanners
     scannersLocationsArr = []
@@ -118,22 +118,16 @@ def makeGridOrigins(videoResX, videoResY):
     c = 0
     for x in range(0, videoResX - int(videoResX/14), int(videoResX/14)):
         for y in range(0, videoResX-int(videoResX/8), int(videoResY/8)):
-
-            #
             # check if this poistion is in hardcoded locations
             # array and if so get its position
             #
             if c in scannersHardcodeList:
-                # cv2.circle(distortVid, (x, y), 20, (255, 0, 0),
-                #            thickness=1, lineType=8, shift=0)
+                for i in range(0, 3):
+                    for j in range(0, 3):
 
-                # # create text display on bricks
-                # cv2.putText(distortVid, str(c),
-                #             (x-2, y), cv2.FONT_HERSHEY_SIMPLEX,
-                #             0.3, (0, 0, 255))
-
-                # append this loction to array for scanners
-                scannersLocationsArr.append([x, y])
+                        # append 3x3 loctions to array for scanners
+                        scannersLocationsArr.append([x + (i*cropSize),
+                                                     y+(j*cropSize)])
             # count
             c += 1
     print("Init scanner array: ", scannersLocationsArr,
@@ -191,4 +185,16 @@ for x in range(0, gridX*step*3, step):
     if key == 27:
         break
 
+
+
+
+
+
+  # cv2.circle(distortVid, (x, y), 20, (255, 0, 0),
+                        #            thickness=1, lineType=8, shift=0)
+
+                        # # create text display on bricks
+                        # cv2.putText(distortVid, str(c),
+                        #             (x-2, y), cv2.FONT_HERSHEY_SIMPLEX,
+                        #             0.3, (0, 0, 255))
         '''

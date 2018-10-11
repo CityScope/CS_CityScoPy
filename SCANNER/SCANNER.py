@@ -60,7 +60,7 @@ gridY = 3
 gridSize = gridX*gridY
 
 # define the size for each scanner
-cropSize = int(0.1 * videoResX/gridSize)
+cropSize = 10
 
 # array to collect the scanners
 colorArr = np.zeros((gridSize*gridSize), dtype=np.int64)
@@ -72,7 +72,7 @@ colors = MODULES.colDict
 step = int(videoResX/gridSize)
 
 
-scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY)
+scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
 
 # run the video loop forever
@@ -104,10 +104,12 @@ while(True):
         # set scanner crop box size and position
         # at x,y + crop box size
         crop = distortVid[
-            # the y axis of the box
-            y: y+cropSize,
             # the x axis
-            x: x+cropSize
+            x:
+            x+cropSize,
+            # the y axis of the box
+            y:
+            y+cropSize
         ]
 
         # draw rects with mean value of color
