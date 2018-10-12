@@ -44,14 +44,14 @@ pts = [(0, 0), (0, 0), (0, 0), (0, 0)]
 pointIndex = 0
 mousePos = (0, 0)
 
-''' 
+'''
 NOTE: Aspect ratio is fliped than in scanner
 so that ASPECT_RATIO[0,1] will be ASPECT_RATIO[1,0]
 in SCANNER tool
 '''
 
 ASPECT_RATIO = (800, 1600)
-pts2 = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
+srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
     ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
 
@@ -104,16 +104,22 @@ def saveThisPoint(event, x, y, flags, param):
 # checks if finished selecting the 4 corners
 if(selectFourPoints()):
     # The four points in the canvas
-    pts1 = np.float32([
+    userPnts = np.float32([
         [pts[0][0], pts[0][1]],
         [pts[1][0], pts[1][1]],
         [pts[2][0], pts[2][1]],
         [pts[3][0], pts[3][1]]])
 
 # perform the transformation
-    M = cv2.getPerspectiveTransform(pts1, pts2)
+    M = cv2.getPerspectiveTransform(userPnts, srcPnts)
+    print(M, type(M), pts, type(pts))
     filePath = "../KEYSTONE/keystone.txt"
-    np.savetxt(filePath, M)
+    f = open(filePath, 'w')
+    np.savetxt(f, M)
+    np.savetxt(f, pts)
+
+    f.close()
+
     print("np array keystone pts was saved in ", filePath)
 
 webcam.release()

@@ -35,10 +35,21 @@ import numpy as np
 import cv2
 import MODULES
 
+import json
+
 
 # load the tags text file
-tagsArray = np.loadtxt('tags.txt', dtype=list)
-print(tagsArray)
+# tagsArray = np.loadtxt('tags.txt', dtype=str)
+
+tagsArray = []
+with open('tags.json') as json_data:
+    jd = json.load(json_data)
+
+    for i in jd['tags']:
+        npTag = np.array([int(ch) for ch in i])
+        tagsArray.append(npTag)
+
+# raise SystemExit(0)
 
 # load the keystone data from file
 keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
@@ -88,6 +99,13 @@ while(True):
 
     # read video frames
     _, thisFrame = webcam.read()
+
+    # show the whole camera
+    cv2.imshow('test', thisFrame)
+
+    '''
+    NOTE: have fine grain keystone method here
+    '''
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
@@ -142,7 +160,7 @@ while(True):
     # send array to check types
     t = MODULES.findType(resultColorArray, tagsArray)
 
-    print('\n', t)
+    # print('\n', t)
 
     # draw the video to screen
     cv2.imshow("webcamWindow", distortVid)

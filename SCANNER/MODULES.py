@@ -64,23 +64,28 @@ import numpy as np
 
 def findType(resultColorArray, tagsArray):
     typesArray = []
+    c = 0
     for i in resultColorArray:
-
-        if i in tagsArray:
-            typesArray.append(tagsArray.index(i))
-        else:
-            typesArray.append(-1)
-    return typesArray
+        ifInTags = [(i == t).all() for t in tagsArray]
+        print(c, ifInTags)
+        c += 1
+        # print([i for i, x in enumerate(ifInTags) if x])
+    #     if i in tagsArray:
+    #         typesArray.append(tagsArray.index(i))
+    #     else:
+    #         typesArray.append(-1)
+    # return typesArray
 
 
 ##################################################
-
 
 # hardcode the locations of the scanners
 scannersHardcodeList = [
     15, 43, 85, 113, 155, 183,
     18, 46, 88, 116, 158, 186,
     21, 49, 91, 119, 161, 189
+
+
 ]
 
 
