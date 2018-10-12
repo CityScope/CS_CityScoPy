@@ -63,7 +63,7 @@ gridSize = gridX*gridY
 cropSize = 10
 
 # array to collect the scanners
-colorArr = np.zeros((gridSize*gridSize), dtype=np.int64)
+colorArr = np.zeros((3 * gridX * 3 * gridY), dtype=np.int64)
 
 # call colors dictionary
 colors = MODULES.colDict
@@ -75,7 +75,6 @@ scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
 # run the video loop forever
 while(True):
-
     # break video loop by pressing ESC
     key = cv2.waitKey(10) & 0xFF
     if key == 27:
@@ -86,15 +85,9 @@ while(True):
     # read video frames
     _, thisFrame = webcam.read()
 
-    # BW conversion
-    # thisFrame = cv2.cvtColor(thisFrame, cv2.COLOR_BGR2GRAY)
-
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
         thisFrame, keyStoneData, (videoResX, videoResY))
-
-    # if needed, implement max_rgb_filter
-    # distortVid = MODULES.max_rgb_filter(distortVid)
 
     ########
     for loc in scanLocArr:
@@ -116,6 +109,8 @@ while(True):
 
         # select the right color based on sample
         scannerCol = MODULES.colorSelect(mCol)
+
+        # get color from dict
         thisColor = colors[scannerCol]
 
         # draw rects with frame colored by range result
@@ -128,13 +123,17 @@ while(True):
         #               (x+cropSize, y+cropSize),
         #               meanCol, -1)
 
+        cv2.putText(distortVid, str(counter),
+                    (x, y), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.3, (0, 0, 0))
+
         # add colors to array for type analysis
         colorArr[counter] = scannerCol
         counter += 1
 
     # create the output colors array
-    # resultColorArray = colorArr.reshape(gridX, gridY).transpose()
-
+    resultColorArray = colorArr.reshape(gridY*3, gridX * 3).transpose()
+    print(colorArr)
     # draw the video to screen
     cv2.imshow("webcamWindow", distortVid)
 

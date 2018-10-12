@@ -21,36 +21,12 @@ colDict = {
 
 def colorSelect(meanColor):
     # convert color to hsv for oclidian distance
-    bgrToHsv = cv2.cvtColor(meanColor, cv2.COLOR_BGR2HSV)
     bgrToGray = cv2.cvtColor(meanColor, cv2.COLOR_BGR2GRAY)
-
-    #  try to find if this color is in range [0 or 255]
-    # colRange = int(cv2.inRange(
-    #     bgrToHsv, colRangeDict[0][0], colRangeDict[0][1]))
-
     if int(bgrToGray) < 125:
         colResult = 0
     else:
         colResult = 1
-
     return colResult
-
-##################################################
-
-
-def max_rgb_filter(image):
-    # split the image into its BGR components
-    (B, G, R) = cv2.split(image)
-    # find the maximum pixel intensity values for each
-    # (x, y)-coordinate,, then set all pixel values less
-    # than M to zero
-    M = np.maximum(np.maximum(R, G), B)
-    R[R < M] = 0
-    G[G < M] = 0
-    B[B < M] = 0
-    # merge the channels back together and return the image
-    return cv2.merge([B, G, R])
-
 
 ##################################################
 
@@ -139,7 +115,6 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
 
 
 '''
-
 for x in range(0, gridX*step*3, step):
         for y in range(0, gridY*step*3, step):
 
