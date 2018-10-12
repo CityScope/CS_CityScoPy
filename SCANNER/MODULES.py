@@ -62,16 +62,16 @@ import numpy as np
 ##################################################
 
 
-def findType(meanColor):
-    print('########################################################')
-    cc = 0
-    for i in range(0, gridX*3, 3):
-        for j in range(0, gridY*3, 3):
-            # make submatrix of 3x3
-            subMatrix = resultColorArray[i:(i+3), j:(j+3)].flatten()
-            # print it
-            print('\n', cc, '\n', subMatrix)
-            cc += 1
+def findType(resultColorArray, tagsArray):
+    typesArray = []
+    for i in resultColorArray:
+        print(i, type(i), type(tagsArray[0]))
+        if i in tagsArray:
+            typesArray.append(tagsArray.index(i))
+        else:
+            typesArray.append(-1)
+    return typesArray
+
 
 ##################################################
 
@@ -109,70 +109,6 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
                                                      y-25 + j*(cropSize + gap)])
             # count
             c += 1
-    print("Init scanner array: ", scannersLocationsArr,
-          '\n', len(scannersLocationsArr))
+    # print("Init scanner array: ", scannersLocationsArr,
+    #       '\n', len(scannersLocationsArr))
     return scannersLocationsArr
-
-
-'''
-for x in range(0, gridX*step*3, step):
-        for y in range(0, gridY*step*3, step):
-
-            # set scanner crop box size and position
-            # at x,y + crop box size
-            crop = distortVid[y:y+cropSize, x:x+cropSize]
-
-            # draw rects with mean value of color
-            meanCol = cv2.mean(crop)
-
-            # convert colors to rgb
-            b, g, r, _ = np.uint8(meanCol)
-            mCol = np.uint8([[[b, g, r]]])
-
-            # select the right color based on sample
-            scannerCol = MODULES.colorSelect(mCol)
-            thisColor = colors[scannerCol]
-
-            # draw rects with frame colored by range result
-            cv2.rectangle(distortVid, (x-1, y-1),
-                          (x+cropSize + 1, y+cropSize + 1),
-                          thisColor, 1)
-
-            # draw the mean color itself
-            cv2.rectangle(distortVid, (x, y),
-                          (x+cropSize, y+cropSize),
-                          meanCol, -1)
-
-            # create text display on bricks
-            cv2.putText(distortVid, str(scannerCol),
-                        (x + int(cropSize/3), y+cropSize), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.3, (0, 0, 0))
-
-            # add colors to array for type analysis
-            colorArr[counter] = scannerCol
-            counter += 1
-
-    # create the output colors array
-    resultColorArray = colorArr.reshape(gridSize, gridSize).transpose()
-
-    # draw the video to screen
-    cv2.imshow("webcamWindow", distortVid)
-
-    # break video loop by pressing ESC
-    key = cv2.waitKey(10) & 0xFF
-    if key == 27:
-        break
-
-
-
-
-
-
-  # cv2.circle(distortVid, (x, y), 20, (255, 0, 0),
-                        #            thickness=1, lineType=8, shift=0)
-
-                        # # create text display on bricks
-                        # cv2.putText(distortVid, str(c),
-                        #             (x-2, y), cv2.FONT_HERSHEY_SIMPLEX,
-                        #             0.3, (0, 0, 255))
-        '''

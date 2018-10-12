@@ -38,6 +38,7 @@ import MODULES
 
 # load the tags text file
 tagsArray = np.loadtxt('tags.txt', dtype=str)
+print(tagsArray)
 
 # load the keystone data from file
 keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
@@ -48,6 +49,7 @@ webcam = cv2.VideoCapture(0)
 # define the video window
 cv2.namedWindow('webcamWindow')
 
+# NOTE: must fit KEYSTONE resolution
 # set res. for webcamWindow
 videoResX = 1600
 videoResY = 800
@@ -62,9 +64,6 @@ gridSize = gridX*gridY
 # define the size for each scanner
 cropSize = 10
 
-# array to collect the scanners
-colorArr = np.zeros((3 * gridX * 3 * gridY), dtype=np.int64)
-
 # call colors dictionary
 colors = MODULES.colDict
 
@@ -75,13 +74,18 @@ scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
 # run the video loop forever
 while(True):
+
+    # zero an array to collect the scanners
+    colorArr = []
+
+    # init counter
+    counter = 0
+
     # break video loop by pressing ESC
     key = cv2.waitKey(10) & 0xFF
     if key == 27:
         break
 
-    # init counter for populating colors array
-    counter = 0
     # read video frames
     _, thisFrame = webcam.read()
 
@@ -89,7 +93,7 @@ while(True):
     distortVid = cv2.warpPerspective(
         thisFrame, keyStoneData, (videoResX, videoResY))
 
-    ########
+    # run through locations list and make scanners
     for loc in scanLocArr:
 
         # set x and y from locations array
@@ -113,27 +117,33 @@ while(True):
         # get color from dict
         thisColor = colors[scannerCol]
 
+        # add colors to array for type analysis
+        colorArr.append(scannerCol)
+
         # draw rects with frame colored by range result
         cv2.rectangle(distortVid, (x, y),
                       (x+cropSize, y+cropSize),
-                      thisColor, 1)
+                      thisColor, 2)
 
         # draw the mean color itself
         # cv2.rectangle(distortVid, (x, y),
         #               (x+cropSize, y+cropSize),
         #               meanCol, -1)
 
-        cv2.putText(distortVid, str(counter),
+        cv2.putText(distortVid, str(counter) + '_' + str(scannerCol),
                     (x, y), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.3, (0, 0, 0))
+                    0.2, (0, 0, 0))
 
-        # add colors to array for type analysis
-        colorArr[counter] = scannerCol
         counter += 1
 
     # create the output colors array
-    resultColorArray = colorArr.reshape(gridY*3, gridX * 3).transpose()
-    print(colorArr)
+    resultColorArray = np.reshape(colorArr, (18, 9))
+
+    # send array to check types
+    t = MODULES.findType(resultColorArray, tagsArray)
+
+    print('\n', t)
+
     # draw the video to screen
     cv2.imshow("webcamWindow", distortVid)
 
@@ -142,5 +152,6 @@ while(True):
     if key == 27:
         break
 
+# break the loop
 webcam.release()
 cv2.destroyAllWindows()
