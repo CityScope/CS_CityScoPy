@@ -65,7 +65,7 @@ import numpy as np
 def findType(resultColorArray, tagsArray):
     typesArray = []
     for i in resultColorArray:
-        print(i, type(i), type(tagsArray[0]))
+
         if i in tagsArray:
             typesArray.append(tagsArray.index(i))
         else:

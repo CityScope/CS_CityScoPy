@@ -37,7 +37,7 @@ import MODULES
 
 
 # load the tags text file
-tagsArray = np.loadtxt('tags.txt', dtype=str)
+tagsArray = np.loadtxt('tags.txt', dtype=list)
 print(tagsArray)
 
 # load the keystone data from file
@@ -123,7 +123,7 @@ while(True):
         # draw rects with frame colored by range result
         cv2.rectangle(distortVid, (x, y),
                       (x+cropSize, y+cropSize),
-                      thisColor, 2)
+                      thisColor, 1)
 
         # draw the mean color itself
         # cv2.rectangle(distortVid, (x, y),
