@@ -18,7 +18,7 @@
 # ////////////////////////////////////////////////////////////////////////////////////
 
 # CityScopePy KEYSTONE
-# Exports a selection of a transformed matrix from a webcam video using GUI
+# Exports a selection of keystone points using webcam GUI
 
 # "@context": "https://github.com/CityScope/", "@type": "Person", "address": {
 # "@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
@@ -34,35 +34,31 @@ import cv2
 
 # make webcam
 webcam = cv2.VideoCapture(0)
-print('Webcam found at:', '\n', webcam)
 # video winodw
 cv2.namedWindow('canvas')
 
 
 # top left, top right, bottom left, bottom right
-pts = [(0, 0), (0, 0), (0, 0), (0, 0)]
+points = [(0, 0), (0, 0), (0, 0), (0, 0)]
 pointIndex = 0
 mousePos = (0, 0)
 
-'''
-NOTE: Aspect ratio is fliped than in scanner
-so that ASPECT_RATIO[0,1] will be ASPECT_RATIO[1,0]
-in SCANNER tool
-'''
-
-ASPECT_RATIO = (800, 1600)
-
-srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
-    ASPECT_RATIO[1], ASPECT_RATIO[0]]])
-
 
 def selectFourPoints():
+    # let users select 4 points on webcam GUI
+
     global frame
     global pointIndex
 
     print("select 4 points, by double clicking on each of them in the order: \n\
 	top left, top right, bottom left, bottom right.")
+
+    # loop until 4 clicks
     while(pointIndex != 4):
+
+        key = cv2.waitKey(20) & 0xFF
+        if key == 27:
+            return False
 
         # wait for clicks
         cv2.setMouseCallback('canvas', saveThisPoint)
@@ -72,24 +68,24 @@ def selectFourPoints():
 
         # draw mouse pos
         cv2.circle(frame, mousePos, 10, (0, 0, 255), 1)
+        cv2.circle(frame, mousePos, 1, (0, 0, 255), 2)
 
         # draw clicked points
-        for pt in pts:
-            cv2.circle(frame, pt, 10, (255, 0, 0), 1)
+        for thisPnt in points:
+            cv2.circle(frame, thisPnt, 10, (255, 0, 0), 1)
         # show the video
         cv2.imshow('canvas', frame)
 
-        key = cv2.waitKey(20) & 0xFF
-        if key == 27:
-            return False
     return True
 
 
 def saveThisPoint(event, x, y, flags, param):
+    # saves this point to array
+
     # mouse callback function
     global frame
     global pointIndex
-    global pts
+    global points
     global mousePos
 
     if event == cv2.EVENT_MOUSEMOVE:
@@ -98,28 +94,18 @@ def saveThisPoint(event, x, y, flags, param):
         # draw a ref. circle
         print('point  # ', pointIndex, (x, y))
         # save this point to the array pts
-        pts[pointIndex] = (x, y)
+        points[pointIndex] = (x, y)
         pointIndex = pointIndex + 1
 
 
 # checks if finished selecting the 4 corners
 if(selectFourPoints()):
-    # The four points in the canvas
-    userPnts = np.float32([
-        [pts[0][0], pts[0][1]],
-        [pts[1][0], pts[1][1]],
-        [pts[2][0], pts[2][1]],
-        [pts[3][0], pts[3][1]]])
 
-# perform the transformation
-    M = cv2.getPerspectiveTransform(userPnts, srcPnts)
-
-    filePath = "../KEYSTONE/keystone.txt"
+    filePath = "DATA/keystone.txt"
     f = open(filePath, 'w')
-    np.savetxt(f, M)
-    # np.savetxt(f, pts)
+    np.savetxt(f, points)
     f.close()
-    print("np array keystone pts was saved in ", filePath)
+    print("keystone initial points were saved in ", filePath)
 
 webcam.release()
 cv2.destroyAllWindows()
