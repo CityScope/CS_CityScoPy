@@ -91,6 +91,9 @@ step = int(videoResX/gridSize)
 # create the location  array of scanners
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
+# get inital keyStoneData before interaction and keystone
+keyStoneData = MODULES.fineGrainKeystone(pts, False)
+
 # run the video loop forever
 while(True):
 
@@ -108,13 +111,12 @@ while(True):
     # read video frames
     _, thisFrame = webcam.read()
 
-    v = 0
-
+    '''
+    NOTE:WIP
+    '''
     if key in (49, 50, 51, 52):
-        v = MODULES.addToVal(pts.index(key))
-        print(v)
-
-    keyStoneData = MODULES.fineGrainKeystone(pts, v)
+        keyStoneData = MODULES.fineGrainKeystone(
+            pts, MODULES.addToVal(pts.index(key)))
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(

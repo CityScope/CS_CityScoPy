@@ -134,11 +134,11 @@ Delete : 3014656
 '''
 
 
-def fineGrainKeystone(pts, v):
+def fineGrainKeystone(pts, value):
 
     # pts[0][1]
     npPnts = np.float32([
-        [v, pts[0][1]],
+        [pts[0][1], pts[0][1]],
         [pts[1][0], pts[1][1]],
         [pts[2][0], pts[2][1]],
         [pts[3][0], pts[3][1]]])
