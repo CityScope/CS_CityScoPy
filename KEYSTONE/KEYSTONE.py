@@ -51,6 +51,7 @@ in SCANNER tool
 '''
 
 ASPECT_RATIO = (800, 1600)
+
 srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
     ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
@@ -112,14 +113,12 @@ if(selectFourPoints()):
 
 # perform the transformation
     M = cv2.getPerspectiveTransform(userPnts, srcPnts)
-    print(M, type(M), pts, type(pts))
+
     filePath = "../KEYSTONE/keystone.txt"
     f = open(filePath, 'w')
     np.savetxt(f, M)
-    np.savetxt(f, pts)
-
+    # np.savetxt(f, pts)
     f.close()
-
     print("np array keystone pts was saved in ", filePath)
 
 webcam.release()

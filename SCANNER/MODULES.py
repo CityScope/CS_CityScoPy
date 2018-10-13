@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 import cv2
 import socket
+import random
 
 ##################################################
 
@@ -67,7 +68,7 @@ def findType(resultColorArray, tagsArray):
     c = 0
     for i in resultColorArray:
         ifInTags = [(i == t).all() for t in tagsArray]
-        print(c, ifInTags)
+        # print(c, ifInTags)
         c += 1
         # print([i for i, x in enumerate(ifInTags) if x])
     #     if i in tagsArray:
@@ -84,8 +85,6 @@ scannersHardcodeList = [
     15, 43, 85, 113, 155, 183,
     18, 46, 88, 116, 158, 186,
     21, 49, 91, 119, 161, 189
-
-
 ]
 
 
@@ -117,3 +116,37 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
     # print("Init scanner array: ", scannersLocationsArr,
     #       '\n', len(scannersLocationsArr))
     return scannersLocationsArr
+
+
+##################################################
+
+
+ASPECT_RATIO = (800, 1600)
+srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
+    ASPECT_RATIO[1], ASPECT_RATIO[0]]])
+
+
+'''
+Upkey : 2490368
+DownKey : 2621440
+LeftKey : 2424832
+RightKey: 2555904
+Space : 32
+Delete : 3014656
+'''
+
+
+def fineGrainKeystone(pts):
+
+    x = random.randint(700, 800)
+    # pts[0][1]
+    npPnts = np.float32([
+        [x, pts[0][1]],
+        [pts[1][0], pts[1][1]],
+        [pts[2][0], pts[2][1]],
+        [pts[3][0], pts[3][1]]])
+
+    print(npPnts)
+
+    M = cv2.getPerspectiveTransform(npPnts, srcPnts)
+    return M

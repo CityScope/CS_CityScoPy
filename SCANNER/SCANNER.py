@@ -49,10 +49,25 @@ with open('tags.json') as json_data:
         npTag = np.array([int(ch) for ch in i])
         tagsArray.append(npTag)
 
+
 # raise SystemExit(0)
 
 # load the keystone data from file
-keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
+# keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
+
+pts = [
+    # 0
+    (800, 130),
+    # 1
+    (1000, 130),
+    # 2
+    (800, 250),
+    # 3
+    (1000, 250)
+]
+
+x = 0
+
 
 # define the video
 webcam = cv2.VideoCapture(0)
@@ -83,6 +98,7 @@ step = int(videoResX/gridSize)
 
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
+
 # run the video loop forever
 while(True):
 
@@ -92,20 +108,23 @@ while(True):
     # init counter
     counter = 0
 
-    # break video loop by pressing ESC
-    key = cv2.waitKey(10) & 0xFF
-    if key == 27:
-        break
-
     # read video frames
     _, thisFrame = webcam.read()
+
+    '''
 
     # show the whole camera
     cv2.imshow('test', thisFrame)
 
-    '''
     NOTE: have fine grain keystone method here
     '''
+
+    # break video loop by pressing ESC
+    key = cv2.waitKey(5) & 0xFF
+    if key == 27:
+        break
+
+    keyStoneData = MODULES.fineGrainKeystone(pts)
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
@@ -159,16 +178,11 @@ while(True):
 
     # send array to check types
     t = MODULES.findType(resultColorArray, tagsArray)
-
     # print('\n', t)
 
     # draw the video to screen
     cv2.imshow("webcamWindow", distortVid)
 
-    # break video loop by pressing ESC
-    key = cv2.waitKey(10) & 0xFF
-    if key == 27:
-        break
 
 # break the loop
 webcam.release()
