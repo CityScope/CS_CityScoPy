@@ -3,7 +3,6 @@ import numpy as np
 import argparse
 import cv2
 import socket
-import random
 
 ##################################################
 
@@ -125,7 +124,6 @@ ASPECT_RATIO = (800, 1600)
 srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
     ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
-
 '''
 Upkey : 2490368
 DownKey : 2621440
@@ -136,17 +134,19 @@ Delete : 3014656
 '''
 
 
-def fineGrainKeystone(pts):
+def fineGrainKeystone(pts, v):
 
-    x = random.randint(700, 800)
     # pts[0][1]
     npPnts = np.float32([
-        [x, pts[0][1]],
+        [v, pts[0][1]],
         [pts[1][0], pts[1][1]],
         [pts[2][0], pts[2][1]],
         [pts[3][0], pts[3][1]]])
 
-    print(npPnts)
-
     M = cv2.getPerspectiveTransform(npPnts, srcPnts)
     return M
+
+
+def addToVal(x):
+    x = x + 1
+    return x

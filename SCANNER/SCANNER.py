@@ -28,19 +28,16 @@
 # "https://www.linkedin.com/", "http://twitter.com/relno",
 # https://github.com/RELNO]
 
+
 # raise SystemExit(0)
 
+import cv2
+import json
 import math
 import numpy as np
-import cv2
 import MODULES
 
-import json
-
-
 # load the tags text file
-# tagsArray = np.loadtxt('tags.txt', dtype=str)
-
 tagsArray = []
 with open('tags.json') as json_data:
     jd = json.load(json_data)
@@ -50,11 +47,8 @@ with open('tags.json') as json_data:
         tagsArray.append(npTag)
 
 
-# raise SystemExit(0)
-
 # load the keystone data from file
 # keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
-
 pts = [
     # 0
     (800, 130),
@@ -65,8 +59,6 @@ pts = [
     # 3
     (1000, 250)
 ]
-
-x = 0
 
 
 # define the video
@@ -96,11 +88,16 @@ colors = MODULES.colDict
 # equal divide of canvas
 step = int(videoResX/gridSize)
 
+# create the location  array of scanners
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
-
 
 # run the video loop forever
 while(True):
+
+    # break video loop by pressing ESC
+    key = cv2.waitKey(5) & 0xFF
+    if key == 27:
+        break
 
     # zero an array to collect the scanners
     colorArr = []
@@ -111,20 +108,13 @@ while(True):
     # read video frames
     _, thisFrame = webcam.read()
 
-    '''
+    v = 0
 
-    # show the whole camera
-    cv2.imshow('test', thisFrame)
+    if key in (49, 50, 51, 52):
+        v = MODULES.addToVal(pts.index(key))
+        print(v)
 
-    NOTE: have fine grain keystone method here
-    '''
-
-    # break video loop by pressing ESC
-    key = cv2.waitKey(5) & 0xFF
-    if key == 27:
-        break
-
-    keyStoneData = MODULES.fineGrainKeystone(pts)
+    keyStoneData = MODULES.fineGrainKeystone(pts, v)
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
