@@ -37,9 +37,12 @@ import math
 import numpy as np
 import MODULES
 
+
+##################################################
+
 # load the tags text file
 tagsArray = []
-with open('tags.json') as json_data:
+with open('DATA/tags.json') as json_data:
     jd = json.load(json_data)
 
     for i in jd['tags']:
@@ -48,18 +51,7 @@ with open('tags.json') as json_data:
 
 
 # load the keystone data from file
-# keyStoneData = np.loadtxt('../KEYSTONE/keystone.txt')
-pts = [
-    # 0
-    (800, 130),
-    # 1
-    (1000, 130),
-    # 2
-    (800, 250),
-    # 3
-    (1000, 250)
-]
-
+keyStoneData = np.loadtxt('DATA/keystone.txt')
 
 # define the video
 webcam = cv2.VideoCapture(0)
@@ -92,13 +84,19 @@ step = int(videoResX/gridSize)
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
 # get inital keyStoneData before interaction and keystone
-keyStoneData = MODULES.fineGrainKeystone(pts, False)
+keyStoneData = MODULES.fineGrainKeystone(keyStoneData, False)
+
+
+##################################################
+###################MAIN LOOP######################
+##################################################
+
 
 # run the video loop forever
 while(True):
 
     # break video loop by pressing ESC
-    key = cv2.waitKey(5) & 0xFF
+    key = cv2.waitKey(2) & 0xFF
     if key == 27:
         break
 
@@ -116,7 +114,7 @@ while(True):
     '''
     if key in (49, 50, 51, 52):
         keyStoneData = MODULES.fineGrainKeystone(
-            pts, MODULES.addToVal(pts.index(key)))
+            keyStoneData, key)
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
@@ -154,14 +152,10 @@ while(True):
                       (x+cropSize, y+cropSize),
                       thisColor, 1)
 
-        # draw the mean color itself
-        # cv2.rectangle(distortVid, (x, y),
-        #               (x+cropSize, y+cropSize),
-        #               meanCol, -1)
-
-        cv2.putText(distortVid, str(counter) + '_' + str(scannerCol),
-                    (x, y), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.2, (0, 0, 0))
+        # add type and pos text
+        cv2.putText(distortVid, str(counter),
+                    (x-1, y-2), cv2.FONT_HERSHEY_PLAIN,
+                    0.6, (0, 0, 0))
 
         counter += 1
 

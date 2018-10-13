@@ -141,9 +141,8 @@ srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
 
 def fineGrainKeystone(pts, value):
 
-    # pts[0][1]
     npPnts = np.float32([
-        [pts[0][1], pts[0][1]],
+        [pts[0][0], pts[0][1]],
         [pts[1][0], pts[1][1]],
         [pts[2][0], pts[2][1]],
         [pts[3][0], pts[3][1]]])
