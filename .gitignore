@@ -16,3 +16,5 @@ yarn-error.log*
 /src/_BIN
 .pyc
 cpython-36.pyc
+/.__pycache__
+__pycache__/MODULES.cpython-36.pyc

@@ -33,7 +33,6 @@
 
 import cv2
 import json
-import math
 import numpy as np
 import MODULES
 
@@ -84,7 +83,8 @@ step = int(videoResX/gridSize)
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
 # get inital keyStoneData before interaction and keystone
-keyStoneData = MODULES.fineGrainKeystone(keyStoneData, False)
+keyStoneData = MODULES.fineGrainKeystone(
+    videoResX, videoResY, keyStoneData, False)
 
 
 ##################################################
@@ -100,6 +100,13 @@ while(True):
     if key == 27:
         break
 
+    '''
+    NOTE:WIP dynamic keystone on runtime 
+    '''
+    if key in (49, 50, 51, 52):
+        keyStoneData = MODULES.fineGrainKeystone(
+            videoResX, videoResY, keyStoneData, key)
+
     # zero an array to collect the scanners
     colorArr = []
 
@@ -108,13 +115,6 @@ while(True):
 
     # read video frames
     _, thisFrame = webcam.read()
-
-    '''
-    NOTE:WIP
-    '''
-    if key in (49, 50, 51, 52):
-        keyStoneData = MODULES.fineGrainKeystone(
-            keyStoneData, key)
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
@@ -159,12 +159,9 @@ while(True):
 
         counter += 1
 
-    # create the output colors array
-    resultColorArray = np.reshape(colorArr, (18, 9))
-
     # send array to check types
-    t = MODULES.findType(resultColorArray, tagsArray)
-    # print('\n', t)
+    t = MODULES.findType(colorArr, tagsArray)
+    print('\n', t)
 
     # draw the video to screen
     cv2.imshow("webcamWindow", distortVid)

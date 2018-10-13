@@ -1,6 +1,5 @@
 # imports packages
 import numpy as np
-import argparse
 import cv2
 import socket
 
@@ -62,19 +61,19 @@ import numpy as np
 ##################################################
 
 
-def findType(resultColorArray, tagsArray):
+def findType(colorArr, tagsArray):
     typesArray = []
-    c = 0
-    for i in resultColorArray:
-        ifInTags = [(i == t).all() for t in tagsArray]
-        # print(c, ifInTags)
-        c += 1
-        # print([i for i, x in enumerate(ifInTags) if x])
-    #     if i in tagsArray:
-    #         typesArray.append(tagsArray.index(i))
-    #     else:
-    #         typesArray.append(-1)
-    # return typesArray
+    # create np output colors array
+    # and reshape to fit the table struct
+    resultColorArray = np.reshape(colorArr, (18, 9))
+
+    for thisResult in resultColorArray:
+        whichTag = np.where([(thisResult == tag).all()
+                             for tag in tagsArray])[0].tolist()
+
+        typesArray.append(whichTag)
+
+    return typesArray
 
 
 ##################################################
@@ -133,14 +132,15 @@ Space: 32
 Delete: 3014656
 '''
 
-ASPECT_RATIO = (800, 1600)
 
-srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
-    ASPECT_RATIO[1], ASPECT_RATIO[0]]])
+def fineGrainKeystone(videoResX, videoResY, pts, value):
+    # inverted screen ratio for np source array
+    ASPECT_RATIO = (videoResY, videoResX)
+    # np source points array
+    srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
+        ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
-
-def fineGrainKeystone(pts, value):
-
+    # NP new array
     npPnts = np.float32([
         [pts[0][0], pts[0][1]],
         [pts[1][0], pts[1][1]],
