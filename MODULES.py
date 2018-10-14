@@ -102,16 +102,16 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
     scannersLocationsArr = []
 
     # sum of 'half' virtual modules in the table
-    moduleX = 14
-    moduleY = 8
-# zreo the counter
+    modX = 14
+    modY = 8
+    # zero the counter
     c = 0
-    # gap
+    # virtual gap
     gap = 10
 
-    for x in range(0, videoResX - int(videoResX/moduleX), int(videoResX/moduleX)):
-        for y in range(0, videoResX - int(videoResX/moduleY), int(videoResY/moduleY)):
-
+    for x in range(0, videoResX - int(videoResX/modX), int(videoResX/modX)):
+        for y in range(0, videoResX - int(videoResX/modY), int(videoResY/modY)):
+            print(x, y)
             # check if this poistion is in hardcoded locations
             # array and if so get its position
             if c in scannersHardcodeList:
