@@ -2,6 +2,7 @@
 import numpy as np
 import cv2
 import socket
+import json
 
 ##################################################
 
@@ -14,6 +15,26 @@ colRangeDict = {
 colDict = {
     0: (0, 0, 0),  # black
     1: (255, 255, 255)}  # white
+
+##################################################
+
+
+def JSONparse(field):
+    # init array for json fields
+    filedArray = []
+    # open json file
+    with open('DATA/tags.json') as json_data:
+        jd = json.load(json_data)
+    # return each item for this field
+    for i in jd[field]:
+        # if item length is more than 1 [tags]
+        if len(i) > 1:
+            # parse this item as np array
+            filedArray.append(np.array([int(ch) for ch in i]))
+        else:
+            # otherwise send it as is
+            filedArray.append(i)
+    return filedArray
 
 ##################################################
 
@@ -41,22 +62,6 @@ def sendOverUDP(udpPacket):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.sendto(udpPacket, (UDP_IP, UDP_PORT))
 
-
-##################################################
-
-def checkForNewGrid():
-    '''
-pseudo code here:
-if no change to results array, do nothing
-else, compse the sliced submatrix of X*Y for each grid cell
-
-import numpy as np
-    a = np.reshape(np.arange(162), (18, 9))
-    print(a)
-    b = a[0: 3, 0: 3]
-    print(b)
-
-'''
 
 ##################################################
 
@@ -95,45 +100,42 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
     # actual locations of scanners
     scannersLocationsArr = []
 
-    # zreo the counter
+    # sum of 'half' virtual modules in the table
+    moduleX = 14
+    moduleY = 8
+# zreo the counter
     c = 0
-
     # gap
     gap = 10
-
-    for x in range(0, videoResX - int(videoResX/14), int(videoResX/14)):
-        for y in range(0, videoResX-int(videoResX/8), int(videoResY/8)):
+    for x in range(0, videoResX - int(videoResX/moduleX), int(videoResX/moduleX)):
+        for y in range(0, videoResX-int(videoResX/moduleY), int(videoResY/moduleY)):
             # check if this poistion is in hardcoded locations
             # array and if so get its position
-            #
             if c in scannersHardcodeList:
                 for i in range(0, 3):
                     for j in range(0, 3):
-
                         # append 3x3 loctions to array for scanners
-                        scannersLocationsArr.append([x-25 + i*(cropSize + gap),
-                                                     y-25 + j*(cropSize + gap)])
+                        scannersLocationsArr.append([x + i*(cropSize + gap),
+                                                     y + j*(cropSize + gap)])
             # count
             c += 1
-    # print("Init scanner array: ", scannersLocationsArr,
-    #       '\n', len(scannersLocationsArr))
     return scannersLocationsArr
 
 
 ##################################################
 
 
+# Upkey: 2490368
+# DownKey: 2621440
+# LeftKey: 2424832
+# RightKey: 2555904
+# Space: 32
+# Delete: 3014656
+
 '''
 NOTE: Aspect ratio is fliped than in scanner
 so that ASPECT_RATIO[0,1] will be ASPECT_RATIO[1,0]
 in SCANNER tool
-
-Upkey: 2490368
-DownKey: 2621440
-LeftKey: 2424832
-RightKey: 2555904
-Space: 32
-Delete: 3014656
 '''
 
 
@@ -155,6 +157,18 @@ def fineGrainKeystone(videoResX, videoResY, pts, value):
     return M
 
 
-def addToVal(x):
-    x = x + 1
-    return x
+##################################################
+
+def checkForNewGrid():
+    '''
+pseudo code here:
+if no change to results array, do nothing
+else, compse the sliced submatrix of X*Y for each grid cell
+
+import numpy as np
+    a = np.reshape(np.arange(162), (18, 9))
+    print(a)
+    b = a[0: 3, 0: 3]
+    print(b)
+
+'''

@@ -32,22 +32,16 @@
 # raise SystemExit(0)
 
 import cv2
-import json
 import numpy as np
 import MODULES
 
 
 ##################################################
 
-# load the tags text file
-tagsArray = []
-with open('DATA/tags.json') as json_data:
-    jd = json.load(json_data)
-
-    for i in jd['tags']:
-        npTag = np.array([int(ch) for ch in i])
-        tagsArray.append(npTag)
-
+# load the json  file
+tagsArray = MODULES.JSONparse('tags')
+mapArray = MODULES.JSONparse('map')
+rotationArray = MODULES.JSONparse('rotation')
 
 # load the keystone data from file
 keyStoneData = np.loadtxt('DATA/keystone.txt')
@@ -110,7 +104,7 @@ while(True):
     # zero an array to collect the scanners
     cellColorsArray = []
 
-    # init counter
+    # init counter for text display
     counter = 0
 
     # read video frames
