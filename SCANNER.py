@@ -36,6 +36,17 @@ import numpy as np
 import MODULES
 
 ##################################################
+# NOTE: Don't change resolution
+videoResX = 1200
+videoResY = 600
+
+# define the grid size
+gridX = 6
+gridY = 3
+
+# define the size for each scanner
+cropSize = 10
+
 
 # load json file
 tagsArray = MODULES.JSONparse('tags')
@@ -49,20 +60,10 @@ keyStonePts = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 webcam = cv2.VideoCapture(0)
 
 # define the video window
-cv2.namedWindow('webcamWindow')
-cv2.namedWindow('GUI', cv2.WINDOW_NORMAL)
+cv2.namedWindow('webcamWindow', cv2.WINDOW_NORMAL)
 
-# NOTE: must fit KEYSTONE resolution
-# set res. for webcamWindow
-videoResX = 1200
-videoResY = 600
-
-# define the grid size
-gridX = 6
-gridY = 3
-
-# define the size for each scanner
-cropSize = 10
+# make the sliders GUI
+MODULES.GUI(keyStonePts, videoResX, videoResY)
 
 # call colors dictionary
 colors = MODULES.colDict
@@ -73,17 +74,6 @@ scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 # get inital key Stone Data before interaction and keystone
 keyStoneData = MODULES.fineGrainKeystone(
     videoResX, videoResY, keyStonePts, False)
-
-
-def passAlong(x):
-    pass
-
-
-# create trackbars for color change
-cv2.createTrackbar('y', 'GUI',
-                   keyStonePts[0][1], videoResY, passAlong)
-cv2.createTrackbar('x', 'GUI',
-                   keyStonePts[0][0], videoResX, passAlong)
 
 
 ##################################################
@@ -101,11 +91,11 @@ while(True):
 
     '''
     NOTE:WIP dynamic keystone on runtime 
-  
-    if key in (49, 50, 51, 52):
-        keyStoneData = MODULES.fineGrainKeystone(
-            videoResX, videoResY, keyStonePts, key)
     '''
+    keyStoneData = MODULES.fineGrainKeystone(
+        videoResX, videoResY, keyStonePts, 0)
+
+    cv2.getTrackbarPos('corner', 'webcamWindow')
 
     # zero an array to collect the scanners
     cellColorsArray = []
@@ -160,8 +150,14 @@ while(True):
         counter += 1
 
     # send array to check types
-    t = MODULES.findType(cellColorsArray, tagsArray)
-    print('\n', t)
+    typesList = MODULES.findType(
+        cellColorsArray, tagsArray, mapArray, rotationArray)
+    # send to UDP here
+
+    # add type and pos text
+    cv2.putText(distortVid, str(typesList),
+                (20, 20), cv2.FONT_HERSHEY_PLAIN,
+                1.5, (0, 0, 0))
 
     # draw the video to screen
     cv2.imshow("webcamWindow", distortVid)

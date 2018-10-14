@@ -39,6 +39,22 @@ def JSONparse(field):
 ##################################################
 
 
+def GUI(keyStonePts, videoResX, videoResY):
+
+    def nothing(x):
+        pass
+
+    # create trackbars for color change
+    cv2.createTrackbar('corner', 'webcamWindow', 0, 3, nothing)
+    cv2.createTrackbar('x', 'webcamWindow',
+                       keyStonePts[0][0], videoResX, nothing)
+    cv2.createTrackbar('y', 'webcamWindow',
+                       keyStonePts[0][1], videoResY, nothing)
+
+
+##################################################
+
+
 def colorSelect(meanColor):
     # convert color to hsv for oclidian distance
     bgrToGray = cv2.cvtColor(meanColor, cv2.COLOR_BGR2GRAY)
@@ -66,7 +82,7 @@ def sendOverUDP(udpPacket):
 ##################################################
 
 
-def findType(cellColorsArray, tagsArray):
+def findType(cellColorsArray, tagsArray, mapArray, rotationArray):
     typesArray = []
     # create np colors array with table struct
     npColsArr = np.reshape(cellColorsArray, (18, 9))
@@ -81,7 +97,8 @@ def findType(cellColorsArray, tagsArray):
             typesArray.append(-1)
         # else return the tag location in the list
         else:
-            typesArray.append(int(whichTag[0]))
+            typesArray.append([mapArray[int(whichTag[0])],
+                               rotationArray[int(whichTag[0])]])
     # finally, return this list to main program for UDP
     return typesArray
 
@@ -111,7 +128,7 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
 
     for x in range(0, videoResX - int(videoResX/modX), int(videoResX/modX)):
         for y in range(0, videoResX - int(videoResX/modY), int(videoResY/modY)):
-            print(x, y)
+
             # check if this poistion is in hardcoded locations
             # array and if so get its position
             if c in scannersHardcodeList:
@@ -143,7 +160,7 @@ in SCANNER tool
 '''
 
 
-def fineGrainKeystone(videoResX, videoResY, keyStonePts, value):
+def fineGrainKeystone(videoResX, videoResY, keyStonePts, corner):
     # inverted screen ratio for np source array
     aspectRat = (videoResY, videoResX)
     # np source points array
