@@ -88,17 +88,17 @@ def findType(cellColorsArray, tagsArray):
 
 ##################################################
 
-# hardcode the locations of the scanners
-scannersHardcodeList = [
-    15, 43, 85, 113, 155, 183,
-    18, 46, 88, 116, 158, 186,
-    21, 49, 91, 119, 161, 189
-]
-
 
 def makeGridOrigins(videoResX, videoResY, cropSize):
 
-    # actual locations of scanners
+    # hardcode the locations of the scanners
+    scannersHardcodeList = [
+        15, 43, 85, 113, 155, 183,
+        18, 46, 88, 116, 158, 186,
+        21, 49, 91, 119, 161, 189
+    ]
+
+# actual locations of scanners
     scannersLocationsArr = []
 
     # sum of 'half' virtual modules in the table
