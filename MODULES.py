@@ -134,17 +134,17 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
 
 '''
 NOTE: Aspect ratio is fliped than in scanner
-so that ASPECT_RATIO[0,1] will be ASPECT_RATIO[1,0]
+so that aspectRat[0,1] will be aspectRat[1,0]
 in SCANNER tool
 '''
 
 
 def fineGrainKeystone(videoResX, videoResY, keyStonePts, value):
     # inverted screen ratio for np source array
-    ASPECT_RATIO = (videoResY, videoResX)
+    aspectRat = (videoResY, videoResX)
     # np source points array
-    srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
-        ASPECT_RATIO[1], ASPECT_RATIO[0]]])
+    srcPnts = np.float32([[0, 0], [aspectRat[1], 0], [0, aspectRat[0]], [
+        aspectRat[1], aspectRat[0]]])
 
     M = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
     return M
