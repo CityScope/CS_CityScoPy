@@ -35,10 +35,9 @@ import cv2
 import numpy as np
 import MODULES
 
-
 ##################################################
 
-# load the json  file
+# load json file
 tagsArray = MODULES.JSONparse('tags')
 mapArray = MODULES.JSONparse('map')
 rotationArray = MODULES.JSONparse('rotation')
@@ -51,18 +50,16 @@ webcam = cv2.VideoCapture(0)
 
 # define the video window
 cv2.namedWindow('webcamWindow')
+cv2.namedWindow('GUI', cv2.WINDOW_NORMAL)
 
 # NOTE: must fit KEYSTONE resolution
 # set res. for webcamWindow
-videoResX = 1600
-videoResY = 800
+videoResX = 1200
+videoResY = 600
 
 # define the grid size
 gridX = 6
 gridY = 3
-
-# define the number of grid pixel scanners
-gridSize = gridX*gridY
 
 # define the size for each scanner
 cropSize = 10
@@ -70,15 +67,23 @@ cropSize = 10
 # call colors dictionary
 colors = MODULES.colDict
 
-# equal divide of canvas
-step = int(videoResX/gridSize)
-
 # create the location  array of scanners
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
 # get inital key Stone Data before interaction and keystone
 keyStoneData = MODULES.fineGrainKeystone(
     videoResX, videoResY, keyStonePts, False)
+
+
+def passAlong(x):
+    pass
+
+
+# create trackbars for color change
+cv2.createTrackbar('y', 'GUI',
+                   keyStonePts[0][1], videoResY, passAlong)
+cv2.createTrackbar('x', 'GUI',
+                   keyStonePts[0][0], videoResX, passAlong)
 
 
 ##################################################
@@ -124,10 +129,10 @@ while(True):
 
         # set scanner crop box size and position
         # at x,y + crop box size
-        crop = distortVid[y:y+cropSize, x:x+cropSize]
+        scannerCropBox = distortVid[y:y+cropSize, x:x+cropSize]
 
         # draw rects with mean value of color
-        meanCol = cv2.mean(crop)
+        meanCol = cv2.mean(scannerCropBox)
 
         # convert colors to rgb
         b, g, r, _ = np.uint8(meanCol)

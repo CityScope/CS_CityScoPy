@@ -13,4 +13,4 @@
 - Tweak UDP endpoints or scanned colors under `MODULES.py`
 - Scan multiple cameras/keystones areas using different `.txt`
 
-![-](MISC/multicam.png "multicam scanning and UDP")
+![-](IMG/multicam.png "multicam scanning and UDP")

@@ -73,6 +73,7 @@ def findType(cellColorsArray, tagsArray):
     # go through the results
     for thisResult in npColsArr:
         # look for this result in tags array from JSON
+        # and return only where TRUE apears in results
         whichTag = np.where([(thisResult == tag).all()
                              for tag in tagsArray])[0]
         # if this tag is not found return -1
@@ -107,16 +108,19 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
     c = 0
     # gap
     gap = 10
+
     for x in range(0, videoResX - int(videoResX/moduleX), int(videoResX/moduleX)):
-        for y in range(0, videoResX-int(videoResX/moduleY), int(videoResY/moduleY)):
+        for y in range(0, videoResX - int(videoResX/moduleY), int(videoResY/moduleY)):
+
             # check if this poistion is in hardcoded locations
             # array and if so get its position
             if c in scannersHardcodeList:
                 for i in range(0, 3):
                     for j in range(0, 3):
                         # append 3x3 loctions to array for scanners
-                        scannersLocationsArr.append([x + i*(cropSize + gap),
-                                                     y + j*(cropSize + gap)])
+                        scannersLocationsArr.append(
+                            [x + i*(cropSize + gap),
+                             y + j*(cropSize + gap)])
             # count
             c += 1
     return scannersLocationsArr
@@ -143,11 +147,16 @@ def fineGrainKeystone(videoResX, videoResY, keyStonePts, value):
     # inverted screen ratio for np source array
     aspectRat = (videoResY, videoResX)
     # np source points array
-    srcPnts = np.float32([[0, 0], [aspectRat[1], 0], [0, aspectRat[0]], [
-        aspectRat[1], aspectRat[0]]])
-
-    M = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
-    return M
+    srcPnts = np.float32(
+        [
+            [0, 0],
+            [aspectRat[1], 0],
+            [0, aspectRat[0]],
+            [aspectRat[1], aspectRat[0]]
+        ])
+    # make the 4 pnts matrix perspective transformation
+    trans = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
+    return trans
 
 
 ##################################################
