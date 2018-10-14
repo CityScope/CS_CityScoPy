@@ -139,21 +139,14 @@ in SCANNER tool
 '''
 
 
-def fineGrainKeystone(videoResX, videoResY, pts, value):
+def fineGrainKeystone(videoResX, videoResY, keyStonePts, value):
     # inverted screen ratio for np source array
     ASPECT_RATIO = (videoResY, videoResX)
     # np source points array
     srcPnts = np.float32([[0, 0], [ASPECT_RATIO[1], 0], [0, ASPECT_RATIO[0]], [
         ASPECT_RATIO[1], ASPECT_RATIO[0]]])
 
-    # NP new array
-    npPnts = np.float32([
-        [pts[0][0], pts[0][1]],
-        [pts[1][0], pts[1][1]],
-        [pts[2][0], pts[2][1]],
-        [pts[3][0], pts[3][1]]])
-
-    M = cv2.getPerspectiveTransform(npPnts, srcPnts)
+    M = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
     return M
 
 

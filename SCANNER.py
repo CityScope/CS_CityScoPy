@@ -44,7 +44,7 @@ mapArray = MODULES.JSONparse('map')
 rotationArray = MODULES.JSONparse('rotation')
 
 # load the keystone data from file
-keyStoneData = np.loadtxt('DATA/keystone.txt')
+keyStonePts = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
 # define the video
 webcam = cv2.VideoCapture(0)
@@ -76,9 +76,9 @@ step = int(videoResX/gridSize)
 # create the location  array of scanners
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
-# get inital keyStoneData before interaction and keystone
+# get inital key Stone Data before interaction and keystone
 keyStoneData = MODULES.fineGrainKeystone(
-    videoResX, videoResY, keyStoneData, False)
+    videoResX, videoResY, keyStonePts, False)
 
 
 ##################################################
@@ -96,10 +96,11 @@ while(True):
 
     '''
     NOTE:WIP dynamic keystone on runtime 
-    '''
+  
     if key in (49, 50, 51, 52):
         keyStoneData = MODULES.fineGrainKeystone(
-            videoResX, videoResY, keyStoneData, key)
+            videoResX, videoResY, keyStonePts, key)
+    '''
 
     # zero an array to collect the scanners
     cellColorsArray = []
