@@ -47,7 +47,6 @@ gridY = 3
 # define the size for each scanner
 cropSize = 10
 
-
 # load json file
 tagsArray = MODULES.JSONparse('tags')
 mapArray = MODULES.JSONparse('map')
@@ -60,7 +59,8 @@ keyStonePts = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 webcam = cv2.VideoCapture(0)
 
 # define the video window
-cv2.namedWindow('webcamWindow', cv2.WINDOW_NORMAL)
+cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
+cv2.resizeWindow('CityScopeScanner', 1000, 1000)
 
 # make the sliders GUI
 MODULES.GUI(keyStonePts, videoResX, videoResY)
@@ -71,9 +71,9 @@ colors = MODULES.colDict
 # create the location  array of scanners
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
-# get inital key Stone Data before interaction and keystone
-keyStoneData = MODULES.fineGrainKeystone(
-    videoResX, videoResY, keyStonePts, False)
+# # get inital key Stone Data before interaction and keystone
+# keyStoneData = MODULES.fineGrainKeystone(
+#     videoResX, videoResY, keyStonePts, False)
 
 
 ##################################################
@@ -92,10 +92,11 @@ while(True):
     '''
     NOTE:WIP dynamic keystone on runtime 
     '''
-    keyStoneData = MODULES.fineGrainKeystone(
-        videoResX, videoResY, keyStonePts, 0)
 
-    cv2.getTrackbarPos('corner', 'webcamWindow')
+    print(MODULES.getSliders())
+
+    keyStoneData = MODULES.fineGrainKeystone(
+        videoResX, videoResY, keyStonePts, False)
 
     # zero an array to collect the scanners
     cellColorsArray = []
@@ -160,7 +161,7 @@ while(True):
                 1.5, (0, 0, 0))
 
     # draw the video to screen
-    cv2.imshow("webcamWindow", distortVid)
+    cv2.imshow("CityScopeScanner", distortVid)
 
 
 # break the loop

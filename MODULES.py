@@ -41,16 +41,65 @@ def JSONparse(field):
 
 def GUI(keyStonePts, videoResX, videoResY):
 
-    def nothing(x):
-        pass
-
-    # create trackbars for color change
-    cv2.createTrackbar('corner', 'webcamWindow', 0, 3, nothing)
-    cv2.createTrackbar('x', 'webcamWindow',
+    cv2.createTrackbar('Upper Left X', 'CityScopeScanner',
                        keyStonePts[0][0], videoResX, nothing)
-    cv2.createTrackbar('y', 'webcamWindow',
+    cv2.createTrackbar('Upper Left Y', 'CityScopeScanner',
                        keyStonePts[0][1], videoResY, nothing)
+    cv2.createTrackbar('Upper Right X', 'CityScopeScanner',
+                       keyStonePts[1][0], videoResX, nothing)
+    cv2.createTrackbar('Upper Right Y', 'CityScopeScanner',
+                       keyStonePts[1][1], videoResY, nothing)
+    cv2.createTrackbar('Buttom Left X', 'CityScopeScanner',
+                       keyStonePts[2][0], videoResX, nothing)
+    cv2.createTrackbar('Buttom Left Y', 'CityScopeScanner',
+                       keyStonePts[2][1], videoResY, nothing)
+    cv2.createTrackbar('Buttom Right X', 'CityScopeScanner',
+                       keyStonePts[3][0], videoResX, nothing)
+    cv2.createTrackbar('Buttom Right Y', 'CityScopeScanner',
+                       keyStonePts[3][1], videoResY, nothing)
 
+
+def nothing(event):
+    pass
+
+
+def getSliders():
+
+    ulx = cv2.getTrackbarPos('Upper Left X', 'CityScopeScanner')
+    uly = cv2.getTrackbarPos('Upper Left Y', 'CityScopeScanner')
+    urx = cv2.getTrackbarPos('Upper Right X', 'CityScopeScanner')
+    ury = cv2.getTrackbarPos('Upper Right Y', 'CityScopeScanner')
+    blx = cv2.getTrackbarPos('Buttom Left X', 'CityScopeScanner')
+    bly = cv2.getTrackbarPos('Buttom Left Y', 'CityScopeScanner')
+    brx = cv2.getTrackbarPos('Buttom Right X', 'CityScopeScanner')
+    bry = cv2.getTrackbarPos('Buttom Right Y', 'CityScopeScanner')
+    return [ulx, uly, urx, ury, blx, bly, brx, bry]
+
+
+##################################################
+
+
+'''
+NOTE: Aspect ratio is fliped than in scanner
+so that aspectRat[0,1] will be aspectRat[1,0]
+in SCANNER tool
+'''
+
+
+def fineGrainKeystone(videoResX, videoResY, keyStonePts, sliderData):
+    # inverted screen ratio for np source array
+    aspectRat = (videoResY, videoResX)
+    # np source points array
+    srcPnts = np.float32(
+        [
+            [0, 0],
+            [aspectRat[1], 0],
+            [0, aspectRat[0]],
+            [aspectRat[1], aspectRat[0]]
+        ])
+    # make the 4 pnts matrix perspective transformation
+    trans = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
+    return trans
 
 ##################################################
 
@@ -146,48 +195,8 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
 ##################################################
 
 
-# Upkey: 2490368
-# DownKey: 2621440
-# LeftKey: 2424832
-# RightKey: 2555904
-# Space: 32
-# Delete: 3014656
-
 '''
-NOTE: Aspect ratio is fliped than in scanner
-so that aspectRat[0,1] will be aspectRat[1,0]
-in SCANNER tool
-'''
-
-
-def fineGrainKeystone(videoResX, videoResY, keyStonePts, corner):
-    # inverted screen ratio for np source array
-    aspectRat = (videoResY, videoResX)
-    # np source points array
-    srcPnts = np.float32(
-        [
-            [0, 0],
-            [aspectRat[1], 0],
-            [0, aspectRat[0]],
-            [aspectRat[1], aspectRat[0]]
-        ])
-    # make the 4 pnts matrix perspective transformation
-    trans = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
-    return trans
-
-
-##################################################
-
 def checkForNewGrid():
-    '''
-pseudo code here:
 if no change to results array, do nothing
 else, compse the sliced submatrix of X*Y for each grid cell
-
-import numpy as np
-    a = np.reshape(np.arange(162), (18, 9))
-    print(a)
-    b = a[0: 3, 0: 3]
-    print(b)
-
 '''
