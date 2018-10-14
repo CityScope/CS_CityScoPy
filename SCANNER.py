@@ -108,7 +108,7 @@ while(True):
             videoResX, videoResY, keyStoneData, key)
 
     # zero an array to collect the scanners
-    colorArr = []
+    cellColorsArray = []
 
     # init counter
     counter = 0
@@ -145,7 +145,7 @@ while(True):
         thisColor = colors[scannerCol]
 
         # add colors to array for type analysis
-        colorArr.append(scannerCol)
+        cellColorsArray.append(scannerCol)
 
         # draw rects with frame colored by range result
         cv2.rectangle(distortVid, (x, y),
@@ -160,7 +160,7 @@ while(True):
         counter += 1
 
     # send array to check types
-    t = MODULES.findType(colorArr, tagsArray)
+    t = MODULES.findType(cellColorsArray, tagsArray)
     print('\n', t)
 
     # draw the video to screen

@@ -61,18 +61,22 @@ import numpy as np
 ##################################################
 
 
-def findType(colorArr, tagsArray):
+def findType(cellColorsArray, tagsArray):
     typesArray = []
-    # create np output colors array
-    # and reshape to fit the table struct
-    resultColorArray = np.reshape(colorArr, (18, 9))
-
-    for thisResult in resultColorArray:
+    # create np colors array with table struct
+    npColsArr = np.reshape(cellColorsArray, (18, 9))
+    # go through the results
+    for thisResult in npColsArr:
+        # look for this result in tags array from JSON
         whichTag = np.where([(thisResult == tag).all()
-                             for tag in tagsArray])[0].tolist()
-
-        typesArray.append(whichTag)
-
+                             for tag in tagsArray])[0]
+        # if this tag is not found return -1
+        if whichTag.size == 0:
+            typesArray.append(-1)
+        # else return the tag location in the list
+        else:
+            typesArray.append(int(whichTag[0]))
+    # finally, return this list to main program for UDP
     return typesArray
 
 
