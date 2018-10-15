@@ -36,10 +36,6 @@ import numpy as np
 import MODULES
 
 ##################################################
-# NOTE: Don't change resolution
-videoResX = 1200
-videoResY = 600
-
 # define the grid size
 gridX = 6
 gridY = 3
@@ -52,11 +48,19 @@ tagsArray = MODULES.JSONparse('tags')
 mapArray = MODULES.JSONparse('map')
 rotationArray = MODULES.JSONparse('rotation')
 
-# load the keystone data from file
+# load the initial keystone data from file
 keyStonePts = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
 # define the video
 webcam = cv2.VideoCapture(0)
+
+# NOTE: Don't change resolution
+videoResX = int(webcam.get(3))
+# 1200
+videoResY = int(webcam.get(4))
+# 600
+
+print(videoResX, videoResY)
 
 # define the video window
 cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
@@ -71,10 +75,6 @@ colors = MODULES.colDict
 # create the location  array of scanners
 scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 
-# # get inital key Stone Data before interaction and keystone
-# keyStoneData = MODULES.fineGrainKeystone(
-#     videoResX, videoResY, keyStonePts, False)
-
 
 ##################################################
 ###################MAIN LOOP######################
@@ -84,19 +84,9 @@ scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
 # run the video loop forever
 while(True):
 
-    # break video loop by pressing ESC
-    key = cv2.waitKey(2) & 0xFF
-    if key == 27:
-        break
-
-    '''
-    NOTE:WIP dynamic keystone on runtime 
-    '''
-
-    print(MODULES.getSliders())
-
-    keyStoneData = MODULES.fineGrainKeystone(
-        videoResX, videoResY, keyStonePts, False)
+    # get a new matrix transformation every frame
+    keyStoneData = MODULES.keystone(
+        videoResX, videoResY, MODULES.getSliders())
 
     # zero an array to collect the scanners
     cellColorsArray = []
@@ -111,6 +101,7 @@ while(True):
     distortVid = cv2.warpPerspective(
         thisFrame, keyStoneData, (videoResX, videoResY))
 
+    ##################################################
     # run through locations list and make scanners
     for loc in scanLocArr:
 
@@ -143,11 +134,11 @@ while(True):
                       (x+cropSize, y+cropSize),
                       thisColor, 1)
 
-        # add type and pos text
-        cv2.putText(distortVid, str(counter),
-                    (x-1, y-2), cv2.FONT_HERSHEY_PLAIN,
-                    0.6, (0, 0, 0))
-
+        # # add type and pos text
+        # cv2.putText(distortVid, str(counter),
+        #             (x-1, y-2), cv2.FONT_HERSHEY_PLAIN,
+        #             0.6, (0, 0, 0))
+        # pixel counter
         counter += 1
 
     # send array to check types
@@ -156,14 +147,26 @@ while(True):
     # send to UDP here
 
     # add type and pos text
-    cv2.putText(distortVid, str(typesList),
+    cv2.putText(distortVid, 'Types:' + str(typesList),
                 (20, 20), cv2.FONT_HERSHEY_PLAIN,
                 1.5, (0, 0, 0))
 
     # draw the video to screen
     cv2.imshow("CityScopeScanner", distortVid)
 
+    ##################################################
+    #####################INTERACT#####################
+    ##################################################
+    # break video loop by pressing ESC
+    key = cv2.waitKey(1)
+    if chr(key & 255) == 'q':
+        # break the loop
+        break
 
-# break the loop
+    # # saves to file
+    elif chr(key & 255) == 's':
+        MODULES.saveToFile(MODULES.getSliders())
+
+# closw opencv
 webcam.release()
 cv2.destroyAllWindows()

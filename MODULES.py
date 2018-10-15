@@ -73,8 +73,17 @@ def getSliders():
     bly = cv2.getTrackbarPos('Buttom Left Y', 'CityScopeScanner')
     brx = cv2.getTrackbarPos('Buttom Right X', 'CityScopeScanner')
     bry = cv2.getTrackbarPos('Buttom Right Y', 'CityScopeScanner')
-    return [ulx, uly, urx, ury, blx, bly, brx, bry]
+    return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
 
+##################################################
+
+
+def saveToFile(keystoneArr):
+    filePath = "DATA/keystone.txt"
+    f = open(filePath, 'w')
+    np.savetxt(f, keystoneArr)
+    f.close()
+    print("keystone points were saved in", filePath)
 
 ##################################################
 
@@ -86,7 +95,7 @@ in SCANNER tool
 '''
 
 
-def fineGrainKeystone(videoResX, videoResY, keyStonePts, sliderData):
+def keystone(videoResX, videoResY, keyStonePts):
     # inverted screen ratio for np source array
     aspectRat = (videoResY, videoResX)
     # np source points array
@@ -173,8 +182,9 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
     # zero the counter
     c = 0
     # virtual gap
-    gap = 10
+    gap = 0
 
+    '''
     for x in range(0, videoResX - int(videoResX/modX), int(videoResX/modX)):
         for y in range(0, videoResX - int(videoResX/modY), int(videoResY/modY)):
 
@@ -189,6 +199,10 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
                              y + j*(cropSize + gap)])
             # count
             c += 1
+    '''
+    for x in range(0, 162):
+        scannersLocationsArr.append([x + (cropSize), x + (cropSize)])
+
     return scannersLocationsArr
 
 
