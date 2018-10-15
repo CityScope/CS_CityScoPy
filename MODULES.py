@@ -165,28 +165,52 @@ def findType(cellColorsArray, tagsArray, mapArray, rotationArray):
 
 
 def makeGridOrigins(videoResX, videoResY, cropSize):
+    # actual locations of scanners
+    scannersLocationsArr = []
+    # sum of 'half' virtual modules in the table
+    modX = 14
+    modY = 8
+    # virtual gap between scanners
+    gap = 0
+    # list of ON scanners locations
+    inX = [0, 2, 5, 7, 10, 12]
+    inY = [0, 3, 6]
+    # zero the counter
+    cX = 0
+    cY = 0
 
-    # hardcode the locations of the scanners
+    step = int(videoResX/modX)
+    arrt = []
+    for x in range(step, (modX * step)-step, step):
+        for y in range(step, (modY * step)-step, step):
+            if cX in inX and cY in inY:
+                arrt.append([x, y])
+                for i in range(0, 3):
+                    for j in range(0, 3):
+                        # append 3x3 loctions to array for scanners
+                        scannersLocationsArr.append(
+                            [x + i*(cropSize + gap),
+                             y + j*(cropSize + gap)])
+        cY += 1
+    cX += 1
+    print(len(arrt), arrt)
+    # for x in range(0, 162):
+    # scannersLocationsArr.append([(x+10) * (cropSize), 50])
+    return scannersLocationsArr
+
+
+'''
+ # hardcode the locations of the scanners
     scannersHardcodeList = [
         15, 43, 85, 113, 155, 183,
         18, 46, 88, 116, 158, 186,
         21, 49, 91, 119, 161, 189
     ]
 
-# actual locations of scanners
-    scannersLocationsArr = []
-
-    # sum of 'half' virtual modules in the table
-    modX = 14
-    modY = 8
-    # zero the counter
-    c = 0
-    # virtual gap
-    gap = 0
-
-    '''
     for x in range(0, videoResX - int(videoResX/modX), int(videoResX/modX)):
-        for y in range(0, videoResX - int(videoResX/modY), int(videoResY/modY)):
+        for y in range(0, videoResY - int(videoResX/modY), int(videoResY/modY)):
+            print(videoResX - int(videoResX/modX), int(videoResX/modX),
+                  videoResY - int(videoResY/modY), int(videoResY/modY), c)
 
             # check if this poistion is in hardcoded locations
             # array and if so get its position
@@ -196,15 +220,11 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
                         # append 3x3 loctions to array for scanners
                         scannersLocationsArr.append(
                             [x + i*(cropSize + gap),
-                             y + j*(cropSize + gap)])
+                            y + j*(cropSize + gap)])
             # count
             c += 1
+
     '''
-    for x in range(0, 162):
-        scannersLocationsArr.append([x * (cropSize), 50])
-
-    return scannersLocationsArr
-
 
 ##################################################
 

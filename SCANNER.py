@@ -149,7 +149,7 @@ while(True):
     # add type and pos text
     cv2.putText(distortVid, 'Types: ' + str(typesList),
                 (50, 50), cv2.FONT_HERSHEY_DUPLEX,
-                1, (0, 0, 0), 4)
+                1, (0, 0, 0), 2)
 
     # draw the video to screen
     cv2.imshow("CityScopeScanner", distortVid)
