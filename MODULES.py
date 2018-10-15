@@ -180,20 +180,24 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
     cY = 0
 
     step = int(videoResX/modX)
-    arrt = []
+    tempARR = []
     for x in range(step, (modX * step)-step, step):
         for y in range(step, (modY * step)-step, step):
             if cX in inX and cY in inY:
-                arrt.append([x, y])
+
+                tempARR.append([x, y])
+
                 for i in range(0, 3):
                     for j in range(0, 3):
                         # append 3x3 loctions to array for scanners
                         scannersLocationsArr.append(
-                            [x + i*(cropSize + gap),
-                             y + j*(cropSize + gap)])
+                            # [x + i*(cropSize + gap),
+                            #  y + j*(cropSize + gap)]
+                            [x+(j*cropSize), y+(i*cropSize)]
+                        )
         cY += 1
     cX += 1
-    print(len(arrt), arrt)
+
     # for x in range(0, 162):
     # scannersLocationsArr.append([(x+10) * (cropSize), 50])
     return scannersLocationsArr
