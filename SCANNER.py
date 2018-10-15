@@ -73,7 +73,8 @@ MODULES.GUI(keyStonePts, videoResX, videoResY)
 colors = MODULES.colDict
 
 # create the location  array of scanners
-scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
+# scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
+scanLocArr = MODULES.get_scanner_pixel_coordinates(videoResX, cropSize)
 
 
 ##################################################

@@ -164,71 +164,69 @@ def findType(cellColorsArray, tagsArray, mapArray, rotationArray):
 ##################################################
 
 
-def makeGridOrigins(videoResX, videoResY, cropSize):
-    # actual locations of scanners
-    scannersLocationsArr = []
-    # sum of 'half' virtual modules in the table
-    modX = 14
-    modY = 8
-    # virtual gap between scanners
-    gap = 0
-    # list of ON scanners locations
-    inX = [0, 2, 5, 7, 10, 12]
-    inY = [0, 3, 6]
-    # zero the counter
-    cX = 0
-    cY = 0
+def get_scanner_pixel_coordinates(video_res_x, crop_size):
+    """Creates list of pixel coordinates for scanner.
 
-    step = int(videoResX/modX)
-    tempARR = []
-    for x in range(step, (modX * step)-step, step):
-        for y in range(step, (modY * step)-step, step):
-            if cX in inX and cY in inY:
+    Steps:
+        - Determine vritual points on the grid that will be the centers of blocks.
+        - Transform those virtual points pixel coordinates and expand them into 3x3 clusters of pixel points
 
-                tempARR.append([x, y])
-
-                for i in range(0, 3):
-                    for j in range(0, 3):
-                        # append 3x3 loctions to array for scanners
-                        scannersLocationsArr.append(
-                            # [x + i*(cropSize + gap),
-                            #  y + j*(cropSize + gap)]
-                            [x+(j*cropSize), y+(i*cropSize)]
-                        )
-        cY += 1
-    cX += 1
-
-    # for x in range(0, 162):
-    # scannersLocationsArr.append([(x+10) * (cropSize), 50])
-    return scannersLocationsArr
+    Args:
 
 
-'''
- # hardcode the locations of the scanners
-    scannersHardcodeList = [
-        15, 43, 85, 113, 155, 183,
-        18, 46, 88, 116, 158, 186,
-        21, 49, 91, 119, 161, 189
+    Returns list of [x, y] pixel coordinates for scanner to read.
+    """
+
+    # Point looks like [x, y]
+    virtual_points = [
+        # # First row
+        [1, 1],
+        [3, 1],
+        [6, 1],
+        [8, 1],
+        [11, 1],
+        [13, 1],
+        # # Second row
+        [1, 4],
+        [3, 4],
+        [6, 4],
+        [8, 4],
+        [11, 4],
+        [13, 4],
+        # # Third row
+        [1, 7],
+        [3, 7],
+        [6, 7],
+        [8, 7],
+        [11, 7],
+        [13, 7]
     ]
 
-    for x in range(0, videoResX - int(videoResX/modX), int(videoResX/modX)):
-        for y in range(0, videoResY - int(videoResX/modY), int(videoResY/modY)):
-            print(videoResX - int(videoResX/modX), int(videoResX/modX),
-                  videoResY - int(videoResY/modY), int(videoResY/modY), c)
+    number_of_cells = 14
+    scale = int(video_res_x/number_of_cells)
+    scanner_locations_array = transform_virtual_points_to_pixels(
+        virtual_points, scale, crop_size)
+    return scanner_locations_array
 
-            # check if this poistion is in hardcoded locations
-            # array and if so get its position
-            if c in scannersHardcodeList:
-                for i in range(0, 3):
-                    for j in range(0, 3):
-                        # append 3x3 loctions to array for scanners
-                        scannersLocationsArr.append(
-                            [x + i*(cropSize + gap),
-                            y + j*(cropSize + gap)])
-            # count
-            c += 1
 
-    '''
+def transform_virtual_points_to_pixels(points, scale, crop_size):
+    """
+    Transforms virtual [x, y] coordinate pairs to pixel representations
+    for scanner.
+
+    Returns list of [x, y] pixel coordinates for scanner.
+    """
+    pixel_coordinates_list = []
+    for [x, y] in points:
+        scaled_x = x*scale
+        scaled_y = y*scale
+        for i in range(0, 3):
+            for j in range(0, 3):
+                pixel_coordinates_list.append(
+                    [scaled_x + (i*crop_size), scaled_y + (j*crop_size)])
+
+    return pixel_coordinates_list
+
 
 ##################################################
 
