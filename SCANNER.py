@@ -147,9 +147,9 @@ while(True):
     # send to UDP here
 
     # add type and pos text
-    cv2.putText(distortVid, 'Types:' + str(typesList),
-                (20, 20), cv2.FONT_HERSHEY_PLAIN,
-                1.5, (0, 0, 0))
+    cv2.putText(distortVid, 'Types: ' + str(typesList),
+                (50, 50), cv2.FONT_HERSHEY_DUPLEX,
+                1, (0, 0, 0), 4)
 
     # draw the video to screen
     cv2.imshow("CityScopeScanner", distortVid)

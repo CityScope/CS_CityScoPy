@@ -201,7 +201,7 @@ def makeGridOrigins(videoResX, videoResY, cropSize):
             c += 1
     '''
     for x in range(0, 162):
-        scannersLocationsArr.append([x + (cropSize), x + (cropSize)])
+        scannersLocationsArr.append([x * (cropSize), 50])
 
     return scannersLocationsArr
 
