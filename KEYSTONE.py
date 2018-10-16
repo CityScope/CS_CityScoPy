@@ -33,7 +33,7 @@ import numpy as np
 import cv2
 
 # make webcam
-webcam = cv2.VideoCapture(1)
+webcam = cv2.VideoCapture(0)
 # video winodw
 cv2.namedWindow('canvas', cv2.WINDOW_NORMAL)
 
