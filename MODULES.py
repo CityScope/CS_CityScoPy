@@ -1,114 +1,178 @@
+# {{ CityScope Python Scanner }}
+# Copyright (C) {{ 2018 }}  {{ Ariel Noyman }}
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# "@context": "https://github.com/CityScope/", "@type": "Person", "address": {
+# "@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
+# "Cambridge", "addressRegion": "MA",},
+# "jobTitle": "Research Scientist", "name": "Ariel Noyman",
+# "alumniOf": "MIT", "url": "http://arielnoyman.com",
+# "https://www.linkedin.com/", "http://twitter.com/relno",
+# https://github.com/RELNO]
+
+
+##################################################
+
+# CityScope Python Scanner - Modules
+# Keystone, decode and send over UDP a 2d array
+# of uniquely tagged LEGO array
+
+##################################################
+
 # imports packages
 import numpy as np
 import cv2
 import socket
 import json
 
-##################################################
-
-colRangeDict = {
-    0: [np.array([0, 0, 0], np.uint8),  # black d
-        np.array([0, 0, 50], np.uint8)],  # black u
-    1: [np.array([0, 0, 50], np.uint8),  # white d
-        np.array([0, 0, 100], np.uint8)]}  # wihte u
-
-colDict = {
-    0: (0, 0, 0),  # black
-    1: (255, 255, 255)}  # white
 
 ##################################################
 
 
-def JSONparse(field):
+def parse_json_file(field):
+    """
+    get data from JSON settings files.
+
+    Steps:
+    - opens file
+    - checks if field has objects longer than one char [such as the 'tags' field]
+    - if so, converts them to numpy arrays 
+
+    Args:
+
+    Returns the desired filed 
+    """
     # init array for json fields
-    filedArray = []
+    json_field = []
+
     # open json file
     with open('DATA/tags.json') as json_data:
+
         jd = json.load(json_data)
     # return each item for this field
     for i in jd[field]:
         # if item length is more than 1 [tags]
         if len(i) > 1:
             # parse this item as np array
-            filedArray.append(np.array([int(ch) for ch in i]))
+            json_field.append(np.array([int(ch) for ch in i]))
         else:
             # otherwise send it as is
-            filedArray.append(i)
-    return filedArray
+            json_field.append(i)
+    return json_field
 
 ##################################################
 
 
-def GUI(keyStonePts, videoResX, videoResY):
+def create_user_intreface(keystone_points_array, video_resolution_x, video_resolution_y):
+    """
+    Creates user interface and GUI.
+
+    Steps:
+    makes a list of sliders for interaction
+
+    Args:
+
+    Returns none
+    """
 
     cv2.createTrackbar('Upper Left X', 'CityScopeScanner',
-                       keyStonePts[0][0], videoResX, nothing)
+                       keystone_points_array[0][0], video_resolution_x, dont_return_on_ui)
     cv2.createTrackbar('Upper Left Y', 'CityScopeScanner',
-                       keyStonePts[0][1], videoResY, nothing)
+                       keystone_points_array[0][1], video_resolution_y, dont_return_on_ui)
     cv2.createTrackbar('Upper Right X', 'CityScopeScanner',
-                       keyStonePts[1][0], videoResX, nothing)
+                       keystone_points_array[1][0], video_resolution_x, dont_return_on_ui)
     cv2.createTrackbar('Upper Right Y', 'CityScopeScanner',
-                       keyStonePts[1][1], videoResY, nothing)
-    cv2.createTrackbar('Buttom Left X', 'CityScopeScanner',
-                       keyStonePts[2][0], videoResX, nothing)
-    cv2.createTrackbar('Buttom Left Y', 'CityScopeScanner',
-                       keyStonePts[2][1], videoResY, nothing)
-    cv2.createTrackbar('Buttom Right X', 'CityScopeScanner',
-                       keyStonePts[3][0], videoResX, nothing)
-    cv2.createTrackbar('Buttom Right Y', 'CityScopeScanner',
-                       keyStonePts[3][1], videoResY, nothing)
+                       keystone_points_array[1][1], video_resolution_y, dont_return_on_ui)
+    cv2.createTrackbar('Bottom Left X', 'CityScopeScanner',
+                       keystone_points_array[2][0], video_resolution_x, dont_return_on_ui)
+    cv2.createTrackbar('Bottom Left Y', 'CityScopeScanner',
+                       keystone_points_array[2][1], video_resolution_y, dont_return_on_ui)
+    cv2.createTrackbar('Bottom Right X', 'CityScopeScanner',
+                       keystone_points_array[3][0], video_resolution_x, dont_return_on_ui)
+    cv2.createTrackbar('Bottom Right Y', 'CityScopeScanner',
+                       keystone_points_array[3][1], video_resolution_y, dont_return_on_ui)
 
 
-def nothing(event):
+def dont_return_on_ui(event):
     pass
 
 
-def getSliders():
+def listen_to_slider_interaction():
+    """
+    listens to user interaction.
+
+    Steps:
+    listen to a list of sliders 
+
+    Args:
+
+    Returns 4x2 array of points location for key-stoning 
+    """
 
     ulx = cv2.getTrackbarPos('Upper Left X', 'CityScopeScanner')
     uly = cv2.getTrackbarPos('Upper Left Y', 'CityScopeScanner')
     urx = cv2.getTrackbarPos('Upper Right X', 'CityScopeScanner')
     ury = cv2.getTrackbarPos('Upper Right Y', 'CityScopeScanner')
-    blx = cv2.getTrackbarPos('Buttom Left X', 'CityScopeScanner')
-    bly = cv2.getTrackbarPos('Buttom Left Y', 'CityScopeScanner')
-    brx = cv2.getTrackbarPos('Buttom Right X', 'CityScopeScanner')
-    bry = cv2.getTrackbarPos('Buttom Right Y', 'CityScopeScanner')
+    blx = cv2.getTrackbarPos('Bottom Left X', 'CityScopeScanner')
+    bly = cv2.getTrackbarPos('Bottom Left Y', 'CityScopeScanner')
+    brx = cv2.getTrackbarPos('Bottom Right X', 'CityScopeScanner')
+    bry = cv2.getTrackbarPos('Bottom Right Y', 'CityScopeScanner')
     return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
 
 ##################################################
 
 
-def saveToFile(keystoneArr):
+def save_keystone_to_file(keystone_data_from_user_interaction):
+    """
+    saves keystone data from user interaction.
+
+    Steps:
+    saves an array of points to file 
+
+    """
+
     filePath = "DATA/keystone.txt"
     f = open(filePath, 'w')
-    np.savetxt(f, keystoneArr)
+    np.savetxt(f, keystone_data_from_user_interaction)
     f.close()
     print("keystone points were saved in", filePath)
 
 ##################################################
 
 
-'''
-NOTE: Aspect ratio is fliped than in scanner
-so that aspectRat[0,1] will be aspectRat[1,0]
-in SCANNER tool
-'''
+def keystone(video_resolution_x, video_resolution_y, keyStonePts):
+    '''
+    NOTE: Aspect ratio must be flipped 
+    so that aspectRat[0,1] will be aspectRat[1,0]
+    '''
 
-
-def keystone(videoResX, videoResY, keyStonePts):
     # inverted screen ratio for np source array
-    aspectRat = (videoResY, videoResX)
+    video_aspect_ratio = (video_resolution_y, video_resolution_x)
     # np source points array
-    srcPnts = np.float32(
+    keystone_origin_points_array = np.float32(
         [
             [0, 0],
-            [aspectRat[1], 0],
-            [0, aspectRat[0]],
-            [aspectRat[1], aspectRat[0]]
+            [video_aspect_ratio[1], 0],
+            [0, video_aspect_ratio[0]],
+            [video_aspect_ratio[1], video_aspect_ratio[0]]
         ])
     # make the 4 pnts matrix perspective transformation
-    trans = cv2.getPerspectiveTransform(keyStonePts, srcPnts)
-    return trans
+    transfromed_matrix = cv2.getPerspectiveTransform(
+        keyStonePts, keystone_origin_points_array)
+
+    return transfromed_matrix
 
 ##################################################
 
@@ -140,7 +204,7 @@ def sendOverUDP(udpPacket):
 ##################################################
 
 
-def findType(cellColorsArray, tagsArray, mapArray, rotationArray):
+def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray):
     typesArray = []
     # create np colors array with table struct
     npColsArr = np.reshape(cellColorsArray, (18, 9))
@@ -207,6 +271,8 @@ def get_scanner_pixel_coordinates(video_res_x, crop_size):
     scanner_locations_array = transform_virtual_points_to_pixels(
         virtual_points, scale, crop_size)
     return scanner_locations_array
+
+##################################################
 
 
 def transform_virtual_points_to_pixels(points, scale, crop_size):

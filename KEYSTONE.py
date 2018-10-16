@@ -33,9 +33,9 @@ import numpy as np
 import cv2
 
 # make webcam
-webcam = cv2.VideoCapture(0)
+webcam = cv2.VideoCapture(1)
 # video winodw
-cv2.namedWindow('canvas')
+cv2.namedWindow('canvas', cv2.WINDOW_NORMAL)
 
 
 # top left, top right, bottom left, bottom right

@@ -1,5 +1,4 @@
-# /////////////////////////////////////////////////////////////////////////////
-# {{ CityScopePy }}
+# {{ CityScope Python Scanner }}
 # Copyright (C) {{ 2018 }}  {{ Ariel Noyman }}
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,11 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# /////////////////////////////////////////////////////////////////////////////
-
-# CityScopePy SCANNER
-# a simple decoder of 2d array made of LEGO bricks, parsing and sending for visualzation
-
 # "@context": "https://github.com/CityScope/", "@type": "Person", "address": {
 # "@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
 # "Cambridge", "addressRegion": "MA",},
@@ -29,52 +23,62 @@
 # https://github.com/RELNO]
 
 
+##################################################
+
+# CityScope Python Scanner
+# Keystone, decode and send over UDP a 2d array
+# of uniquely tagged LEGO array
+
+##################################################
+
 # raise SystemExit(0)
 
 import cv2
 import numpy as np
-import MODULES
+import modules
 
 ##################################################
 # define the grid size
-gridX = 6
-gridY = 3
+grid_dimensions_x = 6
+grid_dimensions_y = 3
 
 # define the size for each scanner
-cropSize = 10
+scanner_square_size = 10
 
 # load json file
-tagsArray = MODULES.JSONparse('tags')
-mapArray = MODULES.JSONparse('map')
-rotationArray = MODULES.JSONparse('rotation')
+array_of_tags_from_json = modules.parse_json_file('tags')
+array_of_maps_form_json = modules.parse_json_file('map')
+array_of_rotations_form_json = modules.parse_json_file('rotation')
 
 # load the initial keystone data from file
-keyStonePts = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
+keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
 # define the video
-webcam = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(0)
 
-# NOTE: Don't change resolution
-videoResX = int(webcam.get(3))
-# 1200
-videoResY = int(webcam.get(4))
-# 600
-
-print(videoResX, videoResY)
+# get video resolution from webcam
+video_resolution_x = int(video_capture.get(3))
+video_resolution_y = int(video_capture.get(4))
 
 # define the video window
 cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
 cv2.resizeWindow('CityScopeScanner', 1000, 1000)
 
 # make the sliders GUI
-MODULES.GUI(keyStonePts, videoResX, videoResY)
+modules.create_user_intreface(
+    keystone_points_array, video_resolution_x, video_resolution_y)
 
 # call colors dictionary
-colors = MODULES.colDict
+colors_from_dictionary = {
+    # black
+    0: (0, 0, 0),
+    # white
+    1: (255, 255, 255)
+}
 
 # create the location  array of scanners
-# scanLocArr = MODULES.makeGridOrigins(videoResX, videoResY, cropSize)
-scanLocArr = MODULES.get_scanner_pixel_coordinates(videoResX, cropSize)
+array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
+    video_resolution_x, scanner_square_size)
 
 
 ##################################################
@@ -86,78 +90,72 @@ scanLocArr = MODULES.get_scanner_pixel_coordinates(videoResX, cropSize)
 while(True):
 
     # get a new matrix transformation every frame
-    keyStoneData = MODULES.keystone(
-        videoResX, videoResY, MODULES.getSliders())
+    keyStoneData = modules.keystone(
+        video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
 
     # zero an array to collect the scanners
     cellColorsArray = []
 
-    # init counter for text display
-    counter = 0
-
     # read video frames
-    _, thisFrame = webcam.read()
+    _, thisFrame = video_capture.read()
 
     # warp the video based on keystone info
     distortVid = cv2.warpPerspective(
-        thisFrame, keyStoneData, (videoResX, videoResY))
+        thisFrame, keyStoneData, (video_resolution_x, video_resolution_y))
 
     ##################################################
+
     # run through locations list and make scanners
-    for loc in scanLocArr:
+    for this_scanner_location in array_of_scanner_points_locations:
 
         # set x and y from locations array
-        x = loc[0]
-        y = loc[1]
+        x = this_scanner_location[0]
+        y = this_scanner_location[1]
 
         # set scanner crop box size and position
         # at x,y + crop box size
-        scannerCropBox = distortVid[y:y+cropSize, x:x+cropSize]
+        this_scanner_size = distortVid[y:y +
+                                       scanner_square_size, x:x+scanner_square_size]
 
         # draw rects with mean value of color
-        meanCol = cv2.mean(scannerCropBox)
+        mean_color = cv2.mean(this_scanner_size)
 
         # convert colors to rgb
-        b, g, r, _ = np.uint8(meanCol)
-        mCol = np.uint8([[[b, g, r]]])
+        b, g, r, _ = np.uint8(mean_color)
+        mean_color_RGB = np.uint8([[[b, g, r]]])
 
         # select the right color based on sample
-        scannerCol = MODULES.colorSelect(mCol)
-
-        # get color from dict
-        thisColor = colors[scannerCol]
+        scannerCol = modules.colorSelect(mean_color_RGB)
 
         # add colors to array for type analysis
         cellColorsArray.append(scannerCol)
 
+        # get color from dict
+        thisColor = colors_from_dictionary[scannerCol]
+
         # draw rects with frame colored by range result
         cv2.rectangle(distortVid, (x, y),
-                      (x+cropSize, y+cropSize),
+                      (x+scanner_square_size, y+scanner_square_size),
                       thisColor, 1)
 
-        # # add type and pos text
-        # cv2.putText(distortVid, str(counter),
-        #             (x-1, y-2), cv2.FONT_HERSHEY_PLAIN,
-        #             0.6, (0, 0, 0))
-        # pixel counter
-        counter += 1
-
     # send array to check types
-    typesList = MODULES.findType(
-        cellColorsArray, tagsArray, mapArray, rotationArray)
-    # send to UDP here
+    typesList = modules.find_type_in_tags_array(
+        cellColorsArray, array_of_tags_from_json, array_of_maps_form_json, array_of_rotations_form_json)
+
+    '''send to UDP here'''
 
     # add type and pos text
     cv2.putText(distortVid, 'Types: ' + str(typesList),
                 (50, 50), cv2.FONT_HERSHEY_DUPLEX,
-                1, (0, 0, 0), 2)
+                0.5, (0, 0, 0), 1)
 
     # draw the video to screen
     cv2.imshow("CityScopeScanner", distortVid)
 
     ##################################################
-    #####################INTERACT#####################
+    #####################INTERACTION##################
     ##################################################
+
     # break video loop by pressing ESC
     key = cv2.waitKey(1)
     if chr(key & 255) == 'q':
@@ -166,8 +164,8 @@ while(True):
 
     # # saves to file
     elif chr(key & 255) == 's':
-        MODULES.saveToFile(MODULES.getSliders())
+        modules.save_keystone_to_file(modules.listen_to_slider_interaction())
 
-# closw opencv
-webcam.release()
+# close opencv
+video_capture.release()
 cv2.destroyAllWindows()
