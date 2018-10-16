@@ -125,7 +125,7 @@ while(True):
         mean_color_RGB = np.uint8([[[b, g, r]]])
 
         # select the right color based on sample
-        scannerCol = modules.colorSelect(mean_color_RGB)
+        scannerCol = modules.select_color_by_mean_value(mean_color_RGB)
 
         # add colors to array for type analysis
         cellColorsArray.append(scannerCol)
@@ -139,13 +139,14 @@ while(True):
                       thisColor, 1)
 
     # send array to check types
-    typesList = modules.find_type_in_tags_array(
+    types_list = modules.find_type_in_tags_array(
         cellColorsArray, array_of_tags_from_json, array_of_maps_form_json, array_of_rotations_form_json)
 
-    '''send to UDP here'''
+    # send using UDP
+    modules.send_over_UDP(types_list)
 
     # add type and pos text
-    cv2.putText(distortVid, 'Types: ' + str(typesList),
+    cv2.putText(distortVid, 'Types: ' + str(types_list),
                 (50, 50), cv2.FONT_HERSHEY_DUPLEX,
                 0.5, (0, 0, 0), 1)
 

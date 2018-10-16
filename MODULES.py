@@ -177,28 +177,30 @@ def keystone(video_resolution_x, video_resolution_y, keyStonePts):
 ##################################################
 
 
-def colorSelect(meanColor):
+def select_color_by_mean_value(mean_color_RGB):
     # convert color to hsv for oclidian distance
-    bgrToGray = cv2.cvtColor(meanColor, cv2.COLOR_BGR2GRAY)
-    if int(bgrToGray) < 125:
-        colResult = 0
+    bgr_to_grayscale = cv2.cvtColor(mean_color_RGB, cv2.COLOR_BGR2GRAY)
+    if int(bgr_to_grayscale) < 125:
+        this_color = 0
     else:
-        colResult = 1
-    return colResult
+        this_color = 1
+    return this_color
 
 ##################################################
 
 
-def sendOverUDP(udpPacket):
+def send_over_UDP(udpPacket):
     UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
+    UDP_PORT = 5000
+
     # convert to string and encode the packet
-    udpPacket = str(udpPacket).encode()
+    enocded_udp_packet = str(udpPacket).encode("utf-8")
     # debug
-    print('\n', "UDP message:", '\n', udpPacket)
+    print('\n', "UDP:", udpPacket)
+
     # open UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(udpPacket, (UDP_IP, UDP_PORT))
+    sock.sendto(enocded_udp_packet, (UDP_IP, UDP_PORT))
 
 
 ##################################################
