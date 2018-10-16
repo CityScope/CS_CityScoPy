@@ -1,6 +1,6 @@
 # CityScope Scanner
 
-####[Python, openCV]
+#### [Python, openCV]
 
 A tool for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical colored bricks. Used by MIT CityScope project.
 
