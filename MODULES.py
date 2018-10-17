@@ -311,13 +311,13 @@ def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
         for i in range(0, 3):
             for j in range(0, 3):
                 pixel_coordinates_list.append(
-                    [scaled_x + (i*scanner_square_size),
+                    [scaled_x + (i*scanner_square_size)
 
-                     #  + int(scale/2),
+                     + int(scale/4),
 
                      scaled_y + (j*scanner_square_size)
 
-                     #  + int(scale/2)
+                     + int(scale/4)
                      ])
 
     return pixel_coordinates_list
