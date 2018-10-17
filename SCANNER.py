@@ -42,8 +42,6 @@ import modules
 grid_dimensions_x = 6
 grid_dimensions_y = 3
 
-# define the size for each scanner
-scanner_square_size = 10
 
 # load json file
 array_of_tags_from_json = modules.parse_json_file('tags')
@@ -59,6 +57,15 @@ video_capture = cv2.VideoCapture(0)
 # get video resolution from webcam
 video_resolution_x = int(video_capture.get(3))
 video_resolution_y = int(video_capture.get(4))
+
+# number of overall modules in the table x dimension
+number_of_table_modules = 14
+
+# scale of one module in actual pixel size over the x axis
+one_module_scale = int(video_resolution_x/number_of_table_modules)
+
+# define the size for each scanner
+scanner_square_size = int(one_module_scale/2)
 
 # define the video window
 cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
@@ -78,7 +85,7 @@ colors_from_dictionary = {
 
 # create the location  array of scanners
 array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
-    video_resolution_x, scanner_square_size)
+    video_resolution_x, one_module_scale,  scanner_square_size)
 
 
 ##################################################

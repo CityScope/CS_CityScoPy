@@ -230,11 +230,11 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
 ##################################################
 
 
-def get_scanner_pixel_coordinates(video_res_x, crop_size):
+def get_scanner_pixel_coordinates(video_res_x, scale, scanner_square_size):
     """Creates list of pixel coordinates for scanner.
 
     Steps:
-        - Determine vritual points on the grid that will be the centers of blocks.
+        - Determine virtual points on the grid that will be the centers of blocks.
         - Transform those virtual points pixel coordinates and expand them into 3x3 clusters of pixel points
 
     Args:
@@ -246,38 +246,58 @@ def get_scanner_pixel_coordinates(video_res_x, crop_size):
     # Point looks like [x, y]
     virtual_points = [
         # # First row
-        [1, 1],
-        [3, 1],
-        [6, 1],
-        [8, 1],
-        [11, 1],
-        [13, 1],
-        # # Second row
-        [1, 4],
-        [3, 4],
-        [6, 4],
-        [8, 4],
-        [11, 4],
-        [13, 4],
-        # # Third row
-        [1, 7],
-        [3, 7],
-        [6, 7],
-        [8, 7],
-        [11, 7],
-        [13, 7]
+        # [1, 1],
+        # [3, 1],
+        # [6, 1],
+        # [8, 1],
+        # [11, 1],
+        # [13, 1],
+        # # # Second row
+        # [1, 4],
+        # [3, 4],
+        # [6, 4],
+        # [8, 4],
+        # [11, 4],
+        # [13, 4],
+        # # # Third row
+        # [1, 7],
+        # [3, 7],
+        # [6, 7],
+        # [8, 7],
+        # [11, 7],
+        # [13, 7]
+
+        [0, 0],
+        [2, 0],
+        [5, 0],
+        [7, 0],
+        [10, 0],
+        [12, 0],
+
+        [0, 3],
+        [2, 3],
+        [5, 3],
+        [7, 3],
+        [10, 3],
+        [12, 3],
+
+        [0, 6],
+        [2, 6],
+        [5, 6],
+        [7, 6],
+        [10, 6],
+        [12, 6]
     ]
 
-    number_of_cells = 14
-    scale = int(video_res_x/number_of_cells)
+    # call helper function to find location of each point
     scanner_locations_array = transform_virtual_points_to_pixels(
-        virtual_points, scale, crop_size)
+        virtual_points, scale, scanner_square_size)
     return scanner_locations_array
 
 ##################################################
 
 
-def transform_virtual_points_to_pixels(points, scale, crop_size):
+def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
     """
     Transforms virtual [x, y] coordinate pairs to pixel representations
     for scanner.
@@ -291,7 +311,14 @@ def transform_virtual_points_to_pixels(points, scale, crop_size):
         for i in range(0, 3):
             for j in range(0, 3):
                 pixel_coordinates_list.append(
-                    [scaled_x + (i*crop_size), scaled_y + (j*crop_size)])
+                    [scaled_x + (i*scanner_square_size),
+
+                     #  + int(scale/2),
+
+                     scaled_y + (j*scanner_square_size)
+
+                     #  + int(scale/2)
+                     ])
 
     return pixel_coordinates_list
 
