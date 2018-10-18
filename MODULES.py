@@ -48,11 +48,11 @@ def parse_json_file(field):
     Steps:
     - opens file
     - checks if field has objects longer than one char [such as the 'tags' field]
-    - if so, converts them to numpy arrays 
+    - if so, converts them to numpy arrays
 
     Args:
 
-    Returns the desired filed 
+    Returns the desired filed
     """
     # init array for json fields
     json_field = []
@@ -64,7 +64,8 @@ def parse_json_file(field):
     # return each item for this field
     for i in jd[field]:
         # if item length is more than 1 [tags]
-        if len(i) > 1:
+
+        if field == 'tags':
             # parse this item as np array
             json_field.append(np.array([int(ch) for ch in i]))
         else:
@@ -114,11 +115,11 @@ def listen_to_slider_interaction():
     listens to user interaction.
 
     Steps:
-    listen to a list of sliders 
+    listen to a list of sliders
 
     Args:
 
-    Returns 4x2 array of points location for key-stoning 
+    Returns 4x2 array of points location for key-stoning
     """
 
     ulx = cv2.getTrackbarPos('Upper Left X', 'CityScopeScanner')
@@ -139,7 +140,7 @@ def save_keystone_to_file(keystone_data_from_user_interaction):
     saves keystone data from user interaction.
 
     Steps:
-    saves an array of points to file 
+    saves an array of points to file
 
     """
 
@@ -154,7 +155,7 @@ def save_keystone_to_file(keystone_data_from_user_interaction):
 
 def keystone(video_resolution_x, video_resolution_y, keyStonePts):
     '''
-    NOTE: Aspect ratio must be flipped 
+    NOTE: Aspect ratio must be flipped
     so that aspectRat[0,1] will be aspectRat[1,0]
     '''
 
@@ -191,7 +192,7 @@ def select_color_by_mean_value(mean_color_RGB):
 
 def send_over_UDP(udpPacket):
     UDP_IP = "127.0.0.1"
-    UDP_PORT = 5000
+    UDP_PORT = 5005
 
     # convert to string and encode the packet
     enocded_udp_packet = str(udpPacket).encode("utf-8")
@@ -218,11 +219,15 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
                              for tag in tagsArray])[0]
         # if this tag is not found return -1
         if whichTag.size == 0:
-            typesArray.append(-1)
+            typesArray.append(["-1", "-1"])
         # else return the tag location in the list
         else:
-            typesArray.append([mapArray[int(whichTag[0])],
-                               rotationArray[int(whichTag[0])]])
+            this_tag = int(whichTag[0])
+            type_number = mapArray[this_tag]
+            rotation_value = rotationArray[this_tag]
+
+            typesArray.append([type_number, rotation_value])
+
     # finally, return this list to main program for UDP
     return typesArray
 

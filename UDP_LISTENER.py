@@ -11,4 +11,4 @@ print("Starting UDP listener at:", UDP_IP, ' port: ', UDP_PORT, sock)
 
 while True:
     data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
-    print('\n', '//////////////////////////////////', '\n', data)
+    print('\n', data.decode())

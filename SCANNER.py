@@ -96,6 +96,8 @@ array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
 # run the video loop forever
 while(True):
 
+    # print(int(43/4))
+
     # get a new matrix transformation every frame
     keyStoneData = modules.keystone(
         video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
