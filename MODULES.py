@@ -208,6 +208,17 @@ def send_over_UDP(udpPacket):
 
 
 def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray):
+    """Get the right brick type out of the list of JSON types.
+
+    Steps:
+        - get the colors array from the scanners
+        - get the JSON lists of type tags, mapping, rotations 
+        - parse the color data into an NP array of the table shape 
+
+    Args:
+    Returns an array of found types in [T{ype},R{otation}] format 
+    """
+
     typesArray = []
     # create np colors array with table struct
     npColsArr = np.reshape(cellColorsArray, (18, 9))
@@ -244,8 +255,7 @@ def get_scanner_pixel_coordinates(video_res_x, scale, scanner_square_size):
 
     Args:
 
-
-    Returns list of [x, y] pixel coordinates for scanner to read.
+    Returns list of[x, y] pixel coordinates for scanner to read.
     """
 
     # Point looks like [x, y]
@@ -304,10 +314,10 @@ def get_scanner_pixel_coordinates(video_res_x, scale, scanner_square_size):
 
 def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
     """
-    Transforms virtual [x, y] coordinate pairs to pixel representations
+    Transforms virtual[x, y] coordinate pairs to pixel representations
     for scanner.
 
-    Returns list of [x, y] pixel coordinates for scanner.
+    Returns list of[x, y] pixel coordinates for scanner.
     """
     pixel_coordinates_list = []
     for [x, y] in points:
