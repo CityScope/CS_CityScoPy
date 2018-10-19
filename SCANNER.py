@@ -52,7 +52,7 @@ array_of_rotations_form_json = modules.parse_json_file('rotation')
 keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
 # define the video
-video_capture = cv2.VideoCapture(0)
+video_capture = cv2.VideoCapture(1)
 
 # get video resolution from webcam
 video_resolution_x = int(video_capture.get(3))
@@ -145,7 +145,7 @@ while(True):
         # draw rects with frame colored by range result
         cv2.rectangle(distortVid, (x, y),
                       (x+scanner_square_size, y+scanner_square_size),
-                      thisColor, 1)
+                      thisColor, 3)
 
     # send array to check types
     types_list = modules.find_type_in_tags_array(
