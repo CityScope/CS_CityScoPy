@@ -194,14 +194,19 @@ def send_over_UDP(udpPacket):
     UDP_IP = "127.0.0.1"
     UDP_PORT = 5005
 
+    pre_udp = '{"grid":'.encode("utf-8")
     # convert to string and encode the packet
-    enocded_udp_packet = str(udpPacket).encode("utf-8")
+    udp_body = str(udpPacket).encode("utf-8")
+    post_udp = "}".encode("utf-8")
+
+    udp_message = pre_udp+udp_body+post_udp
+
     # debug
-    print('\n', "UDP:", udpPacket)
+    print('\n', "UDP:", udp_message)
 
     # open UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(enocded_udp_packet, (UDP_IP, UDP_PORT))
+    sock.sendto(udp_message, (UDP_IP, UDP_PORT))
 
 
 ##################################################
@@ -218,27 +223,26 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
     Args:
     Returns an array of found types in [T{ype},R{otation}] format 
     """
-
     typesArray = []
     # create np colors array with table struct
     npColsArr = np.reshape(cellColorsArray, (18, 9))
+
     # go through the results
     for thisResult in npColsArr:
         # look for this result in tags array from JSON
-        # and return only where TRUE apears in results
+        # and return only where TRUE appears in results
         whichTag = np.where([(thisResult == tag).all()
                              for tag in tagsArray])[0]
         # if this tag is not found return -1
         if whichTag.size == 0:
-            typesArray.append(["-1", "-1"])
+            typesArray.append([-1, -1])
         # else return the tag location in the list
         else:
             this_tag = int(whichTag[0])
             type_number = mapArray[this_tag]
             rotation_value = rotationArray[this_tag]
 
-            typesArray.append([type_number, rotation_value])
-
+            typesArray.append([int(type_number), int(rotation_value)])
     # finally, return this list to main program for UDP
     return typesArray
 
@@ -260,27 +264,6 @@ def get_scanner_pixel_coordinates(video_res_x, scale, scanner_square_size):
 
     # Point looks like [x, y]
     virtual_points = [
-        # # First row
-        # [1, 1],
-        # [3, 1],
-        # [6, 1],
-        # [8, 1],
-        # [11, 1],
-        # [13, 1],
-        # # # Second row
-        # [1, 4],
-        # [3, 4],
-        # [6, 4],
-        # [8, 4],
-        # [11, 4],
-        # [13, 4],
-        # # # Third row
-        # [1, 7],
-        # [3, 7],
-        # [6, 7],
-        # [8, 7],
-        # [11, 7],
-        # [13, 7]
 
         [0, 0],
         [2, 0],
