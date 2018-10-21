@@ -52,7 +52,7 @@ array_of_rotations_form_json = modules.parse_json_file('rotation')
 keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
 # define the video
-video_capture = cv2.VideoCapture(1)
+video_capture = cv2.VideoCapture(0)
 
 # get video resolution from webcam
 video_resolution_x = int(video_capture.get(3))
@@ -87,23 +87,22 @@ colors_from_dictionary = {
 array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
     video_resolution_x, one_module_scale,  scanner_square_size)
 
+# holder of old cell colors array to check for new scan
+old_cell_colors_array = []
 
 ##################################################
 ###################MAIN LOOP######################
 ##################################################
 
-
 # run the video loop forever
 while(True):
-
-    # print(int(43/4))
 
     # get a new matrix transformation every frame
     keyStoneData = modules.keystone(
         video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
 
     # zero an array to collect the scanners
-    cellColorsArray = []
+    cell_Colors_Array = []
 
     # read video frames
     _, thisFrame = video_capture.read()
@@ -137,7 +136,7 @@ while(True):
         scannerCol = modules.select_color_by_mean_value(mean_color_RGB)
 
         # add colors to array for type analysis
-        cellColorsArray.append(scannerCol)
+        cell_Colors_Array.append(scannerCol)
 
         # get color from dict
         thisColor = colors_from_dictionary[scannerCol]
@@ -147,12 +146,25 @@ while(True):
                       (x+scanner_square_size, y+scanner_square_size),
                       thisColor, 3)
 
-    # send array to check types
-    types_list = modules.find_type_in_tags_array(
-        cellColorsArray, array_of_tags_from_json, array_of_maps_form_json, array_of_rotations_form_json)
+##################################################
 
-    # send using UDP
-    modules.send_over_UDP(types_list)
+    # reduce unnecessary scan analysis and sending by comparing
+    # the list of scanned cells to an old one
+    if cell_Colors_Array != old_cell_colors_array:
+
+        # send array to check types
+        types_list = modules.find_type_in_tags_array(
+            cell_Colors_Array, array_of_tags_from_json,
+            array_of_maps_form_json,
+            array_of_rotations_form_json)
+
+        # send using UDP
+        modules.send_over_UDP(types_list)
+
+        # match the two
+        old_cell_colors_array = cell_Colors_Array
+    else:
+        pass
 
     # add type and pos text
     cv2.putText(distortVid, 'Types: ' + str(types_list),

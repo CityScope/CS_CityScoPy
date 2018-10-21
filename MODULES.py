@@ -179,7 +179,9 @@ def keystone(video_resolution_x, video_resolution_y, keyStonePts):
 
 
 def select_color_by_mean_value(mean_color_RGB):
-    # convert color to hsv for oclidian distance
+    '''
+    convert color to hsv for oclidian distance
+    '''
     bgr_to_grayscale = cv2.cvtColor(mean_color_RGB, cv2.COLOR_BGR2GRAY)
     if int(bgr_to_grayscale) < 125:
         this_color = 0
