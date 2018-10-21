@@ -120,10 +120,13 @@ while(True):
         x = this_scanner_location[0]
         y = this_scanner_location[1]
 
+        # use this to control reduction of scanner size
+        this_scanner_max_dimension = int(scanner_square_size/2)
+
         # set scanner crop box size and position
         # at x,y + crop box size
-        this_scanner_size = distortVid[y:y +
-                                       scanner_square_size, x:x+scanner_square_size]
+        this_scanner_size = distortVid[y:y + this_scanner_max_dimension,
+                                       x:x + this_scanner_max_dimension]
 
         # draw rects with mean value of color
         mean_color = cv2.mean(this_scanner_size)
@@ -143,7 +146,8 @@ while(True):
 
         # draw rects with frame colored by range result
         cv2.rectangle(distortVid, (x, y),
-                      (x+scanner_square_size, y+scanner_square_size),
+                      (x+this_scanner_max_dimension,
+                       y+this_scanner_max_dimension),
                       thisColor, 3)
 
 ##################################################
