@@ -18,8 +18,7 @@
 # "@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
 # "Cambridge", "addressRegion": "MA",},
 # "jobTitle": "Research Scientist", "name": "Ariel Noyman",
-# "alumniOf": "MIT", "url": "http://arielnoyman.com",
-# "https://www.linkedin.com/", "http://twitter.com/relno",
+# "alumniOf": "MIT", "url": "http://arielnoyman.com", "http://twitter.com/relno",
 # https://github.com/RELNO]
 
 
