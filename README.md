@@ -1,6 +1,6 @@
 # CityScope Scanner
 
-#### [Python, openCV]
+#### [Python, openCV, NumPy]
 
 A tool for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical colored bricks. Used by MIT CityScope project.
 
@@ -37,3 +37,17 @@ A tool for capturing, key-stoning, scanning and sending uniquely tagged arrays o
 ## What is it good for?
 
 - CityScope Scanner will detect the color [black or white, other might be added in `modules`] of arrays of 2d-pixel arrays [at sizes of 3x3, 2x2 or 4x4] Than, these color arrays will be compared to `tags` attribute of a given `json` file [should be located in `data` folder]. At last, the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list can be sent over UDP for visualizing.
+
+## Specific for CH project
+
+clone submodule current state [i.e, last time it was updated in parent] into its folder at parent repo:
+
+`git submodule update --init --recursive Scanner`
+
+Then, update submodule to last commit of origin:
+
+`$ cd Scanner`
+
+`$ git checkout master`
+
+[if this is the desired commit]
