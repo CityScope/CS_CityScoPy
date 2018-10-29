@@ -76,7 +76,7 @@ modules.create_user_intreface(
     keystone_points_array, video_resolution_x, video_resolution_y)
 
 # call colors dictionary
-colors_from_dictionary = {
+DICTIONARY_COLORS = {
     # black
     0: (0, 0, 0),
     # white
@@ -88,28 +88,28 @@ array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
     video_resolution_x, one_module_scale,  scanner_square_size)
 
 # holder of old cell colors array to check for new scan
-old_cell_colors_array = []
+OLD_CELL_COLORS_ARRAY = []
 
 ##################################################
 ###################MAIN LOOP######################
 ##################################################
 
 # run the video loop forever
-while(True):
+while True:
 
     # get a new matrix transformation every frame
-    keyStoneData = modules.keystone(
+    KEY_STONE_DATA = modules.keystone(
         video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
 
     # zero an array to collect the scanners
-    cell_Colors_Array = []
+    CELL_COLORS_ARRAY = []
 
     # read video frames
-    _, thisFrame = video_capture.read()
+    _, THIS_FRAME = video_capture.read()
 
     # warp the video based on keystone info
-    distortVid = cv2.warpPerspective(
-        thisFrame, keyStoneData, (video_resolution_x, video_resolution_y))
+    DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
+        THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
 
     ##################################################
 
@@ -125,27 +125,27 @@ while(True):
 
         # set scanner crop box size and position
         # at x,y + crop box size
-        this_scanner_size = distortVid[y:y + this_scanner_max_dimension,
-                                       x:x + this_scanner_max_dimension]
+        this_scanner_size = DISTORTED_VIDEO_STREAM[y:y + this_scanner_max_dimension,
+                                                   x:x + this_scanner_max_dimension]
 
         # draw rects with mean value of color
         mean_color = cv2.mean(this_scanner_size)
 
         # convert colors to rgb
-        b, g, r, _ = np.uint8(mean_color)
-        mean_color_RGB = np.uint8([[[b, g, r]]])
+        color_b, color_g, color_r, _ = np.uint8(mean_color)
+        mean_color_RGB = np.uint8([[[color_b, color_g, color_r]]])
 
         # select the right color based on sample
         scannerCol = modules.select_color_by_mean_value(mean_color_RGB)
 
         # add colors to array for type analysis
-        cell_Colors_Array.append(scannerCol)
+        CELL_COLORS_ARRAY.append(scannerCol)
 
         # get color from dict
-        thisColor = colors_from_dictionary[scannerCol]
+        thisColor = DICTIONARY_COLORS[scannerCol]
 
         # draw rects with frame colored by range result
-        cv2.rectangle(distortVid, (x, y),
+        cv2.rectangle(DISTORTED_VIDEO_STREAM, (x, y),
                       (x+this_scanner_max_dimension,
                        y+this_scanner_max_dimension),
                       thisColor, 3)
@@ -154,42 +154,43 @@ while(True):
 
     # reduce unnecessary scan analysis and sending by comparing
     # the list of scanned cells to an old one
-    if cell_Colors_Array != old_cell_colors_array:
+    if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
 
         # send array to check types
-        types_list = modules.find_type_in_tags_array(
-            cell_Colors_Array, array_of_tags_from_json,
+        TYPES_LIST = modules.find_type_in_tags_array(
+            CELL_COLORS_ARRAY, array_of_tags_from_json,
             array_of_maps_form_json,
             array_of_rotations_form_json)
 
         # send using UDP
-        modules.send_over_UDP(types_list)
+        modules.send_over_UDP(TYPES_LIST)
 
         # match the two
-        old_cell_colors_array = cell_Colors_Array
+        OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
     else:
+        # else skip this
         pass
 
     # add type and pos text
-    cv2.putText(distortVid, 'Types: ' + str(types_list),
+    cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
                 (50, 50), cv2.FONT_HERSHEY_DUPLEX,
                 0.5, (0, 0, 0), 1)
 
     # draw the video to screen
-    cv2.imshow("CityScopeScanner", distortVid)
+    cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
 
     ##################################################
     #####################INTERACTION##################
     ##################################################
 
     # break video loop by pressing ESC
-    key = cv2.waitKey(1)
-    if chr(key & 255) == 'q':
+    KEY_STROKE = cv2.waitKey(1)
+    if chr(KEY_STROKE & 255) == 'q':
         # break the loop
         break
 
     # # saves to file
-    elif chr(key & 255) == 's':
+    elif chr(KEY_STROKE & 255) == 's':
         modules.save_keystone_to_file(modules.listen_to_slider_interaction())
 
 # close opencv

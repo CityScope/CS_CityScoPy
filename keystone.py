@@ -18,7 +18,7 @@
 # ////////////////////////////////////////////////////////////////////////////////////
 
 # CityScopePy KEYSTONE
-# Exports a selection of keystone points using webcam GUI
+# Exports a selection of keystone points using WEBCAM GUI
 
 # "@context": "https://github.com/CityScope/", "@type": "Person", "address": {
 # "@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
@@ -32,80 +32,80 @@
 import numpy as np
 import cv2
 
-# make webcam
-webcam = cv2.VideoCapture(0)
+# make WEBCAM
+WEBCAM = cv2.VideoCapture(0)
 # video winodw
 cv2.namedWindow('canvas', cv2.WINDOW_NORMAL)
 
 
 # top left, top right, bottom left, bottom right
-points = [(0, 0), (0, 0), (0, 0), (0, 0)]
-pointIndex = 0
-mousePos = (0, 0)
+POINTS = [(0, 0), (0, 0), (0, 0), (0, 0)]
+POINT_INDEX = 0
+MOUSE_POSITION = (0, 0)
 
 
 def selectFourPoints():
-    # let users select 4 points on webcam GUI
+    # let users select 4 points on WEBCAM GUI
 
-    global frame
-    global pointIndex
+    global FRAME
+    global POINT_INDEX
 
     print("select 4 points, by double clicking on each of them in the order: \n\
 	top left, top right, bottom left, bottom right.")
 
     # loop until 4 clicks
-    while(pointIndex != 4):
+    while POINT_INDEX != 4:
 
         key = cv2.waitKey(20) & 0xFF
         if key == 27:
             return False
 
         # wait for clicks
-        cv2.setMouseCallback('canvas', saveThisPoint)
+        cv2.setMouseCallback('canvas', save_this_point)
 
-        # read the webcam frames
-        _, frame = webcam.read()
+        # read the WEBCAM frames
+        _, FRAME = WEBCAM.read()
 
         # draw mouse pos
-        cv2.circle(frame, mousePos, 10, (0, 0, 255), 1)
-        cv2.circle(frame, mousePos, 1, (0, 0, 255), 2)
+        cv2.circle(FRAME, MOUSE_POSITION, 10, (0, 0, 255), 1)
+        cv2.circle(FRAME, MOUSE_POSITION, 1, (0, 0, 255), 2)
 
         # draw clicked points
-        for thisPnt in points:
-            cv2.circle(frame, thisPnt, 10, (255, 0, 0), 1)
+        for thisPnt in POINTS:
+            cv2.circle(FRAME, thisPnt, 10, (255, 0, 0), 1)
         # show the video
-        cv2.imshow('canvas', frame)
+        cv2.imshow('canvas', FRAME)
 
     return True
 
 
-def saveThisPoint(event, x, y, flags, param):
+def save_this_point(event, x, y, flags, param):
     # saves this point to array
 
     # mouse callback function
-    global frame
-    global pointIndex
-    global points
-    global mousePos
+    global FRAME
+    global POINT_INDEX
+    global POINTS
+    global MOUSE_POSITION
 
     if event == cv2.EVENT_MOUSEMOVE:
-        mousePos = (x, y)
+        MOUSE_POSITION = (x, y)
     elif event == cv2.EVENT_LBUTTONUP:
         # draw a ref. circle
-        print('point  # ', pointIndex, (x, y))
+        print('point  # ', POINT_INDEX, (x, y))
         # save this point to the array pts
-        points[pointIndex] = (x, y)
-        pointIndex = pointIndex + 1
+        POINTS[POINT_INDEX] = (x, y)
+        POINT_INDEX = POINT_INDEX + 1
 
 
 # checks if finished selecting the 4 corners
-if(selectFourPoints()):
+if selectFourPoints():
 
     filePath = "DATA/keystone.txt"
     f = open(filePath, 'w')
-    np.savetxt(f, points)
+    np.savetxt(f, POINTS)
     f.close()
     print("keystone initial points were saved in ", filePath)
 
-webcam.release()
+WEBCAM.release()
 cv2.destroyAllWindows()
