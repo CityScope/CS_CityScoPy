@@ -31,10 +31,10 @@
 ##################################################
 
 # imports packages
+import json
+import socket
 import numpy as np
 import cv2
-import socket
-import json
 
 
 ##################################################
@@ -144,10 +144,8 @@ def save_keystone_to_file(keystone_data_from_user_interaction):
     """
 
     filePath = "DATA/keystone.txt"
-    f = open(filePath, 'w')
-    np.savetxt(f, keystone_data_from_user_interaction)
-    f.close()
-    print("keystone points were saved in", filePath)
+    np.savetxt(filePath, keystone_data_from_user_interaction)
+    print("[!] keystone points were saved in", filePath)
 
 ##################################################
 

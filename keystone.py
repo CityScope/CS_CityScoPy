@@ -32,6 +32,9 @@
 import numpy as np
 import cv2
 
+# file path to save
+FILE_PATH = "DATA/keystone.txt"
+
 # make WEBCAM
 WEBCAM = cv2.VideoCapture(0)
 # video winodw
@@ -100,12 +103,8 @@ def save_this_point(event, x, y, flags, param):
 
 # checks if finished selecting the 4 corners
 if selectFourPoints():
-
-    filePath = "DATA/keystone.txt"
-    f = open(filePath, 'w')
-    np.savetxt(f, POINTS)
-    f.close()
-    print("keystone initial points were saved in ", filePath)
+    np.savetxt(FILE_PATH, POINTS)
+    print("keystone initial points were saved")
 
 WEBCAM.release()
 cv2.destroyAllWindows()
