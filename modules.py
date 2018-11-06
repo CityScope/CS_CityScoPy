@@ -189,16 +189,20 @@ def select_color_by_mean_value(mean_color_RGB):
 ##################################################
 
 
-def send_over_UDP(udpPacket):
+def send_over_UDP(TYPES_LIST, SLIDER):
     UDP_IP = "127.0.0.1"
     UDP_PORT = 5005
 
-    pre_udp = '{"grid":'.encode("utf-8")
+    pre_json = '{"grid":'.encode("utf-8")
     # convert to string and encode the packet
-    udp_body = str(udpPacket).encode("utf-8")
+    types_json = str(TYPES_LIST).encode("utf-8")
+    slider_json = str(SLIDER).encode("utf-8")
     post_udp = "}".encode("utf-8")
 
-    udp_message = pre_udp+udp_body+post_udp
+    udp_message = pre_json + types_json + \
+        ',"slider":['.encode("utf-8") + \
+        slider_json + ']'.encode("utf-8") +\
+        post_udp
 
     # debug
     print('\n', "UDP:", udp_message)

@@ -37,6 +37,11 @@ import cv2
 import numpy as np
 import modules
 
+'''
+TO REMOVE LATER
+'''
+import random
+
 ##################################################
 # define the grid size
 grid_dimensions_x = 6
@@ -90,12 +95,17 @@ DICTIONARY_COLORS = {
     1: (255, 255, 255)
 }
 
+
 # create the location  array of scanners
 array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
     video_resolution_x, one_module_scale,  scanner_square_size)
 
 # holder of old cell colors array to check for new scan
 OLD_CELL_COLORS_ARRAY = []
+
+# holder of old slider for new one
+OLD_SLIDER = 0.5
+
 
 ##################################################
 ###################MAIN LOOP######################
@@ -157,11 +167,13 @@ while True:
                        y+this_scanner_max_dimension),
                       thisColor, 3)
 
+        '''TO REMOVE LATER -- MAKE RANDOM SLIDER'''
+        SLIDER = random.random()
 ##################################################
 
     # reduce unnecessary scan analysis and sending by comparing
     # the list of scanned cells to an old one
-    if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
+    if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY or SLIDER != OLD_SLIDER:
 
         # send array to check types
         TYPES_LIST = modules.find_type_in_tags_array(
@@ -170,10 +182,11 @@ while True:
             array_of_rotations_form_json)
 
         # send using UDP
-        modules.send_over_UDP(TYPES_LIST)
+        modules.send_over_UDP(TYPES_LIST, SLIDER)
 
         # match the two
         OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
+        OLD_SLIDER = SLIDER
     else:
         # else skip this
         pass
