@@ -51,8 +51,15 @@ array_of_rotations_form_json = modules.parse_json_file('rotation')
 # load the initial keystone data from file
 keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
-# define the video
-video_capture = cv2.VideoCapture(0)
+# define the video stream
+try:
+    # try from a device 1 in list, not default webcam
+    video_capture = cv2.VideoCapture(1)
+    # if not exist, use device 0
+    if not video_capture.isOpened():
+        video_capture = cv2.VideoCapture(0)
+finally:
+    print(video_capture)
 
 # get video resolution from webcam
 video_resolution_x = int(video_capture.get(3))
