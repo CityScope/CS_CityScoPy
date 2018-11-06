@@ -41,6 +41,8 @@ import modules
 TO REMOVE LATER
 '''
 import random
+import time
+import math
 
 ##################################################
 # define the grid size
@@ -168,7 +170,9 @@ while True:
                       thisColor, 3)
 
         '''TO REMOVE LATER -- MAKE RANDOM SLIDER'''
-        SLIDER = random.random()
+        SLIDER = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
+
+
 ##################################################
 
     # reduce unnecessary scan analysis and sending by comparing
@@ -211,7 +215,8 @@ while True:
 
     # # saves to file
     elif chr(KEY_STROKE & 255) == 's':
-        modules.save_keystone_to_file(modules.listen_to_slider_interaction())
+        modules.save_keystone_to_file(
+            modules.listen_to_slider_interaction())
 
 # close opencv
 video_capture.release()
