@@ -36,7 +36,17 @@ import cv2
 FILE_PATH = "DATA/keystone.txt"
 
 # make WEBCAM
-WEBCAM = cv2.VideoCapture(0)
+
+# define the video stream
+try:
+    # try from a device 1 in list, not default webcam
+    WEBCAM = cv2.VideoCapture(1)
+    # if not exist, use device 0
+    if not WEBCAM.isOpened():
+        WEBCAM = cv2.VideoCapture(0)
+finally:
+    print(WEBCAM)
+
 # video winodw
 cv2.namedWindow('canvas', cv2.WINDOW_NORMAL)
 

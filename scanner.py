@@ -169,7 +169,9 @@ while True:
                        y+this_scanner_max_dimension),
                       thisColor, 3)
 
-        '''TO REMOVE LATER -- MAKE RANDOM SLIDER'''
+        '''
+        TO REMOVE LATER -- MAKES A GRADUAL SLIDER
+        '''
         SLIDER = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
 
 
@@ -177,6 +179,7 @@ while True:
 
     # reduce unnecessary scan analysis and sending by comparing
     # the list of scanned cells to an old one
+    # as well as checks for new slider position
     if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY or SLIDER != OLD_SLIDER:
 
         # send array to check types
