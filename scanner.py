@@ -32,32 +32,25 @@
 ##################################################
 
 # raise SystemExit(0)
-'''
-TEMP, TO REMOVE LATER
-'''
-import time
-import math
 
-from multiprocessing import Process
+
+from multiprocessing import Process, Manager
 
 import cv2
 import numpy as np
 import modules
+import time
 
 
 ##################################################
 
 
-def scanner_function():
+def scanner_function(multiprocess_shared_list):
 
     TYPES_LIST = []
-    SLIDER = 0.5
 
     # holder of old cell colors array to check for new scan
     OLD_CELL_COLORS_ARRAY = []
-
-    # holder of old slider for new one
-    OLD_SLIDER = 0.5
 
     # define the grid size
     grid_dimensions_x = 6
@@ -123,7 +116,7 @@ def scanner_function():
 
         # get a new matrix transformation every frame
         KEY_STONE_DATA = modules.keystone(
-            video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
+            video_resolution_x, video_resolution_y, modules.listen_to_UI_interaction())
 
         # zero an array to collect the scanners
         CELL_COLORS_ARRAY = []
@@ -174,17 +167,11 @@ def scanner_function():
                            y+this_scanner_max_dimension),
                           thisColor, 3)
 
-            '''
-            TO REMOVE LATER -- MAKES A GRADUAL SLIDER
-            '''
-            SLIDER = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
-
     ##################################################
 
         # reduce unnecessary scan analysis and sending by comparing
         # the list of scanned cells to an old one
-        # as well as checks for new slider position
-        if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY or SLIDER != OLD_SLIDER:
+        if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
 
             # send array to check types
             TYPES_LIST = modules.find_type_in_tags_array(
@@ -194,7 +181,8 @@ def scanner_function():
 
             # match the two
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
-            OLD_SLIDER = SLIDER
+
+            multiprocess_shared_list[0] = TYPES_LIST
         else:
             # else skip this
             pass
@@ -210,7 +198,6 @@ def scanner_function():
         ##################################################
         #####################INTERACTION##################
         ##################################################
-
         # break video loop by pressing ESC
         KEY_STROKE = cv2.waitKey(1)
         if chr(KEY_STROKE & 255) == 'q':
@@ -220,31 +207,39 @@ def scanner_function():
         # # saves to file
         elif chr(KEY_STROKE & 255) == 's':
             modules.save_keystone_to_file(
-                modules.listen_to_slider_interaction())
+                modules.listen_to_UI_interaction())
 
     # close opencv
     video_capture.release()
     cv2.destroyAllWindows()
 
 
-def udp_function():
-    while True:
-        time.sleep(1)
-        print(TYPES_LIST, SLIDER)
-
-        # send using UDP
-        modules.send_over_UDP(TYPES_LIST, SLIDER)
-
 ##################################################
 ################RUN MULTITHREADED#################
 ##################################################
 
 
-if __name__ == '__main__':
-    process_scanner = Process(target=scanner_function, args=())
-    process_udp = Process(target=udp_function, args=())
+# https://kite.com/python/docs/multiprocessing.Manager
 
+
+if __name__ == '__main__':
+    # define global list manager
+    MANAGER = Manager()
+    # create shared global list to work with both processes
+    multiprocess_shared_list = MANAGER.list()
+    # initial population of shared list
+    multiprocess_shared_list = [[-1, -1], 0.5]
+    # make scanner process
+    process_scanner = Process(target=scanner_function,
+                              args=([multiprocess_shared_list]))
+
+    process_slider = Process(target=modules.slider_listener,
+                             args=([multiprocess_shared_list]))
+    # start all multi porcesses
     process_scanner.start()
-    process_udp.start()
+    process_slider.start()
     process_scanner.join()
-    process_udp.join()
+    process_slider.join()
+
+    while True:
+        modules.send_over_UDP(multiprocess_shared_list)

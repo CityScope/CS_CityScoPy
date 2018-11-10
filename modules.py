@@ -32,6 +32,13 @@
 
 # imports packages
 import json
+
+'''
+TEMP
+'''
+import time
+import math
+
 import socket
 import numpy as np
 import cv2
@@ -109,7 +116,7 @@ def dont_return_on_ui(event):
     pass
 
 
-def listen_to_slider_interaction():
+def listen_to_UI_interaction():
     """
     listens to user interaction.
 
@@ -195,11 +202,11 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
 
     Steps:
         - get the colors array from the scanners
-        - get the JSON lists of type tags, mapping, rotations 
-        - parse the color data into an NP array of the table shape 
+        - get the JSON lists of type tags, mapping, rotations
+        - parse the color data into an NP array of the table shape
 
     Args:
-    Returns an array of found types in [T{ype},R{otation}] format 
+    Returns an array of found types in [T{ype},R{otation}] format
     """
     typesArray = []
     # create np colors array with table struct
@@ -299,25 +306,38 @@ def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
 ##################################################
 
 
-def send_over_UDP(TYPES_LIST, SLIDER):
+def slider_listener(multiprocess_shared_list):
+    """
+     Listen to physical slider input and return a [0-1] value
+    """
+    slider = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
+    multiprocess_shared_list[1] = slider
 
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
 
-    pre_json = '{"grid":'.encode("utf-8")
-    # convert to string and encode the packet
-    types_json = str(TYPES_LIST).encode("utf-8")
-    slider_json = str(SLIDER).encode("utf-8")
-    post_udp = "}".encode("utf-8")
+##################################################
 
-    udp_message = pre_json + types_json + \
-        ',"slider":['.encode("utf-8") + \
-        slider_json + ']'.encode("utf-8") +\
-        post_udp
 
-    # debug
-    print('\n', "UDP:", udp_message)
+def send_over_UDP(multiprocess_shared_list):
 
-    # open UDP socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(udp_message, (UDP_IP, UDP_PORT))
+    print(multiprocess_shared_list)
+
+    # UDP_IP = "127.0.0.1"
+    # UDP_PORT = 5005
+
+    # pre_json = '{"grid":'.encode("utf-8")
+    # # convert to string and encode the packet
+    # types_json = str(TYPES_LIST).encode("utf-8")
+    # slider_json = str(SLIDER).encode("utf-8")
+    # post_udp = "}".encode("utf-8")
+
+    # udp_message = pre_json + types_json + \
+    #     ',"slider":['.encode("utf-8") + \
+    #     slider_json + ']'.encode("utf-8") +\
+    #     post_udp
+
+    # # debug
+    # print('\n', "UDP:", udp_message)
+
+    # # open UDP socket
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # sock.sendto(udp_message, (UDP_IP, UDP_PORT))
