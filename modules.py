@@ -259,7 +259,7 @@ def slider_listener(multiprocess_shared_dict):
         """
         Listen to physical slider input and return a [0-1] value
         """
-        slider = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
+        slider = "{0:.3f}".format(math.sin(time.time()/5) ** 2)
         multiprocess_shared_dict['slider'] = str(slider)
 
 
