@@ -49,6 +49,8 @@ import math
 grid_dimensions_x = 6
 grid_dimensions_y = 3
 
+# flag for camera
+camera_flag = True
 
 # load json file
 array_of_tags_from_json = modules.parse_json_file('tags')
@@ -65,8 +67,10 @@ try:
     # if not exist, use device 0
     if not video_capture.isOpened():
         video_capture = cv2.VideoCapture(0)
+    else:
+        camera_flag = False
 finally:
-    print(video_capture)
+    print("camera is: ", camera_flag, "at: ", video_capture)
 
 # get video resolution from webcam
 video_resolution_x = int(video_capture.get(3))
