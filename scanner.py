@@ -32,195 +32,219 @@
 ##################################################
 
 # raise SystemExit(0)
+'''
+TEMP, TO REMOVE LATER
+'''
+import time
+import math
+
+from multiprocessing import Process
 
 import cv2
 import numpy as np
 import modules
 
-'''
-TO REMOVE LATER
-'''
-import random
-import time
-import math
 
 ##################################################
-# define the grid size
-grid_dimensions_x = 6
-grid_dimensions_y = 3
 
 
-# load json file
-array_of_tags_from_json = modules.parse_json_file('tags')
-array_of_maps_form_json = modules.parse_json_file('map')
-array_of_rotations_form_json = modules.parse_json_file('rotation')
+def scanner_function():
 
-# load the initial keystone data from file
-keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
+    TYPES_LIST = []
+    SLIDER = 0.5
 
-# define the video stream
-try:
-    # try from a device 1 in list, not default webcam
-    video_capture = cv2.VideoCapture(1)
-    # if not exist, use device 0
-    if not video_capture.isOpened():
-        video_capture = cv2.VideoCapture(0)
-finally:
-    print(video_capture)
+    # holder of old cell colors array to check for new scan
+    OLD_CELL_COLORS_ARRAY = []
 
-# get video resolution from webcam
-video_resolution_x = int(video_capture.get(3))
-video_resolution_y = int(video_capture.get(4))
+    # holder of old slider for new one
+    OLD_SLIDER = 0.5
 
-# number of overall modules in the table x dimension
-number_of_table_modules = 14
+    # define the grid size
+    grid_dimensions_x = 6
+    grid_dimensions_y = 3
 
-# scale of one module in actual pixel size over the x axis
-one_module_scale = int(video_resolution_x/number_of_table_modules)
+    # load json file
+    array_of_tags_from_json = modules.parse_json_file('tags')
+    array_of_maps_form_json = modules.parse_json_file('map')
+    array_of_rotations_form_json = modules.parse_json_file('rotation')
 
-# define the size for each scanner
-scanner_square_size = int(one_module_scale/2)
+    # load the initial keystone data from file
+    keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
 
-# define the video window
-cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
-cv2.resizeWindow('CityScopeScanner', 1000, 1000)
+    # define the video stream
+    try:
+        # try from a device 1 in list, not default webcam
+        video_capture = cv2.VideoCapture(1)
+        # if not exist, use device 0
+        if not video_capture.isOpened():
+            video_capture = cv2.VideoCapture(0)
+    finally:
+        print(video_capture)
 
-# make the sliders GUI
-modules.create_user_intreface(
-    keystone_points_array, video_resolution_x, video_resolution_y)
+    # get video resolution from webcam
+    video_resolution_x = int(video_capture.get(3))
+    video_resolution_y = int(video_capture.get(4))
 
-# call colors dictionary
-DICTIONARY_COLORS = {
-    # black
-    0: (0, 0, 0),
-    # white
-    1: (255, 255, 255)
-}
+    # number of overall modules in the table x dimension
+    number_of_table_modules = 14
 
+    # scale of one module in actual pixel size over the x axis
+    one_module_scale = int(video_resolution_x/number_of_table_modules)
 
-# create the location  array of scanners
-array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
-    video_resolution_x, one_module_scale,  scanner_square_size)
+    # define the size for each scanner
+    scanner_square_size = int(one_module_scale/2)
 
-# holder of old cell colors array to check for new scan
-OLD_CELL_COLORS_ARRAY = []
+    # define the video window
+    cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('CityScopeScanner', 1000, 1000)
 
-# holder of old slider for new one
-OLD_SLIDER = 0.5
+    # make the sliders GUI
+    modules.create_user_intreface(
+        keystone_points_array, video_resolution_x, video_resolution_y)
 
+    # call colors dictionary
+    DICTIONARY_COLORS = {
+        # black
+        0: (0, 0, 0),
+        # white
+        1: (255, 255, 255)
+    }
 
-##################################################
-###################MAIN LOOP######################
-##################################################
+    # create the location  array of scanners
+    array_of_scanner_points_locations = modules.get_scanner_pixel_coordinates(
+        video_resolution_x, one_module_scale,  scanner_square_size)
 
-# run the video loop forever
-while True:
+    ##################################################
+    ###################MAIN LOOP######################
+    ##################################################
 
-    # get a new matrix transformation every frame
-    KEY_STONE_DATA = modules.keystone(
-        video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
+    # run the video loop forever
+    while True:
 
-    # zero an array to collect the scanners
-    CELL_COLORS_ARRAY = []
+        # get a new matrix transformation every frame
+        KEY_STONE_DATA = modules.keystone(
+            video_resolution_x, video_resolution_y, modules.listen_to_slider_interaction())
 
-    # read video frames
-    _, THIS_FRAME = video_capture.read()
+        # zero an array to collect the scanners
+        CELL_COLORS_ARRAY = []
 
-    # warp the video based on keystone info
-    DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
-        THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
+        # read video frames
+        _, THIS_FRAME = video_capture.read()
+
+        # warp the video based on keystone info
+        DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
+            THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
+
+        ##################################################
+
+        # run through locations list and make scanners
+        for this_scanner_location in array_of_scanner_points_locations:
+
+            # set x and y from locations array
+            x = this_scanner_location[0]
+            y = this_scanner_location[1]
+
+            # use this to control reduction of scanner size
+            this_scanner_max_dimension = int(scanner_square_size/2)
+
+            # set scanner crop box size and position
+            # at x,y + crop box size
+            this_scanner_size = DISTORTED_VIDEO_STREAM[y:y + this_scanner_max_dimension,
+                                                       x:x + this_scanner_max_dimension]
+
+            # draw rects with mean value of color
+            mean_color = cv2.mean(this_scanner_size)
+
+            # convert colors to rgb
+            color_b, color_g, color_r, _ = np.uint8(mean_color)
+            mean_color_RGB = np.uint8([[[color_b, color_g, color_r]]])
+
+            # select the right color based on sample
+            scannerCol = modules.select_color_by_mean_value(mean_color_RGB)
+
+            # add colors to array for type analysis
+            CELL_COLORS_ARRAY.append(scannerCol)
+
+            # get color from dict
+            thisColor = DICTIONARY_COLORS[scannerCol]
+
+            # draw rects with frame colored by range result
+            cv2.rectangle(DISTORTED_VIDEO_STREAM, (x, y),
+                          (x+this_scanner_max_dimension,
+                           y+this_scanner_max_dimension),
+                          thisColor, 3)
+
+            '''
+            TO REMOVE LATER -- MAKES A GRADUAL SLIDER
+            '''
+            SLIDER = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
 
     ##################################################
 
-    # run through locations list and make scanners
-    for this_scanner_location in array_of_scanner_points_locations:
+        # reduce unnecessary scan analysis and sending by comparing
+        # the list of scanned cells to an old one
+        # as well as checks for new slider position
+        if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY or SLIDER != OLD_SLIDER:
 
-        # set x and y from locations array
-        x = this_scanner_location[0]
-        y = this_scanner_location[1]
+            # send array to check types
+            TYPES_LIST = modules.find_type_in_tags_array(
+                CELL_COLORS_ARRAY, array_of_tags_from_json,
+                array_of_maps_form_json,
+                array_of_rotations_form_json)
 
-        # use this to control reduction of scanner size
-        this_scanner_max_dimension = int(scanner_square_size/2)
+            # match the two
+            OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
+            OLD_SLIDER = SLIDER
+        else:
+            # else skip this
+            pass
 
-        # set scanner crop box size and position
-        # at x,y + crop box size
-        this_scanner_size = DISTORTED_VIDEO_STREAM[y:y + this_scanner_max_dimension,
-                                                   x:x + this_scanner_max_dimension]
+        # add type and pos text
+        cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
+                    (50, 50), cv2.FONT_HERSHEY_DUPLEX,
+                    0.5, (0, 0, 0), 1)
 
-        # draw rects with mean value of color
-        mean_color = cv2.mean(this_scanner_size)
+        # draw the video to screen
+        cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
 
-        # convert colors to rgb
-        color_b, color_g, color_r, _ = np.uint8(mean_color)
-        mean_color_RGB = np.uint8([[[color_b, color_g, color_r]]])
+        ##################################################
+        #####################INTERACTION##################
+        ##################################################
 
-        # select the right color based on sample
-        scannerCol = modules.select_color_by_mean_value(mean_color_RGB)
+        # break video loop by pressing ESC
+        KEY_STROKE = cv2.waitKey(1)
+        if chr(KEY_STROKE & 255) == 'q':
+            # break the loop
+            break
 
-        # add colors to array for type analysis
-        CELL_COLORS_ARRAY.append(scannerCol)
+        # # saves to file
+        elif chr(KEY_STROKE & 255) == 's':
+            modules.save_keystone_to_file(
+                modules.listen_to_slider_interaction())
 
-        # get color from dict
-        thisColor = DICTIONARY_COLORS[scannerCol]
-
-        # draw rects with frame colored by range result
-        cv2.rectangle(DISTORTED_VIDEO_STREAM, (x, y),
-                      (x+this_scanner_max_dimension,
-                       y+this_scanner_max_dimension),
-                      thisColor, 3)
-
-        '''
-        TO REMOVE LATER -- MAKES A GRADUAL SLIDER
-        '''
-        SLIDER = "{0:.2f}".format(math.sin(time.time()/5) ** 2)
+    # close opencv
+    video_capture.release()
+    cv2.destroyAllWindows()
 
 
-##################################################
-
-    # reduce unnecessary scan analysis and sending by comparing
-    # the list of scanned cells to an old one
-    # as well as checks for new slider position
-    if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY or SLIDER != OLD_SLIDER:
-
-        # send array to check types
-        TYPES_LIST = modules.find_type_in_tags_array(
-            CELL_COLORS_ARRAY, array_of_tags_from_json,
-            array_of_maps_form_json,
-            array_of_rotations_form_json)
+def udp_function():
+    while True:
+        time.sleep(1)
+        print(TYPES_LIST, SLIDER)
 
         # send using UDP
         modules.send_over_UDP(TYPES_LIST, SLIDER)
 
-        # match the two
-        OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
-        OLD_SLIDER = SLIDER
-    else:
-        # else skip this
-        pass
+##################################################
+################RUN MULTITHREADED#################
+##################################################
 
-    # add type and pos text
-    cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
-                (50, 50), cv2.FONT_HERSHEY_DUPLEX,
-                0.5, (0, 0, 0), 1)
 
-    # draw the video to screen
-    cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
+if __name__ == '__main__':
+    process_scanner = Process(target=scanner_function, args=())
+    process_udp = Process(target=udp_function, args=())
 
-    ##################################################
-    #####################INTERACTION##################
-    ##################################################
-
-    # break video loop by pressing ESC
-    KEY_STROKE = cv2.waitKey(1)
-    if chr(KEY_STROKE & 255) == 'q':
-        # break the loop
-        break
-
-    # # saves to file
-    elif chr(KEY_STROKE & 255) == 's':
-        modules.save_keystone_to_file(
-            modules.listen_to_slider_interaction())
-
-# close opencv
-video_capture.release()
-cv2.destroyAllWindows()
+    process_scanner.start()
+    process_udp.start()
+    process_scanner.join()
+    process_udp.join()
