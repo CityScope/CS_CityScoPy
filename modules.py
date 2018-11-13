@@ -31,12 +31,244 @@
 ##################################################
 
 # imports packages
-import json
 import socket
+import json
+import time
+import math
 import numpy as np
 import cv2
 
+##################################################
+##################################################
+# MAIN FUNCTIONS
+##################################################
+##################################################
 
+
+def send_over_UDP(multiprocess_shared_dict):
+    old_grid = [-1]
+    old_slider = [0.5]
+
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 5005
+
+    pre_json = '{"grid":'.encode("utf-8")
+
+    post_udp = "}".encode("utf-8")
+
+    while True:
+        grid = multiprocess_shared_dict['grid']
+        slider = multiprocess_shared_dict['slider']
+
+        if grid != old_grid or slider != old_slider:
+
+            # convert to string and encode the packet
+            types_json = str(grid).encode("utf-8")
+            slider_json = str(slider).encode("utf-8")
+
+            udp_message = pre_json + types_json + \
+                ',"slider":['.encode("utf-8") + \
+                slider_json + ']'.encode("utf-8") +\
+                post_udp
+
+            # debug
+            print('\n', "UDP:", udp_message)
+
+            # open UDP socket
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(udp_message, (UDP_IP, UDP_PORT))
+
+            # match the two
+            old_grid = grid
+            # raise SystemExit(0)
+
+
+##################################################
+
+
+def scanner_function(multiprocess_shared_dict):
+
+    TYPES_LIST = []
+
+    # holder of old cell colors array to check for new scan
+    OLD_CELL_COLORS_ARRAY = []
+
+    # define the grid size
+    grid_dimensions_x = 6
+    grid_dimensions_y = 3
+
+    # load json file
+    array_of_tags_from_json = parse_json_file('tags')
+    array_of_maps_form_json = parse_json_file('map')
+    array_of_rotations_form_json = parse_json_file('rotation')
+
+    # load the initial keystone data from file
+    keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
+
+    # define the video stream
+    try:
+        # try from a device 1 in list, not default webcam
+        video_capture = cv2.VideoCapture(1)
+        print('no cam in pos 1')
+        # if not exist, use device 0
+        if not video_capture.isOpened():
+            video_capture = cv2.VideoCapture(0)
+
+    finally:
+        print(video_capture)
+
+    # get video resolution from webcam
+    video_resolution_x = int(video_capture.get(3))
+    video_resolution_y = int(video_capture.get(4))
+
+    # number of overall modules in the table x dimension
+    number_of_table_modules = 14
+
+    # scale of one module in actual pixel size over the x axis
+    one_module_scale = int(video_resolution_x/number_of_table_modules)
+
+    # define the size for each scanner
+    scanner_square_size = int(one_module_scale/2)
+
+    # define the video window
+    cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('CityScopeScanner', 1000, 1000)
+
+    # make the sliders GUI
+    create_user_intreface(
+        keystone_points_array, video_resolution_x, video_resolution_y)
+
+    # call colors dictionary
+    DICTIONARY_COLORS = {
+        # black
+        0: (0, 0, 0),
+        # white
+        1: (255, 255, 255)
+    }
+
+    # create the location  array of scanners
+    array_of_scanner_points_locations = get_scanner_pixel_coordinates(
+        video_resolution_x, one_module_scale,  scanner_square_size)
+
+    ##################################################
+    ###################MAIN LOOP######################
+    ##################################################
+
+    # run the video loop forever
+    while True:
+
+        # get a new matrix transformation every frame
+        KEY_STONE_DATA = keystone(
+            video_resolution_x, video_resolution_y, listen_to_UI_interaction())
+
+        # zero an array to collect the scanners
+        CELL_COLORS_ARRAY = []
+
+        # read video frames
+        _, THIS_FRAME = video_capture.read()
+
+        # warp the video based on keystone info
+        DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
+            THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
+
+        # run through locations list and make scanners
+        for this_scanner_location in array_of_scanner_points_locations:
+
+            # set x and y from locations array
+            x = this_scanner_location[0]
+            y = this_scanner_location[1]
+
+            # use this to control reduction of scanner size
+            this_scanner_max_dimension = int(scanner_square_size/2)
+
+            # set scanner crop box size and position
+            # at x,y + crop box size
+            this_scanner_size = DISTORTED_VIDEO_STREAM[y:y + this_scanner_max_dimension,
+                                                       x:x + this_scanner_max_dimension]
+
+            # draw rects with mean value of color
+            mean_color = cv2.mean(this_scanner_size)
+
+            # convert colors to rgb
+            color_b, color_g, color_r, _ = np.uint8(mean_color)
+            mean_color_RGB = np.uint8([[[color_b, color_g, color_r]]])
+
+            # select the right color based on sample
+            scannerCol = select_color_by_mean_value(mean_color_RGB)
+
+            # add colors to array for type analysis
+            CELL_COLORS_ARRAY.append(scannerCol)
+
+            # get color from dict
+            thisColor = DICTIONARY_COLORS[scannerCol]
+
+            # draw rects with frame colored by range result
+            cv2.rectangle(DISTORTED_VIDEO_STREAM, (x, y),
+                          (x+this_scanner_max_dimension,
+                           y+this_scanner_max_dimension),
+                          thisColor, 3)
+
+        # reduce unnecessary scan analysis and sending by comparing
+        # the list of scanned cells to an old one
+        if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
+
+            # send array to check types
+            TYPES_LIST = find_type_in_tags_array(
+                CELL_COLORS_ARRAY, array_of_tags_from_json,
+                array_of_maps_form_json,
+                array_of_rotations_form_json)
+
+            # match the two
+            OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
+
+            # [!] Store the type list results in the multiprocess_shared_dict
+            multiprocess_shared_dict['grid'] = str(TYPES_LIST)
+
+        else:
+            # else skip this
+            pass
+
+        # add type and pos text
+        cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
+                    (50, 50), cv2.FONT_HERSHEY_DUPLEX,
+                    0.5, (0, 0, 0), 1)
+
+        # draw the video to screen
+        cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
+
+        # INTERACTION
+        # break video loop by pressing ESC
+        KEY_STROKE = cv2.waitKey(1)
+        if chr(KEY_STROKE & 255) == 'q':
+            # break the loop
+            break
+
+        # # saves to file
+        elif chr(KEY_STROKE & 255) == 's':
+            save_keystone_to_file(
+                listen_to_UI_interaction())
+
+    # close opencv
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+##################################################
+
+
+def slider_listener(multiprocess_shared_dict):
+
+    while True:
+        """
+        Listen to physical slider input and return a [0-1] value
+        """
+        slider = "{0:.3f}".format(math.sin(time.time()/5) ** 2)
+        multiprocess_shared_dict['slider'] = str(slider)
+
+
+##################################################
+##################################################
+# HELPER FUNCTIONS
+##################################################
 ##################################################
 
 
@@ -109,7 +341,7 @@ def dont_return_on_ui(event):
     pass
 
 
-def listen_to_slider_interaction():
+def listen_to_UI_interaction():
     """
     listens to user interaction.
 
@@ -186,31 +418,6 @@ def select_color_by_mean_value(mean_color_RGB):
         this_color = 1
     return this_color
 
-##################################################
-
-
-def send_over_UDP(TYPES_LIST, SLIDER):
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
-
-    pre_json = '{"grid":'.encode("utf-8")
-    # convert to string and encode the packet
-    types_json = str(TYPES_LIST).encode("utf-8")
-    slider_json = str(SLIDER).encode("utf-8")
-    post_udp = "}".encode("utf-8")
-
-    udp_message = pre_json + types_json + \
-        ',"slider":['.encode("utf-8") + \
-        slider_json + ']'.encode("utf-8") +\
-        post_udp
-
-    # debug
-    print('\n', "UDP:", udp_message)
-
-    # open UDP socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(udp_message, (UDP_IP, UDP_PORT))
-
 
 ##################################################
 
@@ -220,11 +427,11 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
 
     Steps:
         - get the colors array from the scanners
-        - get the JSON lists of type tags, mapping, rotations 
-        - parse the color data into an NP array of the table shape 
+        - get the JSON lists of type tags, mapping, rotations
+        - parse the color data into an NP array of the table shape
 
     Args:
-    Returns an array of found types in [T{ype},R{otation}] format 
+    Returns an array of found types in [T{ype},R{otation}] format
     """
     typesArray = []
     # create np colors array with table struct
@@ -323,10 +530,3 @@ def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
 
 
 ##################################################
-
-
-'''
-def checkForNewGrid():
-if no change to results array, do nothing
-else, compse the sliced submatrix of X*Y for each grid cell
-'''
