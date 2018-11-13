@@ -60,7 +60,7 @@ def send_over_UDP(multiprocess_shared_dict):
         grid = multiprocess_shared_dict['grid']
         slider = multiprocess_shared_dict['slider']
 
-        if grid != old_grid or slider != old_slider:
+        if grid != old_grid and slider != old_slider:
 
             # convert to string and encode the packet
             types_json = str(grid).encode("utf-8")

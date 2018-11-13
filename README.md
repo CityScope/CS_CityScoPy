@@ -17,7 +17,7 @@ A tool for capturing, key-stoning, scanning and sending uniquely tagged arrays o
 
 - `keystone.py` will create `keystone.txt` and close
 - Run `scanner` with `$ python3 scanner.py`. Tool will start scanning using the key stone data created with`keystone.py`
-- make corrections to the key stone using the sliders. Press `s` to save changes to file and `q` to exit program
+- make corrections to the key stone using the sliders. Press `s` to save changes to file and `q` to exit the scanner loop or `ctrl-c` to fully close program
 
 ![-](IMG/scanner.gif "keystone")
 
