@@ -88,7 +88,6 @@ def send_over_UDP(multiprocess_shared_dict):
 
 def scanner_function(multiprocess_shared_dict):
 
-    print('d')
     TYPES_LIST = []
 
     # holder of old cell colors array to check for new scan
