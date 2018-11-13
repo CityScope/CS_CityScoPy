@@ -60,7 +60,7 @@ def send_over_UDP(multiprocess_shared_dict):
         grid = multiprocess_shared_dict['grid']
         slider = multiprocess_shared_dict['slider']
 
-        if grid != old_grid and slider != old_slider:
+        if grid != old_grid or slider != old_slider:
 
             # convert to string and encode the packet
             types_json = str(grid).encode("utf-8")
@@ -109,9 +109,11 @@ def scanner_function(multiprocess_shared_dict):
     try:
         # try from a device 1 in list, not default webcam
         video_capture = cv2.VideoCapture(1)
+        print('no cam in pos 1')
         # if not exist, use device 0
         if not video_capture.isOpened():
             video_capture = cv2.VideoCapture(0)
+
     finally:
         print(video_capture)
 
@@ -254,6 +256,7 @@ def scanner_function(multiprocess_shared_dict):
 
 
 def slider_listener(multiprocess_shared_dict):
+
     while True:
         """
         Listen to physical slider input and return a [0-1] value

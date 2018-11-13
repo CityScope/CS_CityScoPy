@@ -37,7 +37,6 @@
 from multiprocessing import Process, Manager
 import modules
 
-
 ##################################################
 ################RUN MULTITHREADED#################
 ##################################################
@@ -57,8 +56,8 @@ if __name__ == '__main__':
 
     # initial population of shared list
     # make scanner process
-    process_scanner = Process(target=modules.scanner_function,
-                              args=([multiprocess_shared_dict]))
+    # process_scanner = Process(target=modules.scanner_function,
+    #                           args=([multiprocess_shared_dict]))
 
     process_slider = Process(target=modules.slider_listener,
                              args=([multiprocess_shared_dict]))
@@ -66,9 +65,11 @@ if __name__ == '__main__':
     process_udp = Process(target=modules.send_over_UDP,
                           args=([multiprocess_shared_dict]))
     # start all multi porcesses
-    process_scanner.start()
+    # process_scanner.start()
     process_slider.start()
     process_udp.start()
-    process_scanner.join()
+    modules.scanner_function(multiprocess_shared_dict)
+
+    # process_scanner.join()
     process_slider.join()
     process_udp.join()
