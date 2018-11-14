@@ -46,6 +46,7 @@ import modules
 
 
 if __name__ == '__main__':
+
     # define global list manager
     MANAGER = Manager()
     # create shared global list to work with both processes
