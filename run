@@ -5,6 +5,6 @@ import sys
 
 while True:
     print('>>>>>>>>>>>>> Starting Scanner >>>>>>>>>>>')
-    p = Popen("python3 " + 'scanner.py', shell=True)
+    p = Popen("python3 " + 'scanner/scanner.py', shell=True)
     p.wait()
     time.sleep(1)

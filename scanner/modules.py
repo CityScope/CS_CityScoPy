@@ -32,6 +32,8 @@
 
 # imports packages
 import socket
+import os
+import sys
 import json
 import time
 import math
@@ -103,7 +105,8 @@ def scanner_function(multiprocess_shared_dict):
     array_of_rotations_form_json = parse_json_file('rotation')
 
     # load the initial keystone data from file
-    keystone_points_array = np.loadtxt('DATA/keystone.txt', dtype=np.float32)
+    keystone_points_array = np.loadtxt(
+        get_folder_path()+'DATA/keystone.txt', dtype=np.float32)
 
     # define the video stream
     try:
@@ -288,8 +291,10 @@ def parse_json_file(field):
     # init array for json fields
     json_field = []
 
+    json_file_path = get_folder_path()+'DATA/tags.json'
+    print(json_file_path)
     # open json file
-    with open('DATA/tags.json') as json_data:
+    with open(json_file_path) as json_data:
 
         jd = json.load(json_data)
     # return each item for this field
@@ -375,7 +380,7 @@ def save_keystone_to_file(keystone_data_from_user_interaction):
 
     """
 
-    filePath = "DATA/keystone.txt"
+    filePath = get_folder_path() + "DATA/keystone.txt"
     np.savetxt(filePath, keystone_data_from_user_interaction)
     print("[!] keystone points were saved in", filePath)
 
@@ -528,5 +533,17 @@ def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
 
     return pixel_coordinates_list
 
+
+##################################################
+
+
+def get_folder_path():
+    """
+    gets the local folder
+    return is as a string with '/' at the ednd
+    """
+    loc = str(os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))) + '/'
+    return loc
 
 ##################################################
