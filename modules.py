@@ -239,12 +239,12 @@ def scanner_function(multiprocess_shared_dict):
         # INTERACTION
         # break video loop by pressing ESC
         KEY_STROKE = cv2.waitKey(1)
-        if chr(KEY_STROKE & 255) == 'q':
-            # break the loop
-            break
+        # if chr(KEY_STROKE & 255) == 'q':
+        #     # break the loop
+        #     break
 
         # # saves to file
-        elif chr(KEY_STROKE & 255) == 's':
+        if chr(KEY_STROKE & 255) == 's':
             save_keystone_to_file(
                 listen_to_UI_interaction())
 

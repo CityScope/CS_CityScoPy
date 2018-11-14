@@ -10,36 +10,35 @@ CityScope Scanner will detect the color [black or white, other might be added in
 
 ## Setup and Calibration On First Time Usage
 
-- get python ver. 3, clone this repo
+- get python 3.4 and above, clone this repo
 - Install packages manually or using `pip` via `pip install -r requirements.txt`
 - Run `keystone` with: `$ python3 keystone.py`
-- the tool will start assuming a webcam is connected and working
+- the tool will start, assuming a webcam is connected and working
 - Select 4 corners [up right, up left, bottom right, bottom left, at this order] of keystone region
   Note: no need to exactly select the corners, as these are only initial guides for `scanner` tool
+- `keystone.py` will create `keystone.txt` and close
 
 ![-](IMG/keystone.gif "keystone")
 
-- `keystone.py` will create `keystone.txt` and close
 - Run `scanner` with `$ python3 scanner.py`. Tool will start scanning using the key stone data created with`keystone.py`
-- make corrections to the key stone using the sliders. Press `s` to save changes to file and `q` to exit the scanner loop or `ctrl-c` to fully close program
+- make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
 
 ![-](IMG/scanner.gif "keystone")
 
 ## Running Regularly
 
 - Open Terminal in the app folder
-- Run `$ ./run`
-- Tool will start scanning using the key stone data created with`keystone.py` or with iterations made on previous run
-- make corrections to the key stone using the sliders. Press `s` to save change to file and `q` to exit program
+- Run using `$ ./run`
+- Tool will start scanning using previous keystone data
+- make corrections to the key stone using the sliders. Press `s` to save change to file and `ctrl-c` to exit program
 
 ## Optional
 
 - Use `udp_listener.py` to emulate UDP server listener
-- Tweak UDP endpoints or scanned colors under `modules.py`
 
 ---
 
-# Specific for CH project
+# Specific instructions for C-H project
 
 clone submodule current state [i.e, last time it was updated in parent] into its folder at parent repo:
 

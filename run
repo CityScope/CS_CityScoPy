@@ -1,8 +1,10 @@
 #!/usr/bin/python
 from subprocess import Popen
+import time
 import sys
 
 while True:
-    print('>>>>>>>>>>>>> Starting Scanner >>>>>>>>>>')
+    print('>>>>>>>>>>>>> Starting Scanner >>>>>>>>>>>')
     p = Popen("python3 " + 'scanner.py', shell=True)
     p.wait()
+    time.sleep(1)

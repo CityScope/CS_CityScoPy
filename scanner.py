@@ -67,8 +67,11 @@ if __name__ == '__main__':
                           args=([multiprocess_shared_dict]))
     # start all multi porcesses
     # process_scanner.start()
+
     process_slider.start()
     process_udp.start()
+
+    # start camera on main thread due to multiprocces issue
     modules.scanner_function(multiprocess_shared_dict)
 
     # process_scanner.join()
