@@ -31,6 +31,8 @@
 ##################################################
 
 # imports packages
+
+import sliderScope
 import socket
 import os
 import sys
@@ -39,7 +41,8 @@ import time
 import math
 import numpy as np
 import cv2
-import sliderScope
+
+
 ##################################################
 ##################################################
 # MAIN FUNCTIONS
@@ -261,12 +264,8 @@ def scanner_function(multiprocess_shared_dict):
 
 def slider_listener(multiprocess_shared_dict):
 
-    print("anything")
     import sliderScope
     sliderScopeObject = sliderScope.sliderObject()
-
-    print("afterwards")
-
     while True:
         """
         Listen to physical slider input and return a [0-1] value
@@ -301,7 +300,6 @@ def parse_json_file(field):
     json_field = []
 
     json_file_path = get_folder_path()+'DATA/tags.json'
-    print(json_file_path)
     # open json file
     with open(json_file_path) as json_data:
 
