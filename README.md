@@ -18,12 +18,12 @@ CityScope Scanner will detect the color [black or white, other might be added in
   Note: no need to exactly select the corners, as these are only initial guides for `scanner` tool
 - `keystone.py` will create `keystone.txt` and close
 
-![-](IMG/keystone.gif "keystone")
+![-](scanner/IMG/keystone.gif "keystone")
 
 - Run `scanner` with `$ python3 scanner.py`. Tool will start scanning using the key stone data created with`keystone.py`
 - make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
 
-![-](IMG/scanner.gif "keystone")
+![-](scanner/IMG/scanner.gif "keystone")
 
 ## Running Regularly
 
