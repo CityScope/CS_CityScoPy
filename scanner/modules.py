@@ -39,7 +39,7 @@ import time
 import math
 import numpy as np
 import cv2
-
+import sliderScope
 ##################################################
 ##################################################
 # MAIN FUNCTIONS
@@ -82,6 +82,7 @@ def send_over_UDP(multiprocess_shared_dict):
 
             # match the two
             old_grid = grid
+            old_slider = slider
             # raise SystemExit(0)
 
 
@@ -260,12 +261,20 @@ def scanner_function(multiprocess_shared_dict):
 
 def slider_listener(multiprocess_shared_dict):
 
+    print ("anything")
+    import sliderScope
+    sliderScopeObject = sliderScope.sliderObject()
+
+    print ("afterwards")
+
     while True:
         """
         Listen to physical slider input and return a [0-1] value
         """
-        slider = "{0:.3f}".format(math.sin(time.time()/5) ** 2)
-        multiprocess_shared_dict['slider'] = str(slider)
+        sliderScopeObject.sliderRunner()
+        slider = float(sliderScope.sliderValue)
+        # print (slider)
+        multiprocess_shared_dict['slider'] = slider
 
 
 ##################################################
