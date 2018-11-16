@@ -261,11 +261,11 @@ def scanner_function(multiprocess_shared_dict):
 
 def slider_listener(multiprocess_shared_dict):
 
-    print ("anything")
+    print("anything")
     import sliderScope
     sliderScopeObject = sliderScope.sliderObject()
 
-    print ("afterwards")
+    print("afterwards")
 
     while True:
         """
