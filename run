@@ -4,7 +4,29 @@ import time
 import sys
 
 while True:
-    print('>>>>>>>>>>>>> Starting Scanner >>>>>>>>>>>')
+    print(
+
+        '''>>>>>>>>>>>>> Starting CityScope Scanner >>>>>>>>>>>>
+
+
+                            @@@@@@@@@@@                         
+                            @@@@@@@@@@@                         
+                                    @@@                           
+                                    @@@                           
+                                    @@@                       
+                            @@@      @@@@@@@@@@@@   
+                            @@@      @@@@@@@@@@@@    
+                            @@@               @@@      
+                            @@@               @@@ 
+                            @@@               @@@                  
+                            @@@@@@@@@@@@      @@@        
+                            @@@@@@@@@@@@      @@@   
+
+
+            >>>>>>>>>>>>> Starting CityScope Scanner >>>>>>>>>>>>
+''')
+
+    time.sleep(1)
     p = Popen("python3 " + 'scanner/scanner.py', shell=True)
     p.wait()
     time.sleep(1)
