@@ -30,10 +30,27 @@
 
 
 import numpy as np
+import os
 import cv2
 
+##################################################
+
+
+def get_folder_path():
+    """
+    gets the local folder
+    return is as a string with '/' at the ednd
+    """
+    loc = str(os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))) + '/'
+    return loc
+
+
+##################################################
+
+
 # file path to save
-FILE_PATH = "DATA/keystone.txt"
+FILE_PATH = get_folder_path()+"DATA/keystone.txt"
 
 # make WEBCAM
 
