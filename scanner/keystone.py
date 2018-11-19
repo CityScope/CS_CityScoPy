@@ -81,7 +81,7 @@ def selectFourPoints():
     global POINT_INDEX
 
     print("select 4 points, by double clicking on each of them in the order: \n\
-	top left, top right, bottom left, bottom right.")
+	up right, up left, bottom right, bottom left.")
 
     # loop until 4 clicks
     while POINT_INDEX != 4:
