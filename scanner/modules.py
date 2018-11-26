@@ -76,17 +76,23 @@ def send_over_UDP(multiprocess_shared_dict):
                 slider_json + ']'.encode("utf-8") +\
                 post_udp
 
-            # debug
-            print('\n', "UDP:", udp_message)
-
             # open UDP socket
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.sendto(udp_message, (UDP_IP, UDP_PORT))
+
+            # send UDP to 2nd machine with a try catch to avoid crash if fails
+            try:
+                sock.sendto(udp_message, ("192.168.1.102", 7777))
+            except Exception as e:
+                print(e)
 
             # match the two
             old_grid = grid
             old_slider = slider
             # raise SystemExit(0)
+
+            # debug
+            print('\n', "UDP:", udp_message)
 
 
 ##################################################
