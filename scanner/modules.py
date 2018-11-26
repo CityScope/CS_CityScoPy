@@ -38,6 +38,7 @@ import os
 import sys
 import json
 import time
+from datetime import datetime, timedelta
 import math
 import numpy as np
 import cv2
@@ -54,6 +55,9 @@ def send_over_UDP(multiprocess_shared_dict):
     old_grid = [-1]
     old_slider = [0.5]
 
+    SEND_INTERVAL = timedelta(milliseconds = 30) 
+    last_sent = datetime.now()
+
     UDP_IP = "127.0.0.1"
     UDP_PORT = 5005
 
@@ -62,10 +66,13 @@ def send_over_UDP(multiprocess_shared_dict):
     post_udp = "}".encode("utf-8")
 
     while True:
+
         grid = multiprocess_shared_dict['grid']
         slider = multiprocess_shared_dict['slider']
 
-        if grid != old_grid or slider != old_slider:
+        from_last_sent = datetime.now() - last_sent
+
+        if (grid != old_grid or slider != old_slider) and from_last_sent > SEND_INTERVAL:
 
             # convert to string and encode the packet
             types_json = str(grid).encode("utf-8")
@@ -89,10 +96,12 @@ def send_over_UDP(multiprocess_shared_dict):
             # match the two
             old_grid = grid
             old_slider = slider
+            last_sent = datetime.now()
             # raise SystemExit(0)
 
             # debug
             print('\n', "UDP:", udp_message)
+
 
 
 ##################################################
