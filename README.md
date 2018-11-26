@@ -32,6 +32,13 @@ CityScope Scanner will detect the color [black or white, other might be added in
 - Tool will start scanning using previous keystone data
 - make corrections to the key stone using the sliders. Press `s` to save change to file and `ctrl-c` to exit program
 
+## Scan results [With slider]:
+
+```
+{"grid":[[-1, -1], [1, 0], [16, 3], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [2, 2], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],"slider":[0.451]}
+
+```
+
 ## Optional
 
 - Use `udp_listener.py` to emulate UDP server listener
