@@ -46,4 +46,4 @@ Note: Running the tool in this way will involve some fail safe mechanisms that w
 
 ## Troubleshoot
 
-If you encounter any issue with the tool, please cite the error appearing in the terminal window and send it to @RELNO
+If you encounter any issue with the tool, please cite the error appearing in the terminal window and send it to [@RELNO]()
