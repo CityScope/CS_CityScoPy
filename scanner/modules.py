@@ -74,6 +74,8 @@ def send_over_UDP(multiprocess_shared_dict):
         slider = multiprocess_shared_dict['slider']
 
         from_last_sent = datetime.now() - last_sent
+
+        
         if (grid != old_grid or slider != old_slider) and from_last_sent > SEND_INTERVAL:
 
             # convert to string and encode the packet
@@ -121,7 +123,7 @@ def save_grid_to_file(grid, slider):
 
     try:
         file = open(logs_folder + today_date + ".txt", "a")
-        file.write(str([grid, slider])+'\n')
+        file.write(str([datetime.now(), grid, slider])+'\n')
         file.close()
 
         print('\n', "log file saved at", datetime.now())
