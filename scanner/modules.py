@@ -38,7 +38,9 @@ import os
 import sys
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
+from datetime import date
 import math
 import numpy as np
 import cv2
@@ -55,7 +57,9 @@ def send_over_UDP(multiprocess_shared_dict):
     old_grid = [-1]
     old_slider = [0.5]
 
-    SEND_INTERVAL = timedelta(milliseconds = 30) 
+    SEND_INTERVAL = timedelta(milliseconds=300)
+    SAVE_TO_FILE_INTERVAL = timedelta(seconds=5)
+
     last_sent = datetime.now()
 
     UDP_IP = "127.0.0.1"
@@ -64,14 +68,12 @@ def send_over_UDP(multiprocess_shared_dict):
     pre_json = '{"grid":'.encode("utf-8")
 
     post_udp = "}".encode("utf-8")
-
     while True:
 
         grid = multiprocess_shared_dict['grid']
         slider = multiprocess_shared_dict['slider']
 
         from_last_sent = datetime.now() - last_sent
-
         if (grid != old_grid or slider != old_slider) and from_last_sent > SEND_INTERVAL:
 
             # convert to string and encode the packet
@@ -97,11 +99,37 @@ def send_over_UDP(multiprocess_shared_dict):
             old_grid = grid
             old_slider = slider
             last_sent = datetime.now()
-            # raise SystemExit(0)
 
-            # debug
+            if from_last_sent > SAVE_TO_FILE_INTERVAL:
+                save_grid_to_file(grid, slider)
+
+            # debug print
             print('\n', "UDP:", udp_message)
 
+
+##################################################
+
+def save_grid_to_file(grid, slider):
+    '''
+    gets the grid and saves it to txt file every x seconds 
+    '''
+    today_date = str(date.today())
+
+    logs_folder = get_folder_path() + 'LOGS/'
+    if not os.path.exists(logs_folder):
+        os.makedirs(logs_folder)
+
+    try:
+        file = open(logs_folder + today_date + ".txt", "a")
+        file.write(str([grid, slider])+'\n')
+        file.close()
+
+        print('\n', "log file saved at", datetime.now())
+
+    except (OSError, IOError) as e:
+        print(e)
+    except:
+        print('other file error')
 
 
 ##################################################
