@@ -57,7 +57,7 @@ def send_over_UDP(multiprocess_shared_dict):
     old_grid = [-1]
     old_slider = [0.5]
 
-    SEND_INTERVAL = timedelta(milliseconds=300)
+    SEND_INTERVAL = timedelta(milliseconds=30)
     SAVE_TO_FILE_INTERVAL = timedelta(seconds=5)
 
     last_sent = datetime.now()
@@ -75,7 +75,6 @@ def send_over_UDP(multiprocess_shared_dict):
 
         from_last_sent = datetime.now() - last_sent
 
-        
         if (grid != old_grid or slider != old_slider) and from_last_sent > SEND_INTERVAL:
 
             # convert to string and encode the packet
