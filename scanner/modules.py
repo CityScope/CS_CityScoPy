@@ -96,13 +96,15 @@ def send_over_UDP(multiprocess_shared_dict):
             except Exception as e:
                 print(e)
 
+            # save to file the current grid and slider if
+            # change was not detacted for more than interval seconds
+            if from_last_sent > SAVE_TO_FILE_INTERVAL:
+                save_grid_to_file(old_grid, old_slider)
+
             # match the two
             old_grid = grid
             old_slider = slider
             last_sent = datetime.now()
-
-            if from_last_sent > SAVE_TO_FILE_INTERVAL:
-                save_grid_to_file(grid, slider)
 
             # debug print
             print('\n', "UDP:", udp_message)
