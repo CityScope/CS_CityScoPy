@@ -32,7 +32,6 @@
 
 # imports packages
 
-import sliderScope
 import socket
 import os
 import sys
@@ -53,86 +52,43 @@ import cv2
 ##################################################
 
 
-def send_over_UDP(multiprocess_shared_dict):
-    old_grid = [-1]
-    old_slider = [0.5]
+def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_res_x, video_res_y, scanner_square_size):
+    """Creates list of pixel coordinates for scanner.
 
-    SEND_INTERVAL = timedelta(milliseconds=30)
-    SAVE_TO_FILE_INTERVAL = timedelta(seconds=5)
+    Steps:
+        - Determine virtual points on the grid that will be the centers of blocks.
+        - Transforms virtual[x, y] coordinate pairs to pixel representations for scanner.
+        - Transform those virtual points pixel coordinates and expand them into 3x3 clusters of pixel points
 
-    last_sent = datetime.now()
+    Args:
 
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
+    Returns list of[x, y] pixel coordinates for scanner to read.
+    """
+    # create the list of points
+    pixel_coordinates_list = []
 
-    pre_json = '{"grid":'.encode("utf-8")
+    for x in range(0, grid_dimensions_x):
+        for y in range(0, grid_dimensions_y):
 
-    post_udp = "}".encode("utf-8")
-    while True:
+            scaled_x = x * int(video_res_x / grid_dimensions_x)
+            # scanner_square_size * x
 
-        grid = multiprocess_shared_dict['grid']
-        slider = multiprocess_shared_dict['slider']
+            scaled_y = y * int(video_res_y / grid_dimensions_y)
+            # scanner_square_size * y
 
-        from_last_sent = datetime.now() - last_sent
+            for i in range(0, 4):
+                for j in range(0, 4):
 
-        if (grid != old_grid or slider != old_slider) and from_last_sent > SEND_INTERVAL:
-
-            # convert to string and encode the packet
-            types_json = str(grid).encode("utf-8")
-            slider_json = str(slider).encode("utf-8")
-
-            udp_message = pre_json + types_json + \
-                ',"slider":['.encode("utf-8") + \
-                slider_json + ']'.encode("utf-8") +\
-                post_udp
-
-            # open UDP socket
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.sendto(udp_message, (UDP_IP, UDP_PORT))
-
-            # send UDP to 2nd machine with a try catch to avoid crash if fails
-            try:
-                sock.sendto(udp_message, ("192.168.1.102", 7777))
-            except Exception as e:
-                print(e)
-
-            # save to file the current grid and slider if
-            # change was not detacted for more than interval seconds
-            if from_last_sent > SAVE_TO_FILE_INTERVAL:
-                save_grid_to_file(old_grid, old_slider)
-
-            # match the two
-            old_grid = grid
-            old_slider = slider
-            last_sent = datetime.now()
-
-            # debug print
-            print('\n', "UDP:", udp_message)
-
-
-##################################################
-
-def save_grid_to_file(grid, slider):
-    '''
-    gets the grid and saves it to txt file every x seconds 
-    '''
-    today_date = str(date.today())
-
-    logs_folder = get_folder_path() + 'LOGS/'
-    if not os.path.exists(logs_folder):
-        os.makedirs(logs_folder)
-
-    try:
-        file = open(logs_folder + today_date + ".txt", "a")
-        file.write(str([datetime.now(), grid, slider])+'\n')
-        file.close()
-
-        print('\n', "log file saved at", datetime.now())
-
-    except (OSError, IOError) as e:
-        print(e)
-    except:
-        print('other file error')
+                    pixel_coordinates_list.append(
+                        # x value of this scanner location
+                        [scaled_x + (i*scanner_square_size)
+                         + int(scanner_square_size),
+                         # y value of this scanner location
+                         scaled_y + (j*scanner_square_size)
+                         + int(scanner_square_size)
+                         ])
+    # print(len(pixel_coordinates_list), pixel_coordinates_list)
+    return pixel_coordinates_list
 
 
 ##################################################
@@ -140,14 +96,17 @@ def save_grid_to_file(grid, slider):
 
 def scanner_function(multiprocess_shared_dict):
 
+    # define the size for each scanner
+    scanner_square_size = 10
+
+    # define the grid size
+    grid_dimensions_x = 30
+    grid_dimensions_y = 5
+
     TYPES_LIST = []
 
     # holder of old cell colors array to check for new scan
     OLD_CELL_COLORS_ARRAY = []
-
-    # define the grid size
-    grid_dimensions_x = 6
-    grid_dimensions_y = 3
 
     # load json file
     array_of_tags_from_json = parse_json_file('tags')
@@ -174,15 +133,6 @@ def scanner_function(multiprocess_shared_dict):
     video_resolution_x = int(video_capture.get(3))
     video_resolution_y = int(video_capture.get(4))
 
-    # number of overall modules in the table x dimension
-    number_of_table_modules = 14
-
-    # scale of one module in actual pixel size over the x axis
-    one_module_scale = int(video_resolution_x/number_of_table_modules)
-
-    # define the size for each scanner
-    scanner_square_size = int(one_module_scale/2)
-
     # define the video window
     cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('CityScopeScanner', 1000, 1000)
@@ -201,7 +151,7 @@ def scanner_function(multiprocess_shared_dict):
 
     # create the location  array of scanners
     array_of_scanner_points_locations = get_scanner_pixel_coordinates(
-        video_resolution_x, one_module_scale,  scanner_square_size)
+        grid_dimensions_x, grid_dimensions_y, video_resolution_x, video_resolution_y, scanner_square_size)
 
     ##################################################
     ###################MAIN LOOP######################
@@ -259,17 +209,18 @@ def scanner_function(multiprocess_shared_dict):
             cv2.rectangle(DISTORTED_VIDEO_STREAM, (x, y),
                           (x+this_scanner_max_dimension,
                            y+this_scanner_max_dimension),
-                          thisColor, 3)
+                          thisColor, 1)
 
         # reduce unnecessary scan analysis and sending by comparing
         # the list of scanned cells to an old one
         if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
 
             # send array to check types
-            TYPES_LIST = find_type_in_tags_array(
-                CELL_COLORS_ARRAY, array_of_tags_from_json,
-                array_of_maps_form_json,
-                array_of_rotations_form_json)
+            TYPES_LIST = []
+            # find_type_in_tags_array(
+            #     CELL_COLORS_ARRAY, array_of_tags_from_json,
+            #     array_of_maps_form_json,
+            #     array_of_rotations_form_json)
 
             # match the two
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
@@ -306,23 +257,6 @@ def scanner_function(multiprocess_shared_dict):
     cv2.destroyAllWindows()
 
 ##################################################
-
-
-def slider_listener(multiprocess_shared_dict):
-
-    import sliderScope
-    sliderScopeObject = sliderScope.sliderObject()
-    while True:
-        """
-        Listen to physical slider input and return a [0-1] value
-        """
-        sliderScopeObject.sliderRunner()
-        slider = float(sliderScope.sliderValue)
-        # print (slider)
-        multiprocess_shared_dict['slider'] = slider
-
-
-##################################################
 ##################################################
 # HELPER FUNCTIONS
 ##################################################
@@ -344,11 +278,9 @@ def parse_json_file(field):
     """
     # init array for json fields
     json_field = []
-
     json_file_path = get_folder_path()+'DATA/tags.json'
     # open json file
     with open(json_file_path) as json_data:
-
         jd = json.load(json_data)
     # return each item for this field
     for i in jd[field]:
@@ -493,7 +425,7 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
     """
     typesArray = []
     # create np colors array with table struct
-    npColsArr = np.reshape(cellColorsArray, (18, 9))
+    npColsArr = np.reshape(cellColorsArray, (xxxxxxx, yyyyyyy))
 
     # go through the results
     for thisResult in npColsArr:
@@ -518,78 +450,6 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
 ##################################################
 
 
-def get_scanner_pixel_coordinates(video_res_x, scale, scanner_square_size):
-    """Creates list of pixel coordinates for scanner.
-
-    Steps:
-        - Determine virtual points on the grid that will be the centers of blocks.
-        - Transform those virtual points pixel coordinates and expand them into 3x3 clusters of pixel points
-
-    Args:
-
-    Returns list of[x, y] pixel coordinates for scanner to read.
-    """
-
-    # Point looks like [x, y]
-    virtual_points = [
-
-        [0, 0],
-        [2, 0],
-        [5, 0],
-        [7, 0],
-        [10, 0],
-        [12, 0],
-
-        [0, 3],
-        [2, 3],
-        [5, 3],
-        [7, 3],
-        [10, 3],
-        [12, 3],
-
-        [0, 6],
-        [2, 6],
-        [5, 6],
-        [7, 6],
-        [10, 6],
-        [12, 6]
-    ]
-
-    # call helper function to find location of each point
-    scanner_locations_array = transform_virtual_points_to_pixels(
-        virtual_points, scale, scanner_square_size)
-    return scanner_locations_array
-
-##################################################
-
-
-def transform_virtual_points_to_pixels(points, scale, scanner_square_size):
-    """
-    Transforms virtual[x, y] coordinate pairs to pixel representations
-    for scanner.
-
-    Returns list of[x, y] pixel coordinates for scanner.
-    """
-    pixel_coordinates_list = []
-    for [x, y] in points:
-        scaled_x = x*scale
-        scaled_y = y*scale
-        for i in range(0, 3):
-            for j in range(0, 3):
-                pixel_coordinates_list.append(
-                    [scaled_x + (i*scanner_square_size)
-                     + int(scale/4),
-
-                     scaled_y + (j*scanner_square_size)
-                     + int(scale/4)
-                     ])
-
-    return pixel_coordinates_list
-
-
-##################################################
-
-
 def get_folder_path():
     """
     gets the local folder
@@ -598,5 +458,83 @@ def get_folder_path():
     loc = str(os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))) + '/'
     return loc
+
+##################################################
+
+
+def send_over_UDP(multiprocess_shared_dict):
+    old_grid = [-1]
+
+    SEND_INTERVAL = timedelta(milliseconds=30)
+    SAVE_TO_FILE_INTERVAL = timedelta(seconds=5)
+
+    last_sent = datetime.now()
+
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 5005
+
+    pre_json = '{"grid":'.encode("utf-8")
+
+    post_udp = "}".encode("utf-8")
+    while True:
+
+        grid = multiprocess_shared_dict['grid']
+
+        from_last_sent = datetime.now() - last_sent
+
+        if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
+
+            # convert to string and encode the packet
+            types_json = str(grid).encode("utf-8")
+
+            udp_message = pre_json + types_json + post_udp
+
+            # open UDP socket
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.sendto(udp_message, (UDP_IP, UDP_PORT))
+
+            # send UDP to 2nd machine with a try catch to avoid crash if fails
+            try:
+                sock.sendto(udp_message, ("192.168.1.102", 7777))
+            except Exception as e:
+                print(e)
+
+            # save to file the current grid if
+            # change was not detacted for more than interval seconds
+            if from_last_sent > SAVE_TO_FILE_INTERVAL:
+                save_grid_to_file(old_grid)
+
+            # match the two
+            old_grid = grid
+            last_sent = datetime.now()
+
+            # debug print
+            print('\n', "UDP:", udp_message)
+
+
+##################################################
+
+def save_grid_to_file(grid):
+    '''
+    gets the grid and saves it to txt file every x seconds 
+    '''
+    today_date = str(date.today())
+
+    logs_folder = get_folder_path() + 'LOGS/'
+    if not os.path.exists(logs_folder):
+        os.makedirs(logs_folder)
+
+    try:
+        file = open(logs_folder + today_date + ".txt", "a")
+        file.write(str([datetime.now(), grid])+'\n')
+        file.close()
+
+        print('\n', "log file saved at", datetime.now())
+
+    except (OSError, IOError) as e:
+        print(e)
+    except:
+        print('other file error')
+
 
 ##################################################
