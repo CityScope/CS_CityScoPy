@@ -1,7 +1,5 @@
 # CityScope Scanner and Networker
 
-### for Cooper Hewitt, Smithsonian Design Museum “The Road Ahead: Reimagining Mobility” exhibition Dec. 14 through March 31, 2019
-
 #### [Python, openCV, NumPy]
 
 ## What is it good for?
@@ -44,6 +42,16 @@ Note: Running the tool in this way will involve some fail safe mechanisms that w
 
 - Use `udp_listener.py` to emulate UDP server listener and test received string
 
-## Troubleshoot
+## License
 
-If you encounter any issue with the tool, please cite the error appearing in the terminal window and send it to [@RELNO]()
+Please see `LICENSE` file for more details.This tool may require libraries which are subject to own licensing.
+
+## Contribution
+
+Please use GitHub Issues and PR interface for contributions.
+
+---
+
+Maintained by [Ariel Noyman](http://arielnoyman.com)
+
+[Repo contributors](https://github.com/CityScope/CS_Scanner_Python/graphs/contributors)
