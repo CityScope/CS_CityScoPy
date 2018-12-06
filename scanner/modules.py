@@ -100,8 +100,8 @@ def scanner_function(multiprocess_shared_dict):
     scanner_square_size = 5
 
     # define the grid size
-    grid_dimensions_x = 40
-    grid_dimensions_y = 40
+    grid_dimensions_x = 30
+    grid_dimensions_y = 20
 
     TYPES_LIST = []
 
