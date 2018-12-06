@@ -25,10 +25,10 @@ Note: Running the tool in this way will involve some fail safe mechanisms that w
 - Run `scanner` with `$ python3 scanner.py`. Tool will start scanning using the key stone data created with`keystone.py`
 - make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
 
-## Scan results [With slider]:
+## Scan results:
 
 ```
-{"grid":[[-1, -1], [1, 0], [16, 3], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [2, 2], [-1, -1], [-1, -1], [-1, -1], [-1, -1]]}
+{"grid":[[-1, -1], [1, 0], [16, 3], [12, 3], [4, 1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [2, 2], [-1, -1], [-1, -1], [-1, -1], [-1, -1]]}
 ```
 
 ## Optional
