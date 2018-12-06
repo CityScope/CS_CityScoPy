@@ -97,11 +97,11 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
 def scanner_function(multiprocess_shared_dict):
 
     # define the size for each scanner
-    scanner_square_size = 10
+    scanner_square_size = 5
 
     # define the grid size
-    grid_dimensions_x = 30
-    grid_dimensions_y = 5
+    grid_dimensions_x = 40
+    grid_dimensions_y = 40
 
     TYPES_LIST = []
 
@@ -174,6 +174,8 @@ def scanner_function(multiprocess_shared_dict):
         DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
             THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
 
+        # cell counter
+        count = 0
         # run through locations list and make scanners
         for this_scanner_location in array_of_scanner_points_locations:
 
@@ -211,16 +213,22 @@ def scanner_function(multiprocess_shared_dict):
                            y+this_scanner_max_dimension),
                           thisColor, 1)
 
+            '''
+            cv2.putText(DISTORTED_VIDEO_STREAM, str(count),
+                        (x, y), cv2.FONT_HERSHEY_DUPLEX,
+                        .3, (0, 0, 255), 1)
+            # cell counter
+            count = count + 1
+            '''
         # reduce unnecessary scan analysis and sending by comparing
         # the list of scanned cells to an old one
         if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
 
             # send array to check types
-            TYPES_LIST = []
-            # find_type_in_tags_array(
-            #     CELL_COLORS_ARRAY, array_of_tags_from_json,
-            #     array_of_maps_form_json,
-            #     array_of_rotations_form_json)
+            TYPES_LIST = find_type_in_tags_array(
+                CELL_COLORS_ARRAY, array_of_tags_from_json,
+                array_of_maps_form_json,
+                array_of_rotations_form_json, grid_dimensions_x, grid_dimensions_y)
 
             # match the two
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
@@ -229,13 +237,15 @@ def scanner_function(multiprocess_shared_dict):
             multiprocess_shared_dict['grid'] = str(TYPES_LIST)
 
         else:
-            # else skip this
+                # else skip this
             pass
 
+        '''
         # add type and pos text
         cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
                     (50, 50), cv2.FONT_HERSHEY_DUPLEX,
                     0.5, (0, 0, 0), 1)
+        '''
 
         # draw the video to screen
         cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
@@ -412,7 +422,7 @@ def select_color_by_mean_value(mean_color_RGB):
 ##################################################
 
 
-def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray):
+def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray, grid_dimensions_x, grid_dimensions_y):
     """Get the right brick type out of the list of JSON types.
 
     Steps:
@@ -424,15 +434,19 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
     Returns an array of found types in [T{ype},R{otation}] format
     """
     typesArray = []
+
     # create np colors array with table struct
-    npColsArr = np.reshape(cellColorsArray, (xxxxxxx, yyyyyyy))
+    np_array_of_scanned_colors = np.reshape(
+        cellColorsArray, (grid_dimensions_x * grid_dimensions_y, 16))
 
     # go through the results
-    for thisResult in npColsArr:
+    for thisResult in np_array_of_scanned_colors:
+
         # look for this result in tags array from JSON
         # and return only where TRUE appears in results
         whichTag = np.where([(thisResult == tag).all()
                              for tag in tagsArray])[0]
+
         # if this tag is not found return -1
         if whichTag.size == 0:
             typesArray.append([-1, -1])
@@ -443,9 +457,9 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray)
             rotation_value = rotationArray[this_tag]
 
             typesArray.append([int(type_number), int(rotation_value)])
+
     # finally, return this list to main program for UDP
     return typesArray
-
 
 ##################################################
 
@@ -465,7 +479,7 @@ def get_folder_path():
 def send_over_UDP(multiprocess_shared_dict):
     old_grid = [-1]
 
-    SEND_INTERVAL = timedelta(milliseconds=30)
+    SEND_INTERVAL = timedelta(milliseconds=50)
     SAVE_TO_FILE_INTERVAL = timedelta(seconds=5)
 
     last_sent = datetime.now()
@@ -516,7 +530,7 @@ def send_over_UDP(multiprocess_shared_dict):
 
 def save_grid_to_file(grid):
     '''
-    gets the grid and saves it to txt file every x seconds 
+    gets the grid and saves it to txt file every x seconds
     '''
     today_date = str(date.today())
 

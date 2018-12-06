@@ -54,20 +54,12 @@ if __name__ == '__main__':
     # init this dict's props
     multiprocess_shared_dict['grid'] = [-1]
 
-    # initial population of shared list
-    # make scanner process
-    # process_scanner = Process(target=modules.scanner_function,
-    #                           args=([multiprocess_shared_dict]))
-
     process_udp = Process(target=modules.send_over_UDP,
                           args=([multiprocess_shared_dict]))
-    # start all multi porcesses
-    # process_scanner.start()
-
-    # process_udp.start()
+    # start multi porcesse
+    process_udp.start()
 
     # start camera on main thread due to multiprocces issue
     modules.scanner_function(multiprocess_shared_dict)
 
-    # process_scanner.join()
-    # process_udp.join()
+    process_udp.join()
