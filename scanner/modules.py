@@ -43,6 +43,8 @@ from datetime import date
 import math
 import numpy as np
 import cv2
+# importing the requests library
+import requests
 
 
 ##################################################
@@ -100,8 +102,8 @@ def scanner_function(multiprocess_shared_dict):
     scanner_square_size = 5
 
     # define the grid size
-    grid_dimensions_x = 30
-    grid_dimensions_y = 20
+    grid_dimensions_x = 70
+    grid_dimensions_y = 30
 
     TYPES_LIST = []
 
@@ -476,79 +478,44 @@ def get_folder_path():
 ##################################################
 
 
-def send_over_UDP(multiprocess_shared_dict):
+def create_data_json(multiprocess_shared_dict):
+
     old_grid = [-1]
 
-    SEND_INTERVAL = timedelta(milliseconds=50)
-    SAVE_TO_FILE_INTERVAL = timedelta(seconds=5)
-
+    SEND_INTERVAL = timedelta(milliseconds=1000)
     last_sent = datetime.now()
-
     UDP_IP = "127.0.0.1"
     UDP_PORT = 5005
-
     pre_json = '{"grid":'.encode("utf-8")
-
     post_udp = "}".encode("utf-8")
+
     while True:
-
         grid = multiprocess_shared_dict['grid']
-
         from_last_sent = datetime.now() - last_sent
-
         if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
-
             # convert to string and encode the packet
             types_json = str(grid).encode("utf-8")
-
-            udp_message = pre_json + types_json + post_udp
-
-            # open UDP socket
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sock.sendto(udp_message, (UDP_IP, UDP_PORT))
-
-            # send UDP to 2nd machine with a try catch to avoid crash if fails
+            message = pre_json + types_json + post_udp
             try:
-                sock.sendto(udp_message, ("192.168.1.102", 7777))
+                send_json_to_cityIO(message)
             except Exception as e:
                 print(e)
-
-            # save to file the current grid if
-            # change was not detacted for more than interval seconds
-            if from_last_sent > SAVE_TO_FILE_INTERVAL:
-                save_grid_to_file(old_grid)
 
             # match the two
             old_grid = grid
             last_sent = datetime.now()
 
             # debug print
-            print('\n', "UDP:", udp_message)
-
+            print('\n', 'sent at: ', datetime.now())
 
 ##################################################
 
-def save_grid_to_file(grid):
-    '''
-    gets the grid and saves it to txt file every x seconds
-    '''
-    today_date = str(date.today())
 
-    logs_folder = get_folder_path() + 'LOGS/'
-    if not os.path.exists(logs_folder):
-        os.makedirs(logs_folder)
-
-    try:
-        file = open(logs_folder + today_date + ".txt", "a")
-        file.write(str([datetime.now(), grid])+'\n')
-        file.close()
-
-        print('\n', "log file saved at", datetime.now())
-
-    except (OSError, IOError) as e:
-        print(e)
-    except:
-        print('other file error')
+def send_json_to_cityIO(cityIO_json):
+    # defining the api-endpoint
+    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/py"
+    # sending post request and saving response as response object
+    requests.post(url=API_ENDPOINT, data=cityIO_json)
 
 
 ##################################################

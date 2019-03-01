@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # init this dict's props
     multiprocess_shared_dict['grid'] = [-1]
 
-    process_udp = Process(target=modules.send_over_UDP,
+    process_udp = Process(target=modules.create_data_json,
                           args=([multiprocess_shared_dict]))
     # start multi porcesse
     process_udp.start()
