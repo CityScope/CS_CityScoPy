@@ -1,13 +1,12 @@
-# CityScope Scanner and Networker
+# CityScoPy
 
-#### [Python, openCV, NumPy]
+## Scanning and Networking Module for MIT CityScope Project in Python
 
-This tool is for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical colored bricks. CityScope Scanner will detect colors in arrays of 2d-pixel arrays at sizes of 3x3. Than, these color arrays will be compared to `tags` attribute of a given `json` file [should be located in `data` folder]. At last, the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list can be sent for visualizing using UDP and HTTP.
+This tool is for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical Lego bricks. CityScope Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color arrays will be compared to list of `tags` attribute of a given `json` file located in `data` folder. At last, the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list is then converted to cityIO acceptable JSON format and can be sent using UDP and HTTP.
 
-## Running Regularly / Quick-Run
+## Quick-Run
 
-- Clone this repo, start Terminal at the project's folder
-- Run using `$ ./run`
+- From terminal, run the tool using `$ ./run`
 - Tool will start scanning using whatever keystone data was stored in `scanner/data`
 - make corrections to the key stone using the sliders. Press `s` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
 
