@@ -43,7 +43,6 @@ import numpy as np
 import cv2
 import requests
 
-
 ##################################################
 ##################################################
 # MAIN FUNCTIONS
@@ -55,9 +54,12 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
     """Creates list of pixel coordinates for scanner.
 
     Steps:
-        - Determine virtual points on the grid that will be the centers of blocks.
-        - Transforms virtual[x, y] coordinate pairs to pixel representations for scanner.
-        - Transform those virtual points pixel coordinates and expand them into 3x3 clusters of pixel points
+        - Determine virtual points on the grid that
+         will be the centers of blocks.
+        - Transforms virtual[x, y] coordinate pairs to
+        pixel representations for scanner.
+        - Transform those virtual points pixel coordinates
+        and expand them into 3x3 clusters of pixel points
 
     Args:
 
@@ -93,6 +95,16 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
 ##################################################
 
 
+def np_string_tags(json_data):
+    # return each item for this field
+    d = []
+    for i in json_data:
+        d.append(np.array([int(ch) for ch in i]))
+    return d
+
+
+##################################################
+
 def scanner_function(multiprocess_shared_dict):
 
     # define the size for each scanner
@@ -106,11 +118,15 @@ def scanner_function(multiprocess_shared_dict):
 
     # holder of old cell colors array to check for new scan
     OLD_CELL_COLORS_ARRAY = []
+    PATH = 'DATA/cityio.json'
 
-    # load json file
-    array_of_tags_from_json = parse_json_file('tags')
-    array_of_maps_form_json = parse_json_file('map')
-    array_of_rotations_form_json = parse_json_file('rotation')
+    # load infor from json file for tags
+    table_settings = parse_json_file('table', PATH)
+    array_of_tags_from_json = np_string_tags(
+        table_settings['header']['mapping']['tags'])
+
+    array_of_maps_form_json = table_settings['header']['mapping']['type']
+    array_of_rotations_form_json = table_settings['header']['mapping']['rotation']
 
     # load the initial keystone data from file
     keystone_points_array = np.loadtxt(
@@ -324,7 +340,7 @@ def send_json_to_cityIO(cityIO_json):
 
 ##################################################
 
-def parse_json_file(field):
+def parse_json_file(field, PATH):
     """
     get data from JSON settings files.
 
@@ -337,24 +353,15 @@ def parse_json_file(field):
 
     Returns the desired filed
     """
-    # init array for json fields
-    json_field = []
-    json_file_path = get_folder_path()+'DATA/scanner.json'
-    # open json file
-    with open(json_file_path) as json_data:
-        jd = json.load(json_data)
-    # return each item for this field
-    for i in jd[field]:
-        # if item length is more than 1 [tags]
-        if field == 'tags':
-            # parse this item as np array
-            json_field.append(np.array([int(ch) for ch in i]))
-            print(json_field)
-        else:
-            # otherwise send it as is
-            json_field.append(i)
-    return json_field
 
+    print('getting:', field)
+    # field = field[0]
+    # init array for json fields
+    c = get_folder_path()+PATH
+    # open json file
+    with open(c) as d:
+        data = json.load(d)
+    return(data[field])
 
 ##################################################
 
@@ -373,7 +380,7 @@ def get_folder_path():
 
 def create_user_intreface(keystone_points_array, video_resolution_x, video_resolution_y):
     """
-    Creates user interface and GUI.
+    Creates user interface and G
 
     Steps:
     makes a list of sliders for interaction
