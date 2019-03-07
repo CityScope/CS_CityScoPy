@@ -30,8 +30,6 @@
 
 ##################################################
 
-# imports packages
-
 import socket
 import os
 import sys
@@ -43,7 +41,6 @@ from datetime import date
 import math
 import numpy as np
 import cv2
-# importing the requests library
 import requests
 
 
@@ -102,8 +99,8 @@ def scanner_function(multiprocess_shared_dict):
     scanner_square_size = 5
 
     # define the grid size
-    grid_dimensions_x = 70
-    grid_dimensions_y = 30
+    grid_dimensions_x = 10
+    grid_dimensions_y = 10
 
     TYPES_LIST = []
 
@@ -153,7 +150,8 @@ def scanner_function(multiprocess_shared_dict):
 
     # create the location  array of scanners
     array_of_scanner_points_locations = get_scanner_pixel_coordinates(
-        grid_dimensions_x, grid_dimensions_y, video_resolution_x, video_resolution_y, scanner_square_size)
+        grid_dimensions_x, grid_dimensions_y, video_resolution_x,
+        video_resolution_y, scanner_square_size)
 
     ##################################################
     ###################MAIN LOOP######################
@@ -177,7 +175,7 @@ def scanner_function(multiprocess_shared_dict):
             THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
 
         # cell counter
-        count = 0
+        # count = 0
         # run through locations list and make scanners
         for this_scanner_location in array_of_scanner_points_locations:
 
@@ -275,6 +273,57 @@ def scanner_function(multiprocess_shared_dict):
 ##################################################
 
 
+def create_data_json(multiprocess_shared_dict, SEND_INTERVAL):
+    # initial dummy value for old grid
+    old_grid = [-1]
+    SEND_INTERVAL = timedelta(milliseconds=SEND_INTERVAL)
+    last_sent = datetime.now()
+
+    while True:
+
+        grid = multiprocess_shared_dict['grid']
+        from_last_sent = datetime.now() - last_sent
+
+        if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
+
+            try:
+                # send_json_to_cityIO(make_json(grid))
+                print(make_json(grid))
+
+            except Exception as e:
+                print(e)
+
+            # match the two
+            old_grid = grid
+            last_sent = datetime.now()
+
+            # debug print
+            print('\n', 'sent at: ', datetime.now())
+
+##################################################
+
+
+def make_json(grid):
+
+    # convert to json
+    json_struct = {}
+    json_struct['grid'] = grid
+    cityIO_json = json.dumps(json_struct)
+
+    return cityIO_json
+
+##################################################
+
+
+def send_json_to_cityIO(cityIO_json):
+    # defining the api-endpoint
+    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/py"
+    # sending post request and saving response as response object
+    requests.post(url=API_ENDPOINT, data=cityIO_json)
+
+
+##################################################
+
 def parse_json_file(field):
     """
     get data from JSON settings files.
@@ -290,21 +339,34 @@ def parse_json_file(field):
     """
     # init array for json fields
     json_field = []
-    json_file_path = get_folder_path()+'DATA/tags.json'
+    json_file_path = get_folder_path()+'DATA/scanner.json'
     # open json file
     with open(json_file_path) as json_data:
         jd = json.load(json_data)
     # return each item for this field
     for i in jd[field]:
         # if item length is more than 1 [tags]
-
         if field == 'tags':
             # parse this item as np array
             json_field.append(np.array([int(ch) for ch in i]))
+            print(json_field)
         else:
             # otherwise send it as is
             json_field.append(i)
     return json_field
+
+
+##################################################
+
+
+def get_folder_path():
+    """
+    gets the local folder
+    return is as a string with '/' at the ednd
+    """
+    loc = str(os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))) + '/'
+    return loc
 
 ##################################################
 
@@ -462,60 +524,3 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray,
 
     # finally, return this list to main program for UDP
     return typesArray
-
-##################################################
-
-
-def get_folder_path():
-    """
-    gets the local folder
-    return is as a string with '/' at the ednd
-    """
-    loc = str(os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__)))) + '/'
-    return loc
-
-##################################################
-
-
-def create_data_json(multiprocess_shared_dict):
-
-    old_grid = [-1]
-
-    SEND_INTERVAL = timedelta(milliseconds=1000)
-    last_sent = datetime.now()
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
-    pre_json = '{"grid":'.encode("utf-8")
-    post_udp = "}".encode("utf-8")
-
-    while True:
-        grid = multiprocess_shared_dict['grid']
-        from_last_sent = datetime.now() - last_sent
-        if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
-            # convert to string and encode the packet
-            types_json = str(grid).encode("utf-8")
-            message = pre_json + types_json + post_udp
-            try:
-                send_json_to_cityIO(message)
-            except Exception as e:
-                print(e)
-
-            # match the two
-            old_grid = grid
-            last_sent = datetime.now()
-
-            # debug print
-            print('\n', 'sent at: ', datetime.now())
-
-##################################################
-
-
-def send_json_to_cityIO(cityIO_json):
-    # defining the api-endpoint
-    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/py"
-    # sending post request and saving response as response object
-    requests.post(url=API_ENDPOINT, data=cityIO_json)
-
-
-##################################################
