@@ -249,7 +249,7 @@ def scanner_function(multiprocess_shared_dict):
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
 
             # [!] Store the type list results in the multiprocess_shared_dict
-            multiprocess_shared_dict['grid'] = str(TYPES_LIST)
+            multiprocess_shared_dict['grid'] = TYPES_LIST
 
         else:
                 # else skip this
@@ -321,7 +321,6 @@ def create_data_json(multiprocess_shared_dict):
 def make_json(grid):
 
     # convert to json
-    json_struct = {}
     json_struct = table_settings
     json_struct['grid'] = grid
     cityIO_json = json.dumps(json_struct)
@@ -356,7 +355,7 @@ def parse_json_file(field, PATH):
     """
 
     print('getting setting for:', field)
-    # field = field[0]
+
     # init array for json fields
     c = get_folder_path()+PATH
     # open json file
