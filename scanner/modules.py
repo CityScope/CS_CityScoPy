@@ -107,21 +107,17 @@ def np_string_tags(json_data):
 
 def scanner_function(multiprocess_shared_dict):
 
+    # load infor from json file
+    PATH = 'DATA/cityio.json'
+    table_settings = parse_json_file('table', PATH)
+
     # define the size for each scanner
     scanner_square_size = 5
 
-    # define the grid size
-    grid_dimensions_x = 10
-    grid_dimensions_y = 10
+    # define the table params
+    grid_dimensions_x = table_settings['header']['spatial']['nrows']
+    grid_dimensions_y = table_settings['header']['spatial']['ncols']
 
-    TYPES_LIST = []
-
-    # holder of old cell colors array to check for new scan
-    OLD_CELL_COLORS_ARRAY = []
-    PATH = 'DATA/cityio.json'
-
-    # load infor from json file for tags
-    table_settings = parse_json_file('table', PATH)
     array_of_tags_from_json = np_string_tags(
         table_settings['header']['mapping']['tags'])
 
@@ -131,6 +127,12 @@ def scanner_function(multiprocess_shared_dict):
     # load the initial keystone data from file
     keystone_points_array = np.loadtxt(
         get_folder_path()+'DATA/keystone.txt', dtype=np.float32)
+
+    # init type list array
+    TYPES_LIST = []
+
+    # holder of old cell colors array to check for new scan
+    OLD_CELL_COLORS_ARRAY = []
 
     # define the video stream
     try:
