@@ -240,7 +240,7 @@ def scanner_function(multiprocess_shared_dict):
         # the list of scanned cells to an old one
         if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
 
-            # send array to check types
+            # send array to method for checking types
             TYPES_LIST = find_type_in_tags_array(
                 CELL_COLORS_ARRAY, array_of_tags_from_json,
                 array_of_maps_form_json,
@@ -250,7 +250,8 @@ def scanner_function(multiprocess_shared_dict):
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
 
             # [!] Store the type list results in the multiprocess_shared_dict
-            multiprocess_shared_dict['grid'] = TYPES_LIST
+            multiprocess_shared_dict['grid'] = TYPES_LIST[0]
+            multiprocess_shared_dict['rotations'] = TYPES_LIST[1]
 
         else:
                 # else skip this
@@ -296,15 +297,22 @@ def create_data_json(multiprocess_shared_dict):
     last_sent = datetime.now()
 
     while True:
-
         grid = multiprocess_shared_dict['grid']
+        rotations = multiprocess_shared_dict['rotations']
         from_last_sent = datetime.now() - last_sent
 
         if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
 
             try:
-                send_json_to_cityIO(make_json(grid))
-                print(make_json(grid))
+
+                    # convert to json
+                json_struct = table_settings
+                json_struct['grid'] = grid
+                json_struct['rotation'] = rotations
+                cityIO_json = json.dumps(json_struct)
+
+                send_json_to_cityIO(cityIO_json)
+                print(cityIO_json)
 
             except Exception as e:
                 print(e)
@@ -317,16 +325,6 @@ def create_data_json(multiprocess_shared_dict):
             print('\n', 'sent at: ', datetime.now())
 
 ##################################################
-
-
-def make_json(grid):
-
-    # convert to json
-    json_struct = table_settings
-    json_struct['grid'] = grid
-    cityIO_json = json.dumps(json_struct)
-
-    return cityIO_json
 
 ##################################################
 
@@ -494,7 +492,7 @@ def select_color_by_mean_value(mean_color_RGB):
 ##################################################
 
 
-def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray, grid_dimensions_x, grid_dimensions_y):
+def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from_settings, grid_dimensions_x, grid_dimensions_y):
     """Get the right brick type out of the list of JSON types.
 
     Steps:
@@ -505,7 +503,8 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray,
     Args:
     Returns an array of found types in [T{ype},R{otation}] format
     """
-    typesArray = []
+    types_array = []
+    rotation_array = []
 
     # create np colors array with table struct
     np_array_of_scanned_colors = np.reshape(
@@ -521,17 +520,19 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray,
 
         # if this tag is not found return -1
         if whichTag.size == 0:
-            typesArray.append([-1, -1])
+            types_array.append(-1)
+            rotation_array.append(-1)
         # else return the tag location in the list
         else:
             this_tag = int(whichTag[0])
             type_number = mapArray[this_tag]
-            rotation_value = rotationArray[this_tag]
+            rotation_value = rotations_from_settings[this_tag]
 
-            typesArray.append([int(type_number), int(rotation_value)])
+            types_array.append(int(type_number))
+            rotation_array.append(int(rotation_value))
 
     # finally, return this list to main program for UDP
-    return typesArray
+    return [types_array, rotation_array]
 
 
 ##################################################
