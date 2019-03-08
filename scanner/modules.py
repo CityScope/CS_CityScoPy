@@ -43,6 +43,7 @@ import numpy as np
 import cv2
 import requests
 
+
 ##################################################
 ##################################################
 # MAIN FUNCTIONS
@@ -107,10 +108,6 @@ def np_string_tags(json_data):
 
 def scanner_function(multiprocess_shared_dict):
 
-    # load infor from json file
-    PATH = 'DATA/cityio.json'
-    table_settings = parse_json_file('table', PATH)
-
     # define the size for each scanner
     scanner_square_size = 5
 
@@ -138,13 +135,13 @@ def scanner_function(multiprocess_shared_dict):
     try:
         # try from a device 1 in list, not default webcam
         video_capture = cv2.VideoCapture(1)
-        print('no cam in pos 1')
+        print('no camera in pos 1')
         # if not exist, use device 0
         if not video_capture.isOpened():
             video_capture = cv2.VideoCapture(0)
 
     finally:
-        print(video_capture)
+        print('got video at: ', video_capture)
 
     # get video resolution from webcam
     video_resolution_x = int(video_capture.get(3))
@@ -269,13 +266,8 @@ def scanner_function(multiprocess_shared_dict):
         cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
 
         # INTERACTION
-        # break video loop by pressing ESC
         KEY_STROKE = cv2.waitKey(1)
-        # if chr(KEY_STROKE & 255) == 'q':
-        #     # break the loop
-        #     break
-
-        # # saves to file
+        #  saves to file
         if chr(KEY_STROKE & 255) == 's':
             save_keystone_to_file(
                 listen_to_UI_interaction())
@@ -291,7 +283,12 @@ def scanner_function(multiprocess_shared_dict):
 ##################################################
 
 
-def create_data_json(multiprocess_shared_dict, SEND_INTERVAL):
+def create_data_json(multiprocess_shared_dict):
+
+        # load info from json file
+    PATH = 'DATA/cityio.json'
+    table_settings = parse_json_file('table', PATH)
+    SEND_INTERVAL = table_settings['objects']['interval']
     # initial dummy value for old grid
     old_grid = [-1]
     SEND_INTERVAL = timedelta(milliseconds=SEND_INTERVAL)
@@ -305,13 +302,13 @@ def create_data_json(multiprocess_shared_dict, SEND_INTERVAL):
         if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
 
             try:
-                # send_json_to_cityIO(make_json(grid))
+                send_json_to_cityIO(make_json(grid))
                 print(make_json(grid))
 
             except Exception as e:
                 print(e)
 
-            # match the two
+            # match the two grid after send
             old_grid = grid
             last_sent = datetime.now()
 
@@ -325,6 +322,7 @@ def make_json(grid):
 
     # convert to json
     json_struct = {}
+    json_struct = table_settings
     json_struct['grid'] = grid
     cityIO_json = json.dumps(json_struct)
 
@@ -335,7 +333,8 @@ def make_json(grid):
 
 def send_json_to_cityIO(cityIO_json):
     # defining the api-endpoint
-    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/py"
+    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
+        table_settings['header']['name']
     # sending post request and saving response as response object
     requests.post(url=API_ENDPOINT, data=cityIO_json)
 
@@ -356,7 +355,7 @@ def parse_json_file(field, PATH):
     Returns the desired filed
     """
 
-    print('getting:', field)
+    print('getting setting for:', field)
     # field = field[0]
     # init array for json fields
     c = get_folder_path()+PATH
@@ -382,7 +381,7 @@ def get_folder_path():
 
 def create_user_intreface(keystone_points_array, video_resolution_x, video_resolution_y):
     """
-    Creates user interface and G
+    Creates user interface and keystone sliders 
 
     Steps:
     makes a list of sliders for interaction
@@ -533,3 +532,10 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotationArray,
 
     # finally, return this list to main program for UDP
     return typesArray
+
+
+##################################################
+
+# load info from json file
+PATH = 'DATA/cityio.json'
+table_settings = parse_json_file('table', PATH)

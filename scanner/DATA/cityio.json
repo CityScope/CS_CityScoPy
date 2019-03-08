@@ -30,6 +30,8 @@
       }
     },
     "grid": [],
-    "objects": {}
+    "objects": {
+      "interval": 500
+    }
   }
 }

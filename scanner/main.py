@@ -34,6 +34,7 @@
 from multiprocessing import Process, Manager
 import modules
 
+
 ##################################################
 ################RUN MULTITHREADED#################
 ##################################################
@@ -41,7 +42,7 @@ import modules
 
 
 if __name__ == '__main__':
-    SEND_INTERVAL = 1000
+
     # define global list manager
     MANAGER = Manager()
     # create shared global list to work with both processes
@@ -49,10 +50,10 @@ if __name__ == '__main__':
     # init this dict's props with one value
     multiprocess_shared_dict['grid'] = [-1]
     process_send_packet = Process(target=modules.create_data_json,
-                                  args=([multiprocess_shared_dict, SEND_INTERVAL]))
-    # start porcess
+                                  args=([multiprocess_shared_dict]))
+    # # start porcess
     process_send_packet.start()
-    # start camera on main thread due to multiprocces issue
+    # # start camera on main thread due to multiprocces issue
     modules.scanner_function(multiprocess_shared_dict)
-    # join the two processes
+    # # join the two processes
     process_send_packet.join()
