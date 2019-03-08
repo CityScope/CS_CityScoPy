@@ -148,8 +148,9 @@ def scanner_function(multiprocess_shared_dict):
     video_resolution_y = int(video_capture.get(4))
 
     # define the video window
-    cv2.namedWindow('CityScopeScanner', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('CityScopeScanner', 1000, 1000)
+    cv2.namedWindow('scanner_gui_window', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('scanner_gui_window', 200, 200)
+    cv2.namedWindow('sliders_gui_window', cv2.WINDOW_NORMAL)
 
     # make the sliders GUI
     create_user_intreface(
@@ -261,9 +262,9 @@ def scanner_function(multiprocess_shared_dict):
                     (50, 50), cv2.FONT_HERSHEY_DUPLEX,
                     0.5, (0, 0, 0), 1)
         '''
-
-        # draw the video to screen
-        cv2.imshow("CityScopeScanner", DISTORTED_VIDEO_STREAM)
+        if table_settings['objects']['gui'] is 1:
+            # draw the video to screen
+            cv2.imshow("scanner_gui_window", DISTORTED_VIDEO_STREAM)
 
         # INTERACTION
         KEY_STROKE = cv2.waitKey(1)
@@ -390,21 +391,21 @@ def create_user_intreface(keystone_points_array, video_resolution_x, video_resol
     Returns none
     """
 
-    cv2.createTrackbar('Upper Left X', 'CityScopeScanner',
+    cv2.createTrackbar('Upper Left X', 'sliders_gui_window',
                        keystone_points_array[0][0], video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Upper Left Y', 'CityScopeScanner',
+    cv2.createTrackbar('Upper Left Y', 'sliders_gui_window',
                        keystone_points_array[0][1], video_resolution_y, dont_return_on_ui)
-    cv2.createTrackbar('Upper Right X', 'CityScopeScanner',
+    cv2.createTrackbar('Upper Right X', 'sliders_gui_window',
                        keystone_points_array[1][0], video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Upper Right Y', 'CityScopeScanner',
+    cv2.createTrackbar('Upper Right Y', 'sliders_gui_window',
                        keystone_points_array[1][1], video_resolution_y, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Left X', 'CityScopeScanner',
+    cv2.createTrackbar('Bottom Left X', 'sliders_gui_window',
                        keystone_points_array[2][0], video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Left Y', 'CityScopeScanner',
+    cv2.createTrackbar('Bottom Left Y', 'sliders_gui_window',
                        keystone_points_array[2][1], video_resolution_y, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Right X', 'CityScopeScanner',
+    cv2.createTrackbar('Bottom Right X', 'sliders_gui_window',
                        keystone_points_array[3][0], video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Right Y', 'CityScopeScanner',
+    cv2.createTrackbar('Bottom Right Y', 'sliders_gui_window',
                        keystone_points_array[3][1], video_resolution_y, dont_return_on_ui)
 
 
@@ -424,14 +425,14 @@ def listen_to_UI_interaction():
     Returns 4x2 array of points location for key-stoning
     """
 
-    ulx = cv2.getTrackbarPos('Upper Left X', 'CityScopeScanner')
-    uly = cv2.getTrackbarPos('Upper Left Y', 'CityScopeScanner')
-    urx = cv2.getTrackbarPos('Upper Right X', 'CityScopeScanner')
-    ury = cv2.getTrackbarPos('Upper Right Y', 'CityScopeScanner')
-    blx = cv2.getTrackbarPos('Bottom Left X', 'CityScopeScanner')
-    bly = cv2.getTrackbarPos('Bottom Left Y', 'CityScopeScanner')
-    brx = cv2.getTrackbarPos('Bottom Right X', 'CityScopeScanner')
-    bry = cv2.getTrackbarPos('Bottom Right Y', 'CityScopeScanner')
+    ulx = cv2.getTrackbarPos('Upper Left X', 'sliders_gui_window')
+    uly = cv2.getTrackbarPos('Upper Left Y', 'sliders_gui_window')
+    urx = cv2.getTrackbarPos('Upper Right X', 'sliders_gui_window')
+    ury = cv2.getTrackbarPos('Upper Right Y', 'sliders_gui_window')
+    blx = cv2.getTrackbarPos('Bottom Left X', 'sliders_gui_window')
+    bly = cv2.getTrackbarPos('Bottom Left Y', 'sliders_gui_window')
+    brx = cv2.getTrackbarPos('Bottom Right X', 'sliders_gui_window')
+    bry = cv2.getTrackbarPos('Bottom Right Y', 'sliders_gui_window')
     return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
 
 ##################################################

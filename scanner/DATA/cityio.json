@@ -31,7 +31,8 @@
     },
     "grid": [],
     "objects": {
-      "interval": 500
+      "interval": 500,
+      "gui": 1
     }
   }
 }
