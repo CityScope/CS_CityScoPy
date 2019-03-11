@@ -51,65 +51,7 @@ import requests
 ##################################################
 
 
-def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_res_x, video_res_y, scanner_square_size):
-    """Creates list of pixel coordinates for scanner.
-
-    Steps:
-        - Determine virtual points on the grid that
-         will be the centers of blocks.
-        - Transforms virtual[x, y] coordinate pairs to
-        pixel representations for scanner.
-        - Transform those virtual points pixel coordinates
-        and expand them into 3x3 clusters of pixel points
-
-    Args:
-
-    Returns list of[x, y] pixel coordinates for scanner to read.
-    """
-    # create the list of points
-    pixel_coordinates_list = []
-
-    for x in range(0, grid_dimensions_x):
-        for y in range(0, grid_dimensions_y):
-
-            scaled_x = x * int(video_res_x / grid_dimensions_x)
-            # scanner_square_size * x
-
-            scaled_y = y * int(video_res_y / grid_dimensions_y)
-            # scanner_square_size * y
-
-            for i in range(0, 4):
-                for j in range(0, 4):
-
-                    pixel_coordinates_list.append(
-                        # x value of this scanner location
-                        [scaled_x + (i*scanner_square_size)
-                         + int(scanner_square_size),
-                         # y value of this scanner location
-                         scaled_y + (j*scanner_square_size)
-                         + int(scanner_square_size)
-                         ])
-    # print(len(pixel_coordinates_list), pixel_coordinates_list)
-    return pixel_coordinates_list
-
-
-##################################################
-
-
-def np_string_tags(json_data):
-    # return each item for this field
-    d = []
-    for i in json_data:
-        d.append(np.array([int(ch) for ch in i]))
-    return d
-
-
-##################################################
-
 def scanner_function(multiprocess_shared_dict):
-
-    # define the size for each scanner
-    scanner_square_size = 5
 
     # define the table params
     grid_dimensions_x = table_settings['header']['spatial']['nrows']
@@ -164,6 +106,11 @@ def scanner_function(multiprocess_shared_dict):
         1: (255, 255, 255)
     }
 
+    # define the size for each scanner
+    min_reolution = np.minimum(video_resolution_x, video_resolution_y)
+    max_scanners = np.maximum(grid_dimensions_y, grid_dimensions_x)
+    scanner_square_size = int(min_reolution/(max_scanners*4))
+
     # create the location  array of scanners
     array_of_scanner_points_locations = get_scanner_pixel_coordinates(
         grid_dimensions_x, grid_dimensions_y, video_resolution_x,
@@ -200,7 +147,7 @@ def scanner_function(multiprocess_shared_dict):
             y = this_scanner_location[1]
 
             # use this to control reduction of scanner size
-            this_scanner_max_dimension = int(scanner_square_size/2)
+            this_scanner_max_dimension = int(scanner_square_size)
 
             # set scanner crop box size and position
             # at x,y + crop box size
@@ -279,6 +226,68 @@ def scanner_function(multiprocess_shared_dict):
     cv2.destroyAllWindows()
 
 ##################################################
+
+
+def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_res_x, video_res_y, scanner_square_size):
+    """Creates list of pixel coordinates for scanner.
+
+    Steps:
+        - Determine virtual points on the grid that
+         will be the centers of blocks.
+        - Transforms virtual[x, y] coordinate pairs to
+        pixel representations for scanner.
+        - Transform those virtual points pixel coordinates
+        and expand them into 3x3 clusters of pixel points
+
+    Args:
+
+    Returns list of[x, y] pixel coordinates for scanner to read.
+    """
+
+    # calc the half of the ratio between
+    # screen size and the x dim of the grid
+    # for offseting the grid's 0,0
+
+    # grid_x_offset = int(
+    #     (video_res_x / 2) - ((grid_dimensions_x*scanner_square_size*4)/2))
+    # create the list of points
+
+    pixel_coordinates_list = []
+
+    for x in range(0, grid_dimensions_x):
+        for y in range(0, grid_dimensions_y):
+            # sets the two at the same size
+            # so both x and y are equaly devided
+            scaled_x = x * int((video_res_y /
+                                grid_dimensions_y))
+            scaled_y = y * int((video_res_y /
+                                grid_dimensions_y))
+            # make the actual location for the 4x4 scanner points
+            for i in range(0, 4):
+                for j in range(0, 4):
+                    # add them to list
+                    pixel_coordinates_list.append(
+                        # x value of this scanner location
+                        [scaled_x + (i*scanner_square_size)
+                         + int(scanner_square_size),
+                         # y value of this scanner location
+                         scaled_y + (j*scanner_square_size)
+                         + int(scanner_square_size)
+                         ])
+    return pixel_coordinates_list
+
+
+##################################################
+
+
+def np_string_tags(json_data):
+    # return each item for this field
+    d = []
+    for i in json_data:
+        d.append(np.array([int(ch) for ch in i]))
+    return d
+
+##################################################
 ##################################################
 # HELPER FUNCTIONS
 ##################################################
@@ -312,7 +321,7 @@ def create_data_json(multiprocess_shared_dict):
                 cityIO_json = json.dumps(json_struct)
 
                 send_json_to_cityIO(cityIO_json)
-                print(cityIO_json)
+                # print(cityIO_json)
 
             except Exception as e:
                 print(e)
@@ -334,7 +343,8 @@ def send_json_to_cityIO(cityIO_json):
     API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
         table_settings['header']['name']
     # sending post request and saving response as response object
-    requests.post(url=API_ENDPOINT, data=cityIO_json)
+    req = requests.post(url=API_ENDPOINT, data=cityIO_json)
+    print(req)
 
 
 ##################################################
@@ -379,7 +389,7 @@ def get_folder_path():
 
 def create_user_intreface(keystone_points_array, video_resolution_x, video_resolution_y):
     """
-    Creates user interface and keystone sliders 
+    Creates user interface and keystone sliders
 
     Steps:
     makes a list of sliders for interaction

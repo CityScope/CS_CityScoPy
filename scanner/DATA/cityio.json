@@ -3,8 +3,8 @@
     "header": {
       "name": "grasbrook",
       "spatial": {
-        "nrows": 12,
-        "ncols": 36,
+        "nrows": 50,
+        "ncols": 30,
         "physical_longitude": 53.5369,
         "physical_latitude": 10.00748,
         "longitude": 53.536898,
