@@ -91,8 +91,10 @@ def scanner_function(multiprocess_shared_dict):
 
     # define the video window
     cv2.namedWindow('scanner_gui_window', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('scanner_gui_window', 200, 200)
+    cv2.resizeWindow('scanner_gui_window', 400, 400)
+    cv2.moveWindow('scanner_gui_window', 10, 10)
     cv2.namedWindow('sliders_gui_window', cv2.WINDOW_NORMAL)
+    cv2.moveWindow('sliders_gui_window', 550, 10)
 
     # make the sliders GUI
     create_user_intreface(
@@ -107,20 +109,22 @@ def scanner_function(multiprocess_shared_dict):
     }
 
     # define the size for each scanner
-    min_reolution = np.minimum(video_resolution_x, video_resolution_y)
-    max_scanners = np.maximum(grid_dimensions_y, grid_dimensions_x)
-    scanner_square_size = int(min_reolution/(max_scanners*4))
+    x_ratio = int(video_resolution_x/(grid_dimensions_x*4))
+    y_ratio = int(video_resolution_y/(grid_dimensions_y*4))
+    scanner_square_size = np.minimum(x_ratio, y_ratio)
+
+    print(scanner_square_size, x_ratio, y_ratio)
 
     # create the location  array of scanners
     array_of_scanner_points_locations = get_scanner_pixel_coordinates(
         grid_dimensions_x, grid_dimensions_y, video_resolution_x,
         video_resolution_y, scanner_square_size)
 
-    ##################################################
-    ###################MAIN LOOP######################
-    ##################################################
+   ##################################################
+   ###################MAIN LOOP######################
+   ##################################################
 
-    # run the video loop forever
+   # run the video loop forever
     while True:
 
         # get a new matrix transformation every frame
@@ -254,25 +258,26 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
 
     pixel_coordinates_list = []
 
+    # define a cell gap for grided cases
+    cells_gap = 0
+
+    # create the 4x4 sub grid cells
     for x in range(0, grid_dimensions_x):
         for y in range(0, grid_dimensions_y):
-            # sets the two at the same size
-            # so both x and y are equaly devided
-            scaled_x = x * int((video_res_y /
-                                grid_dimensions_y))
-            scaled_y = y * int((video_res_y /
-                                grid_dimensions_y))
+
+            x_positions = x * ((scanner_square_size*4)+cells_gap)
+            y_positions = y * ((scanner_square_size*4)+cells_gap)
+
             # make the actual location for the 4x4 scanner points
             for i in range(0, 4):
                 for j in range(0, 4):
                     # add them to list
                     pixel_coordinates_list.append(
                         # x value of this scanner location
-                        [scaled_x + (i*scanner_square_size)
-                         + int(scanner_square_size),
+                        [x_positions + (i*scanner_square_size),
                          # y value of this scanner location
-                         scaled_y + (j*scanner_square_size)
-                         + int(scanner_square_size)
+                         y_positions + (j*scanner_square_size)
+
                          ])
     return pixel_coordinates_list
 
