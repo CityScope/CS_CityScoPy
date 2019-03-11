@@ -250,12 +250,13 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
 
     # calc the half of the ratio between
     # screen size and the x dim of the grid
-    # for offseting the grid's 0,0
+    # to center the grid in both Y & X
+    grid_x_offset = int(0.5 *
+                        (video_res_x - (grid_dimensions_x*scanner_square_size*4)))
+    grid_y_offset = int(0.5 *
+                        (video_res_y - (grid_dimensions_y*scanner_square_size*4)))
 
-    # grid_x_offset = int(
-    #     (video_res_x / 2) - ((grid_dimensions_x*scanner_square_size*4)/2))
     # create the list of points
-
     pixel_coordinates_list = []
 
     # define a cell gap for grided cases
@@ -274,9 +275,9 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
                     # add them to list
                     pixel_coordinates_list.append(
                         # x value of this scanner location
-                        [x_positions + (i*scanner_square_size),
+                        [grid_x_offset+x_positions + (i*scanner_square_size),
                          # y value of this scanner location
-                         y_positions + (j*scanner_square_size)
+                         grid_y_offset+y_positions + (j*scanner_square_size)
 
                          ])
     return pixel_coordinates_list
