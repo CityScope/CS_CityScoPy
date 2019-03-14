@@ -9,7 +9,7 @@
         "physical_latitude": 10.00748,
         "longitude": 53.536898,
         "latitude": 10.007472,
-        "cellSize": 32,
+        "cellSize": 16,
         "rotation": 325
       },
       "owner": {
