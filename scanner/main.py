@@ -48,8 +48,7 @@ if __name__ == '__main__':
     # create shared global list to work with both processes
     multiprocess_shared_dict = MANAGER.dict()
     # init this dict's props with one value
-    multiprocess_shared_dict['grid'] = [-1]
-    multiprocess_shared_dict['rotations'] = [-1]
+    multiprocess_shared_dict['scan'] = [-1, -1]
 
     # defines a multiprocess for sending the data
     process_send_packet = Process(target=modules.create_data_json,

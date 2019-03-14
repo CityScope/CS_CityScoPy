@@ -58,7 +58,7 @@ def scanner_function(multiprocess_shared_dict):
     grid_dimensions_y = table_settings['header']['spatial']['ncols']
 
     array_of_tags_from_json = np_string_tags(
-        table_settings['header']['mapping']['tags'])
+        table_settings['objects']['tags'])
 
     array_of_maps_form_json = table_settings['header']['mapping']['type']
     array_of_rotations_form_json = table_settings['header']['mapping']['rotation']
@@ -201,8 +201,7 @@ def scanner_function(multiprocess_shared_dict):
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
 
             # [!] Store the type list results in the multiprocess_shared_dict
-            multiprocess_shared_dict['grid'] = TYPES_LIST[0]
-            multiprocess_shared_dict['rotations'] = TYPES_LIST[1]
+            multiprocess_shared_dict['scan'] = TYPES_LIST
 
         else:
                 # else skip this
@@ -307,23 +306,21 @@ def create_data_json(multiprocess_shared_dict):
     table_settings = parse_json_file('table', PATH)
     SEND_INTERVAL = table_settings['objects']['interval']
     # initial dummy value for old grid
-    old_grid = [-1]
+    old_scan_results = [-1]
     SEND_INTERVAL = timedelta(milliseconds=SEND_INTERVAL)
     last_sent = datetime.now()
 
     while True:
-        grid = multiprocess_shared_dict['grid']
-        rotations = multiprocess_shared_dict['rotations']
+        scan_results = multiprocess_shared_dict['scan']
         from_last_sent = datetime.now() - last_sent
 
-        if (grid != old_grid) and from_last_sent > SEND_INTERVAL:
+        if (scan_results != old_scan_results) and from_last_sent > SEND_INTERVAL:
 
             try:
 
                     # convert to json
                 json_struct = table_settings
-                json_struct['grid'] = grid
-                json_struct['rotation'] = rotations
+                json_struct['grid'] = scan_results
                 cityIO_json = json.dumps(json_struct)
 
                 send_json_to_cityIO(cityIO_json)
@@ -333,7 +330,7 @@ def create_data_json(multiprocess_shared_dict):
                 print(e)
 
             # match the two grid after send
-            old_grid = grid
+            old_scan_results = scan_results
             last_sent = datetime.now()
 
             # debug print
@@ -517,10 +514,9 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
         - parse the color data into an NP array of the table shape
 
     Args:
-    Returns an array of found types in [T{ype},R{otation}] format
+    Returns an array of found types
     """
-    types_array = []
-    rotation_array = []
+    scan_results_array = []
 
     # create np colors array with table struct
     np_array_of_scanned_colors = np.reshape(
@@ -536,19 +532,17 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
 
         # if this tag is not found return -1
         if whichTag.size == 0:
-            types_array.append(-1)
-            rotation_array.append(-1)
+            scan_results_array.append([-1, 0])
         # else return the tag location in the list
         else:
             this_tag = int(whichTag[0])
             type_number = mapArray[this_tag]
             rotation_value = rotations_from_settings[this_tag]
 
-            types_array.append(int(type_number))
-            rotation_array.append(int(rotation_value))
+            scan_results_array.append([int(type_number), int(rotation_value)])
 
     # finally, return this list to main program for UDP
-    return [types_array, rotation_array]
+    return scan_results_array
 
 
 ##################################################
