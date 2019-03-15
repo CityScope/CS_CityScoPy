@@ -42,7 +42,7 @@ def get_folder_path():
     return is as a string with '/' at the ednd
     """
     loc = str(os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__)))) + '/'
+        os.path.join(os.getcwd()))) + '/'
     return loc
 
 
@@ -50,10 +50,9 @@ def get_folder_path():
 
 
 # file path to save
-FILE_PATH = get_folder_path()+"DATA/keystone.txt"
+FILE_PATH = get_folder_path()+"scanner/DATA/keystone.txt"
 
 # make WEBCAM
-
 # define the video stream
 try:
     # try from a device 1 in list, not default webcam
