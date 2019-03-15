@@ -29,6 +29,6 @@ while True:
     )
 
     time.sleep(1)
-    p = Popen("python " + 'scanner/main.py', shell=True)
+    p = Popen("python3 " + 'scanner/main.py', shell=True)
     p.wait()
     time.sleep(1)
