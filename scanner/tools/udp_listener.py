@@ -4,7 +4,7 @@ import socket
 
 def udf_listener():
     UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
+    UDP_PORT = 5000
 
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
@@ -12,7 +12,7 @@ def udf_listener():
     print("Starting UDP listener at:", UDP_IP, ' port: ', UDP_PORT, sock)
 
     while True:
-        data,  = sock.recvfrom(1024)  # buffer size is 1024 bytes
+        data, addr = sock.recvfrom(1024)  # buffer size is 1024 bytes
         print('\n', data.decode())
 
 

@@ -323,8 +323,12 @@ def create_data_json(multiprocess_shared_dict):
                 json_struct['grid'] = scan_results
                 cityIO_json = json.dumps(json_struct)
 
-                send_json_to_cityIO(cityIO_json)
-                # print(cityIO_json)
+                if table_settings['objects']['cityio'] is 1:
+                    print('sending to cityIO')
+                    send_json_to_cityIO(cityIO_json)
+                else:
+                    print('sending UDP')
+                    send_json_to_UDP(scan_results)
 
             except Exception as e:
                 print(e)
@@ -348,6 +352,19 @@ def send_json_to_cityIO(cityIO_json):
     # sending post request and saving response as response object
     req = requests.post(url=API_ENDPOINT, data=cityIO_json)
     print(req)
+
+##################################################
+
+
+def send_json_to_UDP(scan_results):
+    # defining the udp endpoint
+    UDP_IP = "127.0.0.1"
+    UDP_PORT = 5000
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        sock.sendto(str(scan_results).encode('utf-8'), (UDP_IP, UDP_PORT))
+    except Exception as e:
+        print(e)
 
 
 ##################################################
