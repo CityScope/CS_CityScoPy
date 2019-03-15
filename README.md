@@ -2,11 +2,11 @@
 
 ## Scanning and Networking Module for MIT CityScope Project in Python
 
-This tool is for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical Lego bricks. CityScope Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color arrays will be compared to list of `tags` attribute of a given `json` file located in `data` folder. At last, the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list is then converted to cityIO acceptable JSON format and can be sent using UDP and HTTP.
+This tool is for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical Lego bricks. CityScope Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color arrays will be compared to list of `tags` attribute of a given `json` file located in `data` folder. At last, the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list is then converted to cityIO acceptable JSON format and can be sent uding POST request.
 
 ## Quick-Run
 
-- From terminal, run the tool using `$ ./run`
+- From terminal, run the tool using `$ run.py`
 - Tool will start scanning using whatever keystone data was stored in `scanner/data`
 - make corrections to the key stone using the sliders. Press `s` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
 
@@ -14,25 +14,17 @@ Note: Running the tool in this way will involve some fail safe mechanisms that w
 
 ## Setup and Calibration On First Time Usage / Full Setup
 
-- get python 3.4 and above, clone this repo
-- Install packages manually or using `pip` via `pip install -r requirements.txt`
-- Run `keystone` with: `$ python3 keystone.py`
+- get python 3.4 and above, clone this repo, install relevant libs [see main.py]
+- Run with `$ python[3] main.py`. 
+- Tool will start scanning using the key stone data created with`keystone.py`
+- make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
+
+## Optional
+- Run `keystone` with: `$ python[3] keystone.py`
 - the tool will start, assuming a webcam is connected and working
 - Select 4 corners [up right, up left, bottom right, bottom left, at this order] of keystone region
   Note: no need to exactly select the corners, as these are only initial guides for `scanner` tool
 - `keystone.py` will create `keystone.txt` and close
-- Run `scanner` with `$ python3 scanner.py`. Tool will start scanning using the key stone data created with`keystone.py`
-- make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
-
-## Scan results:
-
-```
-{"grid":[[-1, -1], [1, 0], [16, 3], [12, 3], [4, 1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [2, 2], [-1, -1], [-1, -1], [-1, -1], [-1, -1]]}
-```
-
-## Optional
-
-- Use `udp_listener.py` to emulate UDP server listener and test received string
 
 ## License
 
