@@ -20,6 +20,12 @@ Note: Running the tool in this way will involve some fail safe mechanisms that w
 - Tool will start scanning using the key stone data created with`keystone.py`
 - make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
 
+### options in `cityio.json` , `objects` field
+  - `gui` 0 or 1 -- turn on or of webcam display
+  - `interval` 0 to inf -- send rate to UDP/HTTP in ms
+- `cityio` 0 or 1 -- send to UDP [0] or HTTP cityIO[1]
+- `tags` ["1000000100000000"] -- 16 digit strings, repesenting of the types of being scanned  
+
 ## Optional
 - Run `keystone` with: `$ python[3] keystone.py`
 - the tool will start, assuming a webcam is connected and working
