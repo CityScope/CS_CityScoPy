@@ -15,7 +15,7 @@ Note: Running the tool in this way will involve some fail safe mechanisms that w
 ## Setup and Calibration On First Time Usage | Full Setup
 
 - get python 3.4 and above, clone this repo, install relevant libs [see main.py]
-- tweek `DATA/cityio.json` to feet your cityIO table setup [read https://github.com/CityScope/CS_CityIO_Backend/wiki to understand cityIO data structure]
+- tweek `DATA/cityio.json` to fit your cityIO table setup [read https://github.com/CityScope/CS_CityIO_Backend/wiki to understand cityIO data structure]
 - Run with `$ python[3] main.py`. 
 - Tool will start scanning using the key stone data created with`keystone.py`
 - make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
