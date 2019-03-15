@@ -12,9 +12,10 @@ This tool is for capturing, key-stoning, scanning and sending uniquely tagged ar
 
 Note: Running the tool in this way will involve some fail safe mechanisms that will auto-restart the tool when it crashes [such as camera disconnect, slider failure or networking issue]
 
-## Setup and Calibration On First Time Usage / Full Setup
+## Setup and Calibration On First Time Usage | Full Setup
 
 - get python 3.4 and above, clone this repo, install relevant libs [see main.py]
+- tweek `DATA/cityio.json` to feet your cityIO table setup [read https://github.com/CityScope/CS_CityIO_Backend/wiki to understand cityIO data structure]
 - Run with `$ python[3] main.py`. 
 - Tool will start scanning using the key stone data created with`keystone.py`
 - make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
