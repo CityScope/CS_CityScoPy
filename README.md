@@ -1,4 +1,6 @@
 # CityScoPy
+### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/tag/2.0)
+
 
 ## Scanning and Networking Module for MIT CityScope Project in Python
 
