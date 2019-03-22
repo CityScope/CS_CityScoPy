@@ -93,7 +93,7 @@ def scanner_function(multiprocess_shared_dict):
     cv2.namedWindow('scanner_gui_window', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('scanner_gui_window', 400, 400)
     cv2.moveWindow('scanner_gui_window', 10, 100)
-    cv2.namedWindow('sliders_gui_window', cv2.WINDOW_AUTOSIZE)
+    cv2.namedWindow('sliders_gui_window', cv2.WINDOW_NORMAL)
     cv2.moveWindow('sliders_gui_window', 550, 100)
 
     # make the sliders GUI
