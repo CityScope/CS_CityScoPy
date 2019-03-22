@@ -65,7 +65,7 @@ def scanner_function(multiprocess_shared_dict):
 
     # load the initial keystone data from file
     keystone_points_array = np.loadtxt(
-        get_folder_path()+'DATA/keystone.txt', dtype=np.float32)
+        get_folder_path()+'keystone.txt', dtype=np.float32)
 
     # init type list array
     TYPES_LIST = []
@@ -302,7 +302,7 @@ def np_string_tags(json_data):
 def create_data_json(multiprocess_shared_dict):
 
         # load info from json file
-    PATH = 'DATA/cityio.json'
+    PATH = 'cityio.json'
     table_settings = parse_json_file('table', PATH)
     SEND_INTERVAL = table_settings['objects']['interval']
     # initial dummy value for old grid
@@ -494,7 +494,7 @@ def save_keystone_to_file(keystone_data_from_user_interaction):
 
     """
 
-    filePath = get_folder_path() + "DATA/keystone.txt"
+    filePath = get_folder_path() + "keystone.txt"
     np.savetxt(filePath, keystone_data_from_user_interaction)
     print("[!] keystone points were saved in", filePath)
 
@@ -584,5 +584,5 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
 ##################################################
 
 # load info from json file
-PATH = 'DATA/cityio.json'
+PATH = 'cityio.json'
 table_settings = parse_json_file('table', PATH)

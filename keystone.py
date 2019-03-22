@@ -50,7 +50,7 @@ def get_folder_path():
 
 
 # file path to save
-FILE_PATH = get_folder_path()+"scanner/DATA/keystone.txt"
+FILE_PATH = get_folder_path()+"keystone.txt"
 
 # make WEBCAM
 # define the video stream
