@@ -567,7 +567,6 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
         # and return only where TRUE appears in results
         whichTag = np.where([(thisResult == tag).all()
                              for tag in tagsArray])[0]
-
         # if this tag is not found return -1
         if whichTag.size == 0:
             scan_results_array.append([-1, 0])
@@ -576,7 +575,6 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
             this_tag = int(whichTag[0])
             type_number = mapArray[this_tag]
             rotation_value = rotations_from_settings[this_tag]
-
             scan_results_array.append([int(type_number), int(rotation_value)])
 
     # finally, return this list to main program for UDP
