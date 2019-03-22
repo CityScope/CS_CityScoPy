@@ -76,11 +76,13 @@ def scanner_function(multiprocess_shared_dict):
     # define the video stream
     try:
         # try from a device 1 in list, not default webcam
-        video_capture = cv2.VideoCapture(1)
-        print('no camera in pos 1')
+        video_capture = cv2.VideoCapture(0)
+        print('no camera in pos 0')
+        time.sleep(0.5)
         # if not exist, use device 0
         if not video_capture.isOpened():
-            video_capture = cv2.VideoCapture(0)
+            video_capture = cv2.VideoCapture(1)
+            time.sleep(0.5)
 
     finally:
         print('got video at: ', video_capture)

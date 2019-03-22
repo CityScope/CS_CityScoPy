@@ -28,10 +28,9 @@
 # "https://www.linkedin.com/", "http://twitter.com/relno",
 # https://github.com/RELNO]
 
-
+import cv2
 import numpy as np
 import os
-import cv2
 
 ##################################################
 
@@ -56,10 +55,10 @@ FILE_PATH = get_folder_path()+"keystone.txt"
 # define the video stream
 try:
     # try from a device 1 in list, not default webcam
-    WEBCAM = cv2.VideoCapture(1)
+    WEBCAM = cv2.VideoCapture(0)
     # if not exist, use device 0
     if not WEBCAM.isOpened():
-        WEBCAM = cv2.VideoCapture(0)
+        WEBCAM = cv2.VideoCapture(1)
 finally:
     print(WEBCAM)
 
