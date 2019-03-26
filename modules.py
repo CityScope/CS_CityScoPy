@@ -144,7 +144,7 @@ def scanner_function(multiprocess_shared_dict):
             THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
 
         # cell counter
-        # count = 0
+        count = 0
         # run through locations list and make scanners
         for this_scanner_location in array_of_scanner_points_locations:
 
@@ -181,14 +181,13 @@ def scanner_function(multiprocess_shared_dict):
                           (x+this_scanner_max_dimension,
                            y+this_scanner_max_dimension),
                           thisColor, 1)
-
-            '''
+            # put grid text
             cv2.putText(DISTORTED_VIDEO_STREAM, str(count),
                         (x, y), cv2.FONT_HERSHEY_DUPLEX,
                         .3, (0, 0, 255), 1)
             # cell counter
             count = count + 1
-            '''
+
         # reduce unnecessary scan analysis and sending by comparing
         # the list of scanned cells to an old one
         if CELL_COLORS_ARRAY != OLD_CELL_COLORS_ARRAY:
@@ -278,9 +277,7 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
                         # x value of this scanner location
                         [grid_x_offset+x_positions + (i*scanner_square_size),
                          # y value of this scanner location
-                         grid_y_offset+y_positions + (j*scanner_square_size)
-
-                         ])
+                         grid_y_offset+y_positions + (j*scanner_square_size)])
     return pixel_coordinates_list
 
 
