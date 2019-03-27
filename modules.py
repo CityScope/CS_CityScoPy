@@ -209,7 +209,7 @@ def scanner_function(multiprocess_shared_dict):
             TYPES_LIST = find_type_in_tags_array(
                 CELL_COLORS_ARRAY, array_of_tags_from_json,
                 array_of_maps_form_json,
-                array_of_rotations_form_json, grid_dimensions_x, grid_dimensions_y)
+                grid_dimensions_x, grid_dimensions_y)
 
             # match the two
             OLD_CELL_COLORS_ARRAY = CELL_COLORS_ARRAY
@@ -553,7 +553,8 @@ def select_color_by_mean_value(mean_color_RGB):
 ##################################################
 
 
-def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from_settings, grid_dimensions_x, grid_dimensions_y):
+def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray,
+                            grid_dimensions_x, grid_dimensions_y):
     """Get the right brick type out of the list of JSON types.
 
     Steps:
@@ -565,34 +566,36 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
     Returns an array of found types
     """
     scan_results_array = []
-
     # create np colors array with table struct
     np_array_of_scanned_colors = np.reshape(
         cellColorsArray, (grid_dimensions_x * grid_dimensions_y, 16))
 
     # go through the results
     for this_16_bits in np_array_of_scanned_colors:
-        rot_arr = brick_rotation_check(this_16_bits)
+
+        ''' Old method
         # look for this result in tags array from JSON
         # and return only where TRUE appears in results
-        #!for tag in tagsArray:
-        #!    print(this_16_bits, tag, np.where(np.isin(tag, rot_arr)))
-
-        whichTag = np.where([
-            (this_16_bits == tag).all()
-            for tag in tagsArray
-        ])[0]
+        # this_tag = np.where([
+        #     (this_16_bits == tag).all()
+        #     for tag in tagsArray
+        # ])[0]
 
         # if this tag is not found return -1
-        if whichTag.size == 0:
+        if this_tag == None:
             scan_results_array.append([-1, 0])
         # else return the tag location in the list
         else:
-            this_tag = int(whichTag[0])
             type_number = mapArray[this_tag]
             rotation_value = rotations_from_settings[this_tag]
             # finally add to array
-            scan_results_array.append([int(type_number), int(rotation_value)])
+        '''
+
+        result_tag = brick_rotation_check(this_16_bits, tagsArray, mapArray)
+        if result_tag == None:
+            result_tag = [-1, -1]
+        else:
+            scan_results_array.append(result_tag)
 
     # finally, return this list to main program for UDP
     return scan_results_array
@@ -600,14 +603,30 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
 ##################################################
 
 
-def brick_rotation_check(this_16_bits):
-
-    brk_4x4 = np.reshape(this_16_bits, (4, 4))
-    brk_4x4_90 = np.reshape((np.rot90(np.rot90(np.rot90(brk_4x4)))), 16)
-    brk_4x4_270 = np.reshape((np.rot90(np.rot90(brk_4x4))), 16)
-    brk_4x4_180 = np.reshape((np.rot90(brk_4x4)), 16)
-    rot_array = [this_16_bits, brk_4x4_90, brk_4x4_180, brk_4x4_270]
-    return rot_array
+def brick_rotation_check(this_16_bits, tagsArray, mapArray):
+    tags_array_counter = 0
+    for this_tag in tagsArray:
+        # if this 16 bits equal the tag as is
+        if np.array_equal(this_16_bits, this_tag):
+            return [tags_array_counter, 0]
+        # convert list of 16 bits to 4x4 matrix for rotation
+        brk_4x4 = np.reshape(this_16_bits, (4, 4))
+        # rotate once
+        brk_4x4_270 = np.reshape((np.rot90(brk_4x4)), 16)
+        if np.array_equal(brk_4x4_270, this_tag):
+            return [tags_array_counter, 1]
+        # rotate once
+        brk_4x4_180 = np.reshape((np.rot90(np.rot90(brk_4x4))), 16)
+        if np.array_equal(brk_4x4_180, this_tag):
+            return [tags_array_counter, 2]
+        # rotate once
+        brk_4x4_90 = np.reshape((np.rot90(np.rot90(np.rot90(brk_4x4)))), 16)
+        if np.array_equal(brk_4x4_90, this_tag):
+            return [tags_array_counter, 3]
+        else:
+            # if no rotation was found go to next tag
+            # in tag list
+            tags_array_counter = tags_array_counter+1
 
 
 ##################################################
