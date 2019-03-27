@@ -572,31 +572,12 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray,
 
     # go through the results
     for this_16_bits in np_array_of_scanned_colors:
-
-        ''' Old method
-        # look for this result in tags array from JSON
-        # and return only where TRUE appears in results
-        # this_tag = np.where([
-        #     (this_16_bits == tag).all()
-        #     for tag in tagsArray
-        # ])[0]
-
-        # if this tag is not found return -1
-        if this_tag == None:
-            scan_results_array.append([-1, 0])
-        # else return the tag location in the list
-        else:
-            type_number = mapArray[this_tag]
-            rotation_value = rotations_from_settings[this_tag]
-            # finally add to array
-        '''
-
         result_tag = brick_rotation_check(this_16_bits, tagsArray, mapArray)
+        # if no results were found
         if result_tag == None:
             result_tag = [-1, -1]
         else:
             scan_results_array.append(result_tag)
-
     # finally, return this list to main program for UDP
     return scan_results_array
 
