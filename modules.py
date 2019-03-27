@@ -43,11 +43,8 @@ import numpy as np
 import cv2
 import requests
 
-
-##################################################
 ##################################################
 # MAIN FUNCTIONS
-##################################################
 ##################################################
 
 
@@ -576,8 +573,8 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray,
         # if no results were found
         if result_tag == None:
             result_tag = [-1, -1]
-        else:
-            scan_results_array.append(result_tag)
+        # add a list of results to the array
+        scan_results_array.append(result_tag)
     # finally, return this list to main program for UDP
     return scan_results_array
 
