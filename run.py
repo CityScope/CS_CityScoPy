@@ -71,7 +71,7 @@ of uniquely tagged LEGO array
 
 '''
     )
-    time.sleep(2)
+    time.sleep(1)
 
     # define global list manager
     MANAGER = Manager()

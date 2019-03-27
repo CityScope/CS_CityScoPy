@@ -58,7 +58,7 @@ def scanner_function(multiprocess_shared_dict):
     grid_dimensions_y = table_settings['header']['spatial']['ncols']
 
     array_of_tags_from_json = np_string_tags(
-        table_settings['objects']['tags'])
+        table_settings['objects']['cityscopy']['tags'])
 
     array_of_maps_form_json = table_settings['header']['mapping']['type']
     array_of_rotations_form_json = table_settings['header']['mapping']['rotation']
@@ -76,13 +76,13 @@ def scanner_function(multiprocess_shared_dict):
     # define the video stream
     try:
         # try from a device 1 in list, not default webcam
-        video_capture = cv2.VideoCapture(0)
+        video_capture = cv2.VideoCapture(1)
         print('no camera in pos 0')
-        time.sleep(0.5)
+        time.sleep(1)
         # if not exist, use device 0
         if not video_capture.isOpened():
-            video_capture = cv2.VideoCapture(1)
-            time.sleep(0.5)
+            video_capture = cv2.VideoCapture(0)
+            time.sleep(1)
 
     finally:
         print('got video at: ', video_capture)
@@ -138,6 +138,9 @@ def scanner_function(multiprocess_shared_dict):
 
         # read video frames
         _, THIS_FRAME = video_capture.read()
+        # mirror camera
+        if table_settings['objects']['cityscopy']['mirror_cam'] is 1:
+            THIS_FRAME = cv2.flip(THIS_FRAME, 1)
 
         # warp the video based on keystone info
         DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
@@ -154,11 +157,16 @@ def scanner_function(multiprocess_shared_dict):
 
             # use this to control reduction of scanner size
             this_scanner_max_dimension = int(scanner_square_size)
+            scanner_reduction = int(scanner_square_size/4)
+            # short vars
+            x_red = x + this_scanner_max_dimension-scanner_reduction
+            y_red = y + this_scanner_max_dimension-scanner_reduction
 
             # set scanner crop box size and position
             # at x,y + crop box size
-            this_scanner_size = DISTORTED_VIDEO_STREAM[y:y + this_scanner_max_dimension,
-                                                       x:x + this_scanner_max_dimension]
+
+            this_scanner_size = DISTORTED_VIDEO_STREAM[y+scanner_reduction:y_red,
+                                                       x+scanner_reduction:x_red]
 
             # draw rects with mean value of color
             mean_color = cv2.mean(this_scanner_size)
@@ -176,15 +184,20 @@ def scanner_function(multiprocess_shared_dict):
             # get color from dict
             thisColor = DICTIONARY_COLORS[scannerCol]
 
-            # draw rects with frame colored by range result
-            cv2.rectangle(DISTORTED_VIDEO_STREAM, (x, y),
-                          (x+this_scanner_max_dimension,
-                           y+this_scanner_max_dimension),
-                          thisColor, 1)
-            # put grid text
-            cv2.putText(DISTORTED_VIDEO_STREAM, str(count),
-                        (x, y), cv2.FONT_HERSHEY_DUPLEX,
-                        .3, (0, 0, 255), 1)
+            # ? only draw vis if settings has 1 in gui
+            if table_settings['objects']['cityscopy']['gui'] is 1:
+                # draw rects with frame colored by range result
+                cv2.rectangle(DISTORTED_VIDEO_STREAM,
+                              (x+scanner_reduction,
+                               y+scanner_reduction),
+                              (x_red,
+                               y_red),
+                              thisColor, 1)
+                # put grid text
+                cv2.putText(DISTORTED_VIDEO_STREAM, str(count),
+                            (x_red,
+                             y_red), cv2.FONT_HERSHEY_DUPLEX,
+                            .3, (0, 0, 255), 1)
             # cell counter
             count = count + 1
 
@@ -208,13 +221,11 @@ def scanner_function(multiprocess_shared_dict):
                 # else skip this
             pass
 
-        '''
-        # add type and pos text
-        cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
-                    (50, 50), cv2.FONT_HERSHEY_DUPLEX,
-                    0.5, (0, 0, 0), 1)
-        '''
-        if table_settings['objects']['gui'] is 1:
+        if table_settings['objects']['cityscopy']['gui'] is 1:
+            # add type and pos text
+            cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
+                        (50, 50), cv2.FONT_HERSHEY_DUPLEX,
+                        0.5, (0, 0, 0), 1)
             # draw the video to screen
             cv2.imshow("scanner_gui_window", DISTORTED_VIDEO_STREAM)
 
@@ -259,12 +270,12 @@ def get_scanner_pixel_coordinates(grid_dimensions_x, grid_dimensions_y, video_re
     # create the list of points
     pixel_coordinates_list = []
 
-    # define a cell gap for grided cases
-    cells_gap = 0
+    # define a cell gap for grided cases [plexi table setup]
+    cells_gap = table_settings['objects']['cityscopy']['cell_gap']
 
     # create the 4x4 sub grid cells
-    for x in range(0, grid_dimensions_x):
-        for y in range(0, grid_dimensions_y):
+    for y in range(0, grid_dimensions_y):
+        for x in range(0, grid_dimensions_x):
 
             x_positions = x * ((scanner_square_size*4)+cells_gap)
             y_positions = y * ((scanner_square_size*4)+cells_gap)
@@ -303,7 +314,7 @@ def create_data_json(multiprocess_shared_dict):
         # load info from json file
     PATH = 'cityio.json'
     table_settings = parse_json_file('table', PATH)
-    SEND_INTERVAL = table_settings['objects']['interval']
+    SEND_INTERVAL = table_settings['objects']['cityscopy']['interval']
     # initial dummy value for old grid
     old_scan_results = [-1]
     SEND_INTERVAL = timedelta(milliseconds=SEND_INTERVAL)
@@ -316,17 +327,19 @@ def create_data_json(multiprocess_shared_dict):
         if (scan_results != old_scan_results) and from_last_sent > SEND_INTERVAL:
 
             try:
-
-                    # convert to json
+                # convert to json
                 json_struct = table_settings
                 json_struct['grid'] = scan_results
-                cityIO_json = json.dumps(json_struct)
 
-                if table_settings['objects']['cityio'] is 1:
-                    print('sending to cityIO')
+                if table_settings['objects']['cityscopy']['cityio'] is 1:
+                    # clean settings area
+                    json_struct['objects']['cityscopy'] = {
+                        'Scanner': 'CityScoPy'}
+                    cityIO_json = json.dumps(json_struct)
+                    print('sending to cityIO...')
                     send_json_to_cityIO(cityIO_json)
                 else:
-                    print('sending UDP')
+                    print('sending UDP...')
                     send_json_to_UDP(scan_results)
 
             except Exception as e:
