@@ -571,12 +571,18 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
         cellColorsArray, (grid_dimensions_x * grid_dimensions_y, 16))
 
     # go through the results
-    for thisResult in np_array_of_scanned_colors:
-
+    for this_16_bits in np_array_of_scanned_colors:
+        rot_arr = brick_rotation_check(this_16_bits)
         # look for this result in tags array from JSON
         # and return only where TRUE appears in results
-        whichTag = np.where([(thisResult == tag).all()
-                             for tag in tagsArray])[0]
+        #!for tag in tagsArray:
+        #!    print(this_16_bits, tag, np.where(np.isin(tag, rot_arr)))
+
+        whichTag = np.where([
+            (this_16_bits == tag).all()
+            for tag in tagsArray
+        ])[0]
+
         # if this tag is not found return -1
         if whichTag.size == 0:
             scan_results_array.append([-1, 0])
@@ -585,14 +591,26 @@ def find_type_in_tags_array(cellColorsArray, tagsArray, mapArray, rotations_from
             this_tag = int(whichTag[0])
             type_number = mapArray[this_tag]
             rotation_value = rotations_from_settings[this_tag]
+            # finally add to array
             scan_results_array.append([int(type_number), int(rotation_value)])
 
     # finally, return this list to main program for UDP
     return scan_results_array
 
-
 ##################################################
 
+
+def brick_rotation_check(this_16_bits):
+
+    brk_4x4 = np.reshape(this_16_bits, (4, 4))
+    brk_4x4_90 = np.reshape((np.rot90(np.rot90(np.rot90(brk_4x4)))), 16)
+    brk_4x4_270 = np.reshape((np.rot90(np.rot90(brk_4x4))), 16)
+    brk_4x4_180 = np.reshape((np.rot90(brk_4x4)), 16)
+    rot_array = [this_16_bits, brk_4x4_90, brk_4x4_180, brk_4x4_270]
+    return rot_array
+
+
+##################################################
 # load info from json file
 PATH = 'cityio.json'
 table_settings = parse_json_file('table', PATH)
