@@ -320,21 +320,17 @@ def create_data_json(multiprocess_shared_dict):
     while True:
         scan_results = multiprocess_shared_dict['scan']
         from_last_sent = datetime.now() - last_sent
-
         if (scan_results != old_scan_results) and from_last_sent > SEND_INTERVAL:
-
             try:
                 # convert to json
                 json_struct = table_settings
                 json_struct['grid'] = scan_results
 
                 if table_settings['objects']['cityscopy']['cityio'] is 1:
-                    # clean settings area
-                    json_struct['objects']['cityscopy'] = {
-                        'Scanner': 'CityScoPy'}
                     cityIO_json = json.dumps(json_struct)
                     print('sending to cityIO...')
                     send_json_to_cityIO(cityIO_json)
+                    print(json_struct, cityIO_json)
                 else:
                     print('sending UDP...')
                     send_json_to_UDP(scan_results)
