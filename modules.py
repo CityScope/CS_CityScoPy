@@ -190,11 +190,13 @@ def scanner_function(multiprocess_shared_dict):
                               (x_red,
                                y_red),
                               thisColor, 1)
+                '''
                 # put grid text
                 cv2.putText(DISTORTED_VIDEO_STREAM, str(count),
                             (x_red,
                              y_red), cv2.FONT_HERSHEY_DUPLEX,
                             .3, (0, 0, 255), 1)
+                '''
             # cell counter
             count = count + 1
 
@@ -330,7 +332,6 @@ def create_data_json(multiprocess_shared_dict):
                     cityIO_json = json.dumps(json_struct)
                     print('sending to cityIO...')
                     send_json_to_cityIO(cityIO_json)
-                    print(json_struct, cityIO_json)
                 else:
                     print('sending UDP...')
                     send_json_to_UDP(scan_results)
