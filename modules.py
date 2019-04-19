@@ -86,13 +86,14 @@ def scanner_function(multiprocess_shared_dict):
 
     # get video resolution from webcam
     video_resolution_x = int(video_capture.get(3))
-    video_resolution_y = int(video_capture.get(4))
+    video_resolution_y = int(video_capture.get(3))
 
     # define the video window
     cv2.namedWindow('scanner_gui_window', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('scanner_gui_window', 400, 400)
     cv2.moveWindow('scanner_gui_window', 10, 100)
     cv2.namedWindow('sliders_gui_window', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('sliders_gui_window', 800, 400)
     cv2.moveWindow('sliders_gui_window', 550, 100)
 
     # make the sliders GUI
@@ -222,9 +223,11 @@ def scanner_function(multiprocess_shared_dict):
 
         if table_settings['objects']['cityscopy']['gui'] is 1:
             # add type and pos text
+            '''
             cv2.putText(DISTORTED_VIDEO_STREAM, 'Types: ' + str(TYPES_LIST),
                         (50, 50), cv2.FONT_HERSHEY_DUPLEX,
                         0.5, (0, 0, 0), 1)
+            '''
             # draw the video to screen
             cv2.imshow("scanner_gui_window", DISTORTED_VIDEO_STREAM)
 
