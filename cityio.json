@@ -3,8 +3,8 @@
     "header": {
       "name": "cityscopy",
       "spatial": {
-        "nrows": 5,
-        "ncols": 5,
+        "nrows": 17,
+        "ncols": 16,
         "physical_longitude": 42.3582145,
         "physical_latitude": -71.1009981,
         "longitude": -71.1009981,

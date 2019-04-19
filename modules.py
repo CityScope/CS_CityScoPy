@@ -49,7 +49,6 @@ import requests
 
 
 def scanner_function(multiprocess_shared_dict):
-
     # define the table params
     grid_dimensions_x = table_settings['header']['spatial']['nrows']
     grid_dimensions_y = table_settings['header']['spatial']['ncols']
@@ -84,11 +83,20 @@ def scanner_function(multiprocess_shared_dict):
     finally:
         print('got video at: ', video_capture)
 
-    # get video resolution from webcam
-    video_resolution_x = int(video_capture.get(3))
-    video_resolution_y = int(video_capture.get(3))
+    if grid_dimensions_y < grid_dimensions_x:
+        # get the smaller of two grid ratio x/y or y/x
+        grid_ratio = grid_dimensions_y / grid_dimensions_x
+        video_resolution_x = int(video_capture.get(3))
+        video_resolution_y = int(video_capture.get(3)*grid_ratio)
+    else:
+        # get the smaller of two grid ratio x/y or y/x
+        grid_ratio = grid_dimensions_x / grid_dimensions_y
+        video_resolution_x = int(video_capture.get(3)*grid_ratio)
+        video_resolution_y = int(video_capture.get(3))
 
-    # define the video window
+        # video_resolution_y = int(video_capture.get(3))
+
+        # define the video window
     cv2.namedWindow('scanner_gui_window', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('scanner_gui_window', 400, 400)
     cv2.moveWindow('scanner_gui_window', 10, 100)
@@ -112,8 +120,6 @@ def scanner_function(multiprocess_shared_dict):
     x_ratio = int(video_resolution_x/(grid_dimensions_x*4))
     y_ratio = int(video_resolution_y/(grid_dimensions_y*4))
     scanner_square_size = np.minimum(x_ratio, y_ratio)
-
-    print(scanner_square_size, x_ratio, y_ratio)
 
     # create the location  array of scanners
     array_of_scanner_points_locations = get_scanner_pixel_coordinates(
