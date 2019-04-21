@@ -518,9 +518,9 @@ def listen_to_UI_interaction():
 
         elif selected_corner == '2':
             if corner_direction == 'd':
-                urx = urx + 1
-            elif corner_direction == 'a':
                 urx = urx - 1
+            elif corner_direction == 'a':
+                urx = urx + 1
             elif corner_direction == 'w':
                 ury = ury + 1
             elif corner_direction == 's':
@@ -528,9 +528,9 @@ def listen_to_UI_interaction():
 
         elif selected_corner == '3':
             if corner_direction == 'd':
-                blx = blx + 1
-            elif corner_direction == 'a':
                 blx = blx - 1
+            elif corner_direction == 'a':
+                blx = blx + 1
             elif corner_direction == 'w':
                 bly = bly + 1
             elif corner_direction == 's':
