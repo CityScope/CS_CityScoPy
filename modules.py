@@ -237,13 +237,6 @@ def scanner_function(multiprocess_shared_dict):
             # draw the video to screen
             cv2.imshow("scanner_gui_window", DISTORTED_VIDEO_STREAM)
 
-        # INTERACTION
-        KEY_STROKE = cv2.waitKey(1)
-        #  saves to file
-        if chr(KEY_STROKE & 255) == 's':
-            save_keystone_to_file(
-                listen_to_UI_interaction())
-
     # close opencv
     video_capture.release()
     cv2.destroyAllWindows()
@@ -339,10 +332,10 @@ def create_data_json(multiprocess_shared_dict):
 
                 if table_settings['objects']['cityscopy']['cityio'] is 1:
                     cityIO_json = json.dumps(json_struct)
-                    print('sending to cityIO...')
+                    #! print('sending to cityIO...')
                     send_json_to_cityIO(cityIO_json)
                 else:
-                    print('sending UDP...')
+                    #! print('sending UDP...')
                     send_json_to_UDP(scan_results)
 
             except Exception as e:
@@ -451,7 +444,7 @@ def create_user_intreface(keystone_points_array, video_resolution_x, video_resol
     cv2.createTrackbar('Bottom Right Y', 'sliders_gui_window',
                        -video_resolution_y, video_resolution_y, dont_return_on_ui)
 
-# now set the sliders position based on the saved values
+    # now set the sliders position based on the saved values
     cv2.setTrackbarPos('Upper Left X', 'sliders_gui_window',
                        keystone_points_array[0][0])
     cv2.setTrackbarPos('Upper Left Y', 'sliders_gui_window',
@@ -494,6 +487,74 @@ def listen_to_UI_interaction():
     bly = cv2.getTrackbarPos('Bottom Left Y', 'sliders_gui_window')
     brx = cv2.getTrackbarPos('Bottom Right X', 'sliders_gui_window')
     bry = cv2.getTrackbarPos('Bottom Right Y', 'sliders_gui_window')
+
+    global selected_corner
+    global corner_direction
+    # INTERACTION
+    corner_keys = ['1', '2', '3', '4']
+    move_keys = ['w', 'a', 's', 'd']
+
+    KEY_STROKE = cv2.waitKey(1)
+    #  saves to file
+    if chr(KEY_STROKE & 255) == 'k':
+        save_keystone_to_file(
+            listen_to_UI_interaction())
+    elif chr(KEY_STROKE & 255) in corner_keys:
+        selected_corner = chr(KEY_STROKE & 255)
+    if selected_corner != None and chr(KEY_STROKE & 255) in move_keys:
+        corner_direction = chr(KEY_STROKE & 255)
+
+        print(selected_corner, corner_direction)
+
+        if selected_corner == '1':
+            if corner_direction == 'd':
+                ulx = ulx - 1
+            elif corner_direction == 'a':
+                ulx = ulx + 1
+            elif corner_direction == 'w':
+                uly = uly + 1
+            elif corner_direction == 's':
+                uly = uly - 1
+
+        elif selected_corner == '2':
+            if corner_direction == 'd':
+                urx = urx + 1
+            elif corner_direction == 'a':
+                urx = urx - 1
+            elif corner_direction == 'w':
+                ury = ury + 1
+            elif corner_direction == 's':
+                ury = ury - 1
+
+        elif selected_corner == '3':
+            if corner_direction == 'd':
+                blx = blx + 1
+            elif corner_direction == 'a':
+                blx = blx - 1
+            elif corner_direction == 'w':
+                bly = bly + 1
+            elif corner_direction == 's':
+                bly = bly - 1
+
+        elif selected_corner == '4':
+            if corner_direction == 'd':
+                brx = brx - 1
+            elif corner_direction == 'a':
+                brx = brx + 1
+            elif corner_direction == 'w':
+                bry = bry + 1
+            elif corner_direction == 's':
+                bry = bry - 1
+
+        # now set the sliders position based on the saved values
+    cv2.setTrackbarPos('Upper Left X', 'sliders_gui_window', ulx)
+    cv2.setTrackbarPos('Upper Left Y', 'sliders_gui_window', uly)
+    cv2.setTrackbarPos('Upper Right X', 'sliders_gui_window', urx)
+    cv2.setTrackbarPos('Upper Right Y', 'sliders_gui_window', ury)
+    cv2.setTrackbarPos('Bottom Left X', 'sliders_gui_window', blx)
+    cv2.setTrackbarPos('Bottom Left Y', 'sliders_gui_window', bly)
+    cv2.setTrackbarPos('Bottom Right X', 'sliders_gui_window', brx)
+    cv2.setTrackbarPos('Bottom Right Y', 'sliders_gui_window', bry)
 
     return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
 
@@ -617,3 +678,7 @@ def brick_rotation_check(this_16_bits, tagsArray, mapArray):
 # load info from json file
 PATH = 'cityio.json'
 table_settings = parse_json_file('table', PATH)
+
+#! ugly way to store keystroke vals between loops.
+selected_corner = None
+corner_direction = None
