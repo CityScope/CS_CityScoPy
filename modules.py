@@ -63,6 +63,20 @@ def scanner_function(multiprocess_shared_dict):
     keystone_points_array = np.loadtxt(
         get_folder_path()+'keystone.txt', dtype=np.float32)
 
+    # break it to points
+    ulx = keystone_points_array[0][0]
+    uly = keystone_points_array[0][1]
+    urx = keystone_points_array[1][0]
+    ury = keystone_points_array[1][1]
+    blx = keystone_points_array[2][0]
+    bly = keystone_points_array[2][1]
+    brx = keystone_points_array[3][0]
+    bry = keystone_points_array[3][1]
+    # init keystone 
+    init_keystone = [ulx,uly,urx,ury,blx,bly,brx,bry]
+
+    print (init_keystone)
+
     # init type list array
     TYPES_LIST = []
 
@@ -127,7 +141,7 @@ def scanner_function(multiprocess_shared_dict):
     while True:
         # get a new matrix transformation every frame
         KEY_STONE_DATA = keystone(
-            video_resolution_x, video_resolution_y, listen_to_UI_interaction(keystone_points_array))
+            video_resolution_x, video_resolution_y, listen_to_UI_interaction(init_keystone))
 
         # zero an array to collect the scanners
         CELL_COLORS_ARRAY = []
@@ -407,7 +421,7 @@ def get_folder_path():
 ##################################################
 
 
-def listen_to_UI_interaction(keystone_points_array):
+def listen_to_UI_interaction(init_keystone):
     """
     listens to user interaction.
 
@@ -419,14 +433,7 @@ def listen_to_UI_interaction(keystone_points_array):
     Returns 4x2 array of points location for key-stoning
     """
 
-    ulx = keystone_points_array[0][0]
-    uly = keystone_points_array[0][1]
-    urx = keystone_points_array[1][0]
-    ury = keystone_points_array[1][1]
-    blx = keystone_points_array[2][0]
-    bly = keystone_points_array[2][1]
-    brx = keystone_points_array[3][0]
-    bry = keystone_points_array[3][1]
+    print (init_keystone)
 
     global selected_corner
     global corner_direction
@@ -435,58 +442,66 @@ def listen_to_UI_interaction(keystone_points_array):
     move_keys = ['w', 'a', 's', 'd']
 
     KEY_STROKE = cv2.waitKey(1)
-    #  saves to file
-    if chr(KEY_STROKE & 255) == 'k':
-        save_keystone_to_file(
-            listen_to_UI_interaction(keystone_points_array))
-    elif chr(KEY_STROKE & 255) in corner_keys:
+    if chr(KEY_STROKE & 255) in corner_keys:
         selected_corner = chr(KEY_STROKE & 255)
     if selected_corner != None and chr(KEY_STROKE & 255) in move_keys:
         corner_direction = chr(KEY_STROKE & 255)
 
-        print(selected_corner, corner_direction)
-
         if selected_corner == '1':
             if corner_direction == 'd':
-                ulx = ulx - 1
+                init_keystone[0] = init_keystone[0] - 1
             elif corner_direction == 'a':
-                ulx = ulx + 1
+                init_keystone[0] = init_keystone[0] + 1
             elif corner_direction == 'w':
-                uly = uly + 1
+                init_keystone[1] = init_keystone[1] + 1
             elif corner_direction == 's':
-                uly = uly - 1
+                init_keystone[1] = init_keystone[1] - 1
 
         elif selected_corner == '2':
             if corner_direction == 'd':
-                urx = urx - 1
+                init_keystone[2] = init_keystone[2] - 1
             elif corner_direction == 'a':
-                urx = urx + 1
+                init_keystone[2] = init_keystone[2] + 1
             elif corner_direction == 'w':
-                ury = ury + 1
+                init_keystone[3] = init_keystone[3] + 1
             elif corner_direction == 's':
-                ury = ury - 1
+                init_keystone[3] = init_keystone[3] - 1
 
         elif selected_corner == '3':
             if corner_direction == 'd':
-                blx = blx - 1
+                init_keystone[4] = init_keystone[4] - 1
             elif corner_direction == 'a':
-                blx = blx + 1
+                init_keystone[4] = init_keystone[4] + 1
             elif corner_direction == 'w':
-                bly = bly + 1
+               init_keystone[5] =init_keystone[5] + 1
             elif corner_direction == 's':
-                bly = bly - 1
+               init_keystone[5] =init_keystone[5] - 1
 
         elif selected_corner == '4':
             if corner_direction == 'd':
-                brx = brx - 1
+               init_keystone[6] =init_keystone[6] - 1
             elif corner_direction == 'a':
-                brx = brx + 1
+               init_keystone[6] =init_keystone[6] + 1
             elif corner_direction == 'w':
-                bry = bry + 1
+               init_keystone[7] =init_keystone[7] + 1
             elif corner_direction == 's':
-                bry = bry - 1
+               init_keystone[7] =init_keystone[7] - 1
+     #  saves to file
+    elif chr(KEY_STROKE & 255) == 'k':
+        save_keystone_to_file(
+            listen_to_UI_interaction(init_keystone))
 
-    return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
+    ulx = init_keystone[0]
+    uly = init_keystone[1]
+    urx = init_keystone[2]
+    ury = init_keystone[3]
+    blx = init_keystone[4]
+    bly = init_keystone[5]
+    brx = init_keystone[6]
+    bry = init_keystone[7]
+
+
+    return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx,bry)], dtype=np.float32)
 
 ##################################################
 
