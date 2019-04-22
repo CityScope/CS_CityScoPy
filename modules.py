@@ -100,13 +100,6 @@ def scanner_function(multiprocess_shared_dict):
     cv2.namedWindow('scanner_gui_window', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('scanner_gui_window', 400, 400)
     cv2.moveWindow('scanner_gui_window', 10, 100)
-    cv2.namedWindow('sliders_gui_window', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('sliders_gui_window', 800, 400)
-    cv2.moveWindow('sliders_gui_window', 550, 100)
-
-    # make the sliders GUI
-    create_user_intreface(
-        keystone_points_array, video_resolution_x, video_resolution_y)
 
     # call colors dictionary
     DICTIONARY_COLORS = {
@@ -132,10 +125,9 @@ def scanner_function(multiprocess_shared_dict):
 
    # run the video loop forever
     while True:
-
         # get a new matrix transformation every frame
         KEY_STONE_DATA = keystone(
-            video_resolution_x, video_resolution_y, listen_to_UI_interaction())
+            video_resolution_x, video_resolution_y, listen_to_UI_interaction(keystone_points_array))
 
         # zero an array to collect the scanners
         CELL_COLORS_ARRAY = []
@@ -415,78 +407,26 @@ def get_folder_path():
 ##################################################
 
 
-def create_user_intreface(keystone_points_array, video_resolution_x, video_resolution_y):
-    """
-    Creates user interface and keystone sliders
-
-    Steps:
-    makes a list of sliders for interaction
-
-    Args:
-
-    Returns none
-    """
-
-    cv2.createTrackbar('Upper Left X', 'sliders_gui_window',
-                       -video_resolution_x, video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Upper Left Y', 'sliders_gui_window',
-                       -video_resolution_y, video_resolution_y, dont_return_on_ui)
-    cv2.createTrackbar('Upper Right X', 'sliders_gui_window',
-                       -video_resolution_x, video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Upper Right Y', 'sliders_gui_window',
-                       -video_resolution_y, video_resolution_y, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Left X', 'sliders_gui_window',
-                       -video_resolution_x, video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Left Y', 'sliders_gui_window',
-                       -video_resolution_y, video_resolution_y, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Right X', 'sliders_gui_window',
-                       -video_resolution_x, video_resolution_x, dont_return_on_ui)
-    cv2.createTrackbar('Bottom Right Y', 'sliders_gui_window',
-                       -video_resolution_y, video_resolution_y, dont_return_on_ui)
-
-    # now set the sliders position based on the saved values
-    cv2.setTrackbarPos('Upper Left X', 'sliders_gui_window',
-                       keystone_points_array[0][0])
-    cv2.setTrackbarPos('Upper Left Y', 'sliders_gui_window',
-                       keystone_points_array[0][1])
-    cv2.setTrackbarPos('Upper Right X', 'sliders_gui_window',
-                       keystone_points_array[1][0])
-    cv2.setTrackbarPos('Upper Right Y', 'sliders_gui_window',
-                       keystone_points_array[1][1])
-    cv2.setTrackbarPos('Bottom Left X', 'sliders_gui_window',
-                       keystone_points_array[2][0])
-    cv2.setTrackbarPos('Bottom Left Y', 'sliders_gui_window',
-                       keystone_points_array[2][1])
-    cv2.setTrackbarPos('Bottom Right X', 'sliders_gui_window',
-                       keystone_points_array[3][0])
-    cv2.setTrackbarPos('Bottom Right Y', 'sliders_gui_window',
-                       keystone_points_array[3][1])
-
-
-def dont_return_on_ui(event):
-    pass
-
-
-def listen_to_UI_interaction():
+def listen_to_UI_interaction(keystone_points_array):
     """
     listens to user interaction.
 
     Steps:
-    listen to a list of sliders
+    listen to UI
 
     Args:
 
     Returns 4x2 array of points location for key-stoning
     """
 
-    ulx = cv2.getTrackbarPos('Upper Left X', 'sliders_gui_window')
-    uly = cv2.getTrackbarPos('Upper Left Y', 'sliders_gui_window')
-    urx = cv2.getTrackbarPos('Upper Right X', 'sliders_gui_window')
-    ury = cv2.getTrackbarPos('Upper Right Y', 'sliders_gui_window')
-    blx = cv2.getTrackbarPos('Bottom Left X', 'sliders_gui_window')
-    bly = cv2.getTrackbarPos('Bottom Left Y', 'sliders_gui_window')
-    brx = cv2.getTrackbarPos('Bottom Right X', 'sliders_gui_window')
-    bry = cv2.getTrackbarPos('Bottom Right Y', 'sliders_gui_window')
+    ulx = keystone_points_array[0][0]
+    uly = keystone_points_array[0][1]
+    urx = keystone_points_array[1][0]
+    ury = keystone_points_array[1][1]
+    blx = keystone_points_array[2][0]
+    bly = keystone_points_array[2][1]
+    brx = keystone_points_array[3][0]
+    bry = keystone_points_array[3][1]
 
     global selected_corner
     global corner_direction
@@ -498,7 +438,7 @@ def listen_to_UI_interaction():
     #  saves to file
     if chr(KEY_STROKE & 255) == 'k':
         save_keystone_to_file(
-            listen_to_UI_interaction())
+            listen_to_UI_interaction(keystone_points_array))
     elif chr(KEY_STROKE & 255) in corner_keys:
         selected_corner = chr(KEY_STROKE & 255)
     if selected_corner != None and chr(KEY_STROKE & 255) in move_keys:
@@ -545,16 +485,6 @@ def listen_to_UI_interaction():
                 bry = bry + 1
             elif corner_direction == 's':
                 bry = bry - 1
-
-        # now set the sliders position based on the saved values
-    cv2.setTrackbarPos('Upper Left X', 'sliders_gui_window', ulx)
-    cv2.setTrackbarPos('Upper Left Y', 'sliders_gui_window', uly)
-    cv2.setTrackbarPos('Upper Right X', 'sliders_gui_window', urx)
-    cv2.setTrackbarPos('Upper Right Y', 'sliders_gui_window', ury)
-    cv2.setTrackbarPos('Bottom Left X', 'sliders_gui_window', blx)
-    cv2.setTrackbarPos('Bottom Left Y', 'sliders_gui_window', bly)
-    cv2.setTrackbarPos('Bottom Right X', 'sliders_gui_window', brx)
-    cv2.setTrackbarPos('Bottom Right Y', 'sliders_gui_window', bry)
 
     return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
 
