@@ -57,7 +57,6 @@ def scanner_function(multiprocess_shared_dict):
         table_settings['objects']['cityscopy']['tags'])
 
     array_of_maps_form_json = table_settings['header']['mapping']['type']
-    array_of_rotations_form_json = table_settings['header']['mapping']['rotation']
 
     # load the initial keystone data from file
     keystone_points_array = np.loadtxt(
@@ -72,10 +71,10 @@ def scanner_function(multiprocess_shared_dict):
     bly = keystone_points_array[2][1]
     brx = keystone_points_array[3][0]
     bry = keystone_points_array[3][1]
-    # init keystone 
-    init_keystone = [ulx,uly,urx,ury,blx,bly,brx,bry]
+    # init keystone
+    init_keystone = [ulx, uly, urx, ury, blx, bly, brx, bry]
 
-    print (init_keystone)
+    print(init_keystone)
 
     # init type list array
     TYPES_LIST = []
@@ -365,6 +364,8 @@ def send_json_to_cityIO(cityIO_json):
         table_settings['header']['name']
     # sending post request and saving response as response object
     req = requests.post(url=API_ENDPOINT, data=cityIO_json)
+    if req.status_code != 200:
+        print("cityIO might be down. so sad.")
     print(req)
 
 ##################################################
@@ -433,7 +434,7 @@ def listen_to_UI_interaction(init_keystone):
     Returns 4x2 array of points location for key-stoning
     """
 
-    print (init_keystone)
+    # print (init_keystone)
 
     global selected_corner
     global corner_direction
@@ -473,20 +474,20 @@ def listen_to_UI_interaction(init_keystone):
             elif corner_direction == 'a':
                 init_keystone[4] = init_keystone[4] + 1
             elif corner_direction == 'w':
-               init_keystone[5] =init_keystone[5] + 1
+                init_keystone[5] = init_keystone[5] + 1
             elif corner_direction == 's':
-               init_keystone[5] =init_keystone[5] - 1
+                init_keystone[5] = init_keystone[5] - 1
 
         elif selected_corner == '4':
             if corner_direction == 'd':
-               init_keystone[6] =init_keystone[6] - 1
+                init_keystone[6] = init_keystone[6] - 1
             elif corner_direction == 'a':
-               init_keystone[6] =init_keystone[6] + 1
+                init_keystone[6] = init_keystone[6] + 1
             elif corner_direction == 'w':
-               init_keystone[7] =init_keystone[7] + 1
+                init_keystone[7] = init_keystone[7] + 1
             elif corner_direction == 's':
-               init_keystone[7] =init_keystone[7] - 1
-     #  saves to file
+                init_keystone[7] = init_keystone[7] - 1
+      #  saves to file
     elif chr(KEY_STROKE & 255) == 'k':
         save_keystone_to_file(
             listen_to_UI_interaction(init_keystone))
@@ -500,8 +501,7 @@ def listen_to_UI_interaction(init_keystone):
     brx = init_keystone[6]
     bry = init_keystone[7]
 
-
-    return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx,bry)], dtype=np.float32)
+    return np.asarray([(ulx, uly), (urx, ury), (blx, bly), (brx, bry)], dtype=np.float32)
 
 ##################################################
 
