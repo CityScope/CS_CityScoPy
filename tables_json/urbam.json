@@ -1,0 +1,45 @@
+{
+  "table": {
+    "header": {
+      "name": "urbam",
+      "spatial": {
+        "nrows": 12,
+        "ncols": 12,
+        "physical_longitude": 42.3582145,
+        "physical_latitude": -71.1009981,
+        "longitude": -71.1009981,
+        "latitude": 42.3582145,
+        "cellSize": 100,
+        "rotation": 0
+      },
+      "owner": {
+        "name": "Arnaud Grignard",
+        "title": "",
+        "institute": "City Science MIT Media Lab"
+      },
+      "block": ["type", "rotation"],
+      "mapping": {
+        "type": ["0", "1", "2", "3","4","5"],
+        "rotation": ["0", "1", "2", "3"]
+      }
+    },
+    "grid": [],
+    "objects": {
+      "cityscopy": {
+        "interval": 50,
+        "gui": 1,
+        "cityio": 1,
+        "tags": [
+	   "1100110000000000",
+          "0011001111111111",
+          "1100110000110011",
+	   "0000000011111111",
+	   "0000000000000000",
+           "1111111111111111"
+        ],
+        "cell_gap": 0,
+        "mirror_cam": 0
+      }
+    }
+  }
+}
