@@ -5,8 +5,8 @@
       "spatial": {
         "nrows": 12,
         "ncols": 12,
-        "physical_longitude": 42.3582145,
-        "physical_latitude": -71.1009981,
+        "physical_longitude": -71.1009981,
+        "physical_latitude": 42.3582145,
         "longitude": -71.1009981,
         "latitude": 42.3582145,
         "cellSize": 100,
@@ -26,7 +26,7 @@
     "grid": [],
     "objects": {
       "cityscopy": {
-        "interval": 50,
+        "interval": 250,
         "gui": 1,
         "cityio": 1,
         "tags": [
