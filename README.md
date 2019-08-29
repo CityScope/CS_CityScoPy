@@ -10,7 +10,7 @@ This tool is for capturing, key-stoning, scanning and sending uniquely tagged ar
 
 - From terminal, run the tool using `$ run.py`
 - Tool will start scanning using whatever keystone data was stored in `keystone.txt`
-- make corrections to the key stone using the sliders or keyboard using `1,2,3,4` to select a corner and `[w,a,s,d]` to move `[up,left,down,right]` the selected corner. Press `s` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
+- make corrections to the key stone using the sliders or keyboard using `1,2,3,4` to select a corner and `[w,a,s,d]` to move `[up,left,down,right]` the selected corner. Press `k` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
 
 Note: Running the tool in this way will involve some fail safe mechanisms that will auto-restart the tool when it crashes [such as camera disconnect, slider failure or networking issue]
 
