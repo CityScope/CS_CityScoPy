@@ -3,8 +3,8 @@
     "header": {
       "name": "urbam",
       "spatial": {
-        "nrows": 12,
-        "ncols": 12,
+        "nrows": 15,
+        "ncols": 15,
         "physical_longitude": -71.1009981,
         "physical_latitude": 42.3582145,
         "longitude": -71.1009981,
