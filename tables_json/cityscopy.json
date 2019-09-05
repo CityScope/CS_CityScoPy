@@ -1,16 +1,16 @@
 {
   "table": {
     "header": {
-      "name": "grasbrook",
+      "name": "cityscopy",
       "spatial": {
-        "cellSize": 16,
-        "latitude": 53.53811,
-        "longitude": 10.0063,
-        "ncols": 10,
-        "nrows": 10,
-        "physical_latitude": 53.53811,
-        "physical_longitude": 10.0063,
-        "rotation": 145.5
+        "nrows": 17,
+        "ncols": 16,
+        "physical_longitude": 42.3582145,
+        "physical_latitude": -71.1009981,
+        "longitude": -71.1009981,
+        "latitude": 42.3582145,
+        "cellSize": 100,
+        "rotation": 0
       },
       "owner": {
         "name": "Ariel Noyman",
@@ -19,14 +19,14 @@
       },
       "block": ["type", "rotation"],
       "mapping": {
-        "type": ["street", "housing", "working", "working_2"],
+        "type": ["0", "1", "2", "3"],
         "rotation": ["0", "1", "2", "3"]
       }
     },
     "grid": [],
     "objects": {
       "cityscopy": {
-        "interval": 500,
+        "interval": 50,
         "gui": 1,
         "cityio": 1,
         "tags": [
@@ -38,13 +38,6 @@
         "cell_gap": 0,
         "mirror_cam": 0
       }
-    },
-    "table_extents": [
-      [10.0063, 53.53811],
-      [10.0003, 53.53289],
-      [10.01582, 53.52655],
-      [10.02182, 53.53177],
-      [10.0063, 53.53811]
-    ]
+    }
   }
 }
