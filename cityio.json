@@ -1,44 +1,53 @@
 {
   "table": {
-    "grid": [],
     "header": {
+      "name": "csepel",
+      "spatial": {
+        "nrows": 15,
+        "ncols": 15,
+        "physical_longitude": 19.050979614257812,
+        "physical_latitude": 47.43630292431787,
+        "longitude": 19.050979614257812,
+        "latitude": 47.43630292431787,
+        "cellSize": 50,
+        "rotation": 260,
+        "projection": 3836
+      },
+      "owner": {
+        "name": "Ariel Noyman",
+        "title": "",
+        "institute": "City Science MIT Media Lab"
+      },
       "block": ["type", "rotation"],
       "mapping": {
-        "rotation": ["0", "1", "2", "3", "4"],
-        "type": ["street", "housing", "housing2", "working", "working_2"]
-      },
-      "name": "grasbrook",
-      "owner": {
-        "institute": "City Science MIT Media Lab",
-        "name": "Ariel Noyman",
-        "title": ""
-      },
-      "spatial": {
-        "cellSize": 16,
-        "latitude": 53.532,
-        "longitude": 10.0121,
-        "ncols": 10,
-        "nrows": 10,
-        "physical_latitude": 53.532,
-        "physical_longitude": 10.0121,
-        "rotation": 144.5
+        "type": ["0", "1", "2", "3"],
+        "rotation": ["0", "1", "2", "3"]
       }
     },
+    "grid": [],
     "objects": {
       "cityscopy": {
-        "cell_gap": 0,
-        "cityio": 1,
+        "makeGrid": false,
+        "grid_full_table": {
+          "longitude": 19.050979614257812,
+          "latitude": 47.43630292431787,
+          "cellSize": 50,
+          "rotation": 260,
+          "nrows": 50,
+          "ncols": 50,
+          "projection": 3836
+        },
+        "interval": 250,
         "gui": 1,
-        "interval": 200,
-        "mirror_cam": 1,
+        "cityio": 1,
         "tags": [
           "0000000000000000",
-          "0011001100000000",
-          "1100110000110011",
-          "1111111100110011",
+          "1111111111111111",
           "1111111100000000",
-          "1111111111111111"
-        ]
+          "1000000000000000"
+        ],
+        "cell_gap": 0,
+        "mirror_cam": 0
       }
     }
   }

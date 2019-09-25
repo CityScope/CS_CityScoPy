@@ -29,19 +29,26 @@
 # of uniquely tagged LEGO array
 
 ##################################################
-
-import socket
-import os
-import sys
-import json
-import time
-from datetime import datetime
-from datetime import timedelta
-from datetime import date
-import math
-import numpy as np
-import cv2
+# grid maker imports
 import requests
+import cv2
+import numpy as np
+import math
+from datetime import date
+from datetime import timedelta
+from datetime import datetime
+import time
+import json
+import sys
+import os
+import socket
+import random
+
+# get this local folder on init to load class
+file_dir = os.path.dirname('grid_geojson')
+sys.path.append(file_dir)
+from grid_geojson import *  # nopep8
+
 
 ##################################################
 # MAIN FUNCTIONS
@@ -49,6 +56,10 @@ import requests
 
 
 def scanner_function(multiprocess_shared_dict):
+
+    if table_settings['objects']['cityscopy']['makeGrid'] == True:
+        gridMaker()
+
     # define the table params
     grid_dimensions_x = table_settings['header']['spatial']['nrows']
     grid_dimensions_y = table_settings['header']['spatial']['ncols']
@@ -620,6 +631,65 @@ def brick_rotation_check(this_16_bits, tagsArray, mapArray):
 
 
 ##################################################
+
+#  method to create a geojson grid on init
+#  and send it to cityIO
+def gridMaker():
+    print('______making GeoJson active and full table grids_______')
+    # make full table grid
+    top_left_lon = table_settings['objects']['cityscopy']['grid_full_table']['longitude']
+    top_left_lat = table_settings['objects']['cityscopy']['grid_full_table']['latitude']
+    nrows = table_settings['objects']['cityscopy']['grid_full_table']['nrows']
+    ncols = table_settings['objects']['cityscopy']['grid_full_table']['ncols']
+    rotation = table_settings['objects']['cityscopy']['grid_full_table']['rotation']
+    cell_size = table_settings['objects']['cityscopy']['grid_full_table']['cellSize']
+    crs_epsg = str(table_settings['objects']
+                   ['cityscopy']['grid_full_table']['projection'])
+    properties = {
+        'id': [i for i in range(nrows*ncols)],
+        'usage': [0 for i in range(nrows*ncols)],
+        'height': [-100 for i in range(nrows*ncols)],
+        'pop_density': [2 for i in range(nrows*ncols)]
+    }
+    results_grid = Grid(top_left_lon, top_left_lat, rotation,
+                        crs_epsg, cell_size, nrows, ncols)
+    grid_geo = results_grid.get_grid_geojson(properties)
+    grid_interactive_area = json.dumps(grid_geo)
+    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
+        table_settings['header']['name'] + "/grid_full_table/"
+    sendGrid(grid_interactive_area, API_ENDPOINT)
+
+    # make interactive grid
+    top_left_lon = table_settings['header']['spatial']['longitude']
+    top_left_lat = table_settings['header']['spatial']['latitude']
+    nrows = table_settings['header']['spatial']['nrows']
+    ncols = table_settings['header']['spatial']['ncols']
+    rotation = table_settings['header']['spatial']['rotation']
+    cell_size = table_settings['header']['spatial']['cellSize']
+    crs_epsg = str(table_settings['header']['spatial']['projection'])
+    properties = {
+        'id': [i for i in range(nrows*ncols)],
+        'usage': [0 for i in range(nrows*ncols)],
+        'height': [-100 for i in range(nrows*ncols)],
+        'pop_density': [2 for i in range(nrows*ncols)]
+    }
+    results_grid = Grid(top_left_lon, top_left_lat, rotation,
+                        crs_epsg, cell_size, nrows, ncols)
+    grid_geo = results_grid.get_grid_geojson(properties)
+    grid_interactive_area = json.dumps(grid_geo)
+    API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
+        table_settings['header']['name'] + "/grid_interactive_area/"
+    sendGrid(grid_interactive_area, API_ENDPOINT)
+
+
+def sendGrid(data, API_ENDPOINT):
+    req = requests.post(url=API_ENDPOINT, data=data)
+    if req.status_code != 200:
+        print("cityIO might be down. so sad.")
+    print(req)
+
+
+  ##################################################
 # load info from json file
 PATH = 'cityio.json'
 table_settings = parse_json_file('table', PATH)
