@@ -6,12 +6,6 @@ import time
 import sys
 
 
-##################################################
-################RUN MULTITHREADED#################
-##################################################
-# https://kite.com/python/docs/multiprocessing.Manager
-
-
 if __name__ == '__main__':
     print(
         '''
@@ -64,11 +58,11 @@ CityScope Python Scanner
 Keystone, decode and send over UDP/HTTTP a 2d array
 of uniquely tagged LEGO array
 
+grid_geojson library by Ronan Doorley @
+
 ##################################################
 
 '''
     )
-    time.sleep(1)
-
     # init cityscopy class
     cityscopy = Cityscopy()

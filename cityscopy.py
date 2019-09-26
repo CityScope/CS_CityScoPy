@@ -1,34 +1,4 @@
-# {{ CityScope Python Scanner }}
-# Copyright (C) {{ 2018 }}  {{ Ariel Noyman }}
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-# "@context": "https://github.com/CityScope/", "@type": "Person", "address": {
-# "@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
-# "Cambridge", "addressRegion": "MA",},
-# "jobTitle": "Research Scientist", "name": "Ariel Noyman",
-# "alumniOf": "MIT", "url": "http://arielnoyman.com", "http://twitter.com/relno",
-# https://github.com/RELNO]
-
-
-##################################################
-
-# CityScope Python Scanner - Modules
-# Keystone, decode and send over UDP a 2d array
-# of uniquely tagged LEGO array
-
-##################################################
 # grid maker imports
 import requests
 import cv2
@@ -58,20 +28,23 @@ class Cityscopy:
         ##################################################
         # load info from json file
         self.SETTINGS_PATH = 'cityio.json'
+        # get the table settings
         self.table_settings = self.parse_json_file('table')
-
-        #! ugly way to store keystroke vals between loops.
+        # init corners
         self.selected_corner = None
         self.corner_direction = None
-
+        # get init keystones
+        self.init_keystone = self.get_init_keystone()
+        # make geojson grid
         if self.table_settings['objects']['cityscopy']['makeGrid'] == True:
             self.gridMaker()
-
+        # start the multi proccess
+        self.start_multiproccess()
         ##################################################
 
+    def start_multiproccess(self):
         # define global list manager
         MANAGER = Manager()
-
         # create shared global list to work with both processes
         self.multiprocess_shared_dict = MANAGER.dict()
 
@@ -90,18 +63,9 @@ class Cityscopy:
 
     ##################################################
 
-    def scanner_function(self, multiprocess_shared_dict):
+    def get_init_keystone(self):
 
-        # define the table params
-        grid_dimensions_x = self.table_settings['header']['spatial']['nrows']
-        grid_dimensions_y = self.table_settings['header']['spatial']['ncols']
-
-        array_of_tags_from_json = self.np_string_tags(
-            self.table_settings['objects']['cityscopy']['tags'])
-
-        array_of_maps_form_json = self.table_settings['header']['mapping']['type']
-
-        # load the initial keystone data from file
+     # load the initial keystone data from file
         keystone_points_array = np.loadtxt(
             self.get_folder_path()+'keystone.txt', dtype=np.float32)
 
@@ -116,8 +80,20 @@ class Cityscopy:
         bry = keystone_points_array[3][1]
         # init keystone
         init_keystone = [ulx, uly, urx, ury, blx, bly, brx, bry]
+        return init_keystone
 
-        print(init_keystone)
+    ##################################################
+
+    def scanner_function(self, multiprocess_shared_dict):
+
+        # define the table params
+        grid_dimensions_x = self.table_settings['header']['spatial']['nrows']
+        grid_dimensions_y = self.table_settings['header']['spatial']['ncols']
+
+        array_of_tags_from_json = self.np_string_tags(
+            self.table_settings['objects']['cityscopy']['tags'])
+
+        array_of_maps_form_json = self.table_settings['header']['mapping']['type']
 
         # init type list array
         TYPES_LIST = []
@@ -179,7 +155,7 @@ class Cityscopy:
         while True:
             # get a new matrix transformation every frame
             KEY_STONE_DATA = self.keystone(
-                video_resolution_x, video_resolution_y, self.listen_to_UI_interaction(init_keystone))
+                video_resolution_x, video_resolution_y, self.listen_to_UI_interaction(self.init_keystone))
 
             # zero an array to collect the scanners
             CELL_COLORS_ARRAY = []
@@ -241,7 +217,6 @@ class Cityscopy:
                                   (x_red,
                                       y_red),
                                   thisColor, 1)
-
                 # cell counter
                 count = count + 1
 
@@ -262,7 +237,7 @@ class Cityscopy:
                 multiprocess_shared_dict['scan'] = TYPES_LIST
 
             else:
-                    # else skip this
+                # else don't do it
                 pass
 
             if self.table_settings['objects']['cityscopy']['gui'] is 1:
@@ -336,7 +311,6 @@ class Cityscopy:
 
     # 2nd proccess to
     def create_data_json(self, multiprocess_shared_dict):
-        print('f')
         self.table_settings = self.parse_json_file('table')
         SEND_INTERVAL = self.table_settings['objects']['cityscopy']['interval']
         # initial dummy value for old grid
@@ -354,10 +328,8 @@ class Cityscopy:
                     json_struct['grid'] = scan_results
                     if self.table_settings['objects']['cityscopy']['cityio'] is 1:
                         cityIO_json = json.dumps(json_struct)
-                        #! print('sending to cityIO..')
                         self.send_json_to_cityIO(cityIO_json)
                     else:
-                        #! print('sending UDP..')
                         self.send_json_to_UDP(scan_results)
                 except Exception as e:
                     print(e)
@@ -367,7 +339,7 @@ class Cityscopy:
                 last_sent = datetime.now()
 
                 # debug print
-                print('\n', 'sent at: ', datetime.now())
+                print('\n', 'CityScopy grid sent at:', datetime.now())
 
     ##################################################
 
@@ -411,8 +383,6 @@ class Cityscopy:
         Returns the desired filed
         """
 
-        print('getting setting for:', field)
-
         # init array for json fields
         settings_file = self.get_folder_path()+self.SETTINGS_PATH
         # open json file
@@ -444,8 +414,6 @@ class Cityscopy:
 
         Returns 4x2 array of points location for key-stoning
         """
-
-        # print (init_keystone)
 
         # selected_corner = self.selected_corner
         # corner_direction = self.corner_direction
