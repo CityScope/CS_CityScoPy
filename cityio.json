@@ -33,7 +33,7 @@
           "latitude": 47.43630292431787,
           "cellSize": 50,
           "rotation": 260,
-          "nrows": 50,
+          "nrows": 20,
           "ncols": 50,
           "projection": 3836
         },
