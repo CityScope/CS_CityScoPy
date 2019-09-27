@@ -15,33 +15,34 @@ import socket
 from multiprocessing import Process, Manager
 from subprocess import Popen
 import random
-# # get this local folder on init to load class
-# file_dir = os.path.dirname('grid_geojson/module/')
-# sys.path.append(file_dir)
 from grid_geojson.module import grid_geojson
-# nopep8
 
 
 class Cityscopy:
 
-    def __init__(self):
+    ##################################################
 
-        ##################################################
+    def __init__(self):
         # load info from json file
         self.SETTINGS_PATH = 'cityio.json'
         # get the table settings
         self.table_settings = self.parse_json_file('table')
-        # init corners
-        self.selected_corner = None
-        self.corner_direction = None
-        # get init keystones
-        self.init_keystone = self.get_init_keystone()
-        # make geojson grid
+        print('getting settings for CityScopy')
+
         if self.table_settings['objects']['cityscopy']['makeGrid'] == True:
+            # make geojson grid
             self.gridMaker()
-        # start the multi proccess
-        self.start_multiproccess()
-        ##################################################
+
+        if self.table_settings['objects']['cityscopy']['scan'] == True:
+            # get init keystones
+            self.init_keystone = self.get_init_keystone()
+            # init corners
+            self.selected_corner = None
+            self.corner_direction = None
+            # start the multi proccess
+            self.start_multiproccess()
+
+    ##################################################
 
     def start_multiproccess(self):
         # define global list manager
@@ -327,7 +328,7 @@ class Cityscopy:
                     # convert to json
                     json_struct = self.table_settings
                     json_struct['grid'] = scan_results
-                    if self.table_settings['objects']['cityscopy']['cityio'] is 1:
+                    if self.table_settings['objects']['cityscopy']['cityio'] is True:
                         cityIO_json = json.dumps(json_struct)
                         self.send_json_to_cityIO(cityIO_json)
                     else:
@@ -341,8 +342,6 @@ class Cityscopy:
 
                 # debug print
                 print('\n', 'CityScopy grid sent at:', datetime.now())
-
-    ##################################################
 
     ##################################################
 
@@ -652,3 +651,18 @@ class Cityscopy:
         if req.status_code != 200:
             print("cityIO might be down. so sad.")
         print(req)
+
+    ##################################################
+
+    def udf_listener(self):
+        UDP_IP = "127.0.0.1"
+        UDP_PORT = 5000
+
+        sock = socket.socket(socket.AF_INET,  # Internet
+                             socket.SOCK_DGRAM)  # UDP
+        sock.bind((UDP_IP, UDP_PORT))
+        print("Starting UDP listener at:", UDP_IP, ' port: ', UDP_PORT, sock)
+
+        while True:
+            data, _ = sock.recvfrom(1024)  # buffer size is 1024 bytes
+            print('\n', data.decode())

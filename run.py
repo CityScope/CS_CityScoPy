@@ -2,8 +2,6 @@
 
 
 from cityscopy import Cityscopy
-import time
-import sys
 
 
 if __name__ == '__main__':
@@ -57,9 +55,9 @@ https://github.com/RELNO]
 CityScope Python Scanner
 Keystone, decode and send over UDP/HTTTP a 2d array
 of uniquely tagged LEGO array
-
-grid_geojson library by Ronan Doorley @
-
+# 
+'grid_geojson' module by Ronan Doorley @doorleyr
+# 
 ##################################################
 
 '''

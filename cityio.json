@@ -27,7 +27,8 @@
     "grid": [],
     "objects": {
       "cityscopy": {
-        "makeGrid": true,
+        "makeGrid": false,
+        "scan": false,
         "grid_full_table": {
           "longitude": 19.050979614257812,
           "latitude": 47.43630292431787,
@@ -39,7 +40,7 @@
         },
         "interval": 250,
         "gui": 1,
-        "cityio": 1,
+        "cityio": true,
         "tags": [
           "0000000000000000",
           "1111111111111111",
