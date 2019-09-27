@@ -15,10 +15,11 @@ import socket
 from multiprocessing import Process, Manager
 from subprocess import Popen
 import random
-# get this local folder on init to load class
-file_dir = os.path.dirname('grid_geojson')
-sys.path.append(file_dir)
-from grid_geojson import *  # nopep8
+# # get this local folder on init to load class
+# file_dir = os.path.dirname('grid_geojson/module/')
+# sys.path.append(file_dir)
+from grid_geojson.module import grid_geojson
+# nopep8
 
 
 class Cityscopy:
@@ -614,8 +615,8 @@ class Cityscopy:
             'height': [-100 for i in range(nrows*ncols)],
             'pop_density': [2 for i in range(nrows*ncols)]
         }
-        results_grid = Grid(top_left_lon, top_left_lat, rotation,
-                            crs_epsg, cell_size, nrows, ncols)
+        results_grid = grid_geojson.Grid(top_left_lon, top_left_lat, rotation,
+                                         crs_epsg, cell_size, nrows, ncols)
         grid_geo = results_grid.get_grid_geojson(properties)
         grid_interactive_area = json.dumps(grid_geo)
         API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
@@ -636,8 +637,8 @@ class Cityscopy:
             'height': [-100 for i in range(nrows*ncols)],
             'pop_density': [2 for i in range(nrows*ncols)]
         }
-        results_grid = Grid(top_left_lon, top_left_lat, rotation,
-                            crs_epsg, cell_size, nrows, ncols)
+        results_grid = grid_geojson.Grid(top_left_lon, top_left_lat, rotation,
+                                         crs_epsg, cell_size, nrows, ncols)
         grid_geo = results_grid.get_grid_geojson(properties)
         grid_interactive_area = json.dumps(grid_geo)
         API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \

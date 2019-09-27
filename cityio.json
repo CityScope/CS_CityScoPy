@@ -27,7 +27,7 @@
     "grid": [],
     "objects": {
       "cityscopy": {
-        "makeGrid": false,
+        "makeGrid": true,
         "grid_full_table": {
           "longitude": 19.050979614257812,
           "latitude": 47.43630292431787,
