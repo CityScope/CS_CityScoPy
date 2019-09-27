@@ -62,8 +62,10 @@ of uniquely tagged LEGO array
 
 '''
     )
+
+    cityscopy_settings_path = "settings/csepel.json"
     # init cityscopy class
-    cityscopy = Cityscopy()
+    cityscopy = Cityscopy(cityscopy_settings_path)
     # cityscopy.keystone()
     # cityscopy.gridMaker()
     cityscopy.scan()

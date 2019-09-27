@@ -22,12 +22,12 @@ class Cityscopy:
 
     ##################################################
 
-    def __init__(self):
+    def __init__(self, path):
         # load info from json file
-        self.SETTINGS_PATH = 'cityio.json'
+        self.SETTINGS_PATH = path
         # get the table settings. This is used bu many metohds
         self.table_settings = self.parse_json_file('table')
-        print('getting settings for CityScopy')
+        print('getting settings for CityScopy...')
 
         # init corners variables
         self.selected_corner = None
@@ -210,7 +210,7 @@ class Cityscopy:
                 thisColor = DICTIONARY_COLORS[scannerCol]
 
                 # ? only draw vis if settings has 1 in gui
-                if self.table_settings['objects']['cityscopy']['gui'] is 1:
+                if self.table_settings['objects']['cityscopy']['gui'] is True:
                     # draw rects with frame colored by range result
                     cv2.rectangle(DISTORTED_VIDEO_STREAM,
                                   (x+scanner_reduction,
@@ -241,7 +241,7 @@ class Cityscopy:
                 # else don't do it
                 pass
 
-            if self.table_settings['objects']['cityscopy']['gui'] is 1:
+            if self.table_settings['objects']['cityscopy']['gui'] is True:
                 # draw the video to screen
                 cv2.imshow("scanner_gui_window", DISTORTED_VIDEO_STREAM)
 

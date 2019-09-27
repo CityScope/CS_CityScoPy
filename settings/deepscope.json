@@ -1,0 +1,44 @@
+{
+  "table": {
+    "header": {
+      "name": "deepscope",
+      "spatial": {
+        "nrows": 16,
+        "ncols": 16,
+        "physical_longitude": 0,
+        "physical_latitude": 0,
+        "longitude": 0,
+        "latitude": 0,
+        "cellSize": 16,
+        "rotation": 0
+      },
+      "owner": {
+        "name": "Ariel Noyman",
+        "title": "",
+        "institute": "City Science MIT Media Lab"
+      },
+      "block": ["type", "rotation"],
+      "mapping": {
+        "type": ["0", "1", "2", "3", "4"],
+        "rotation": ["0", "1", "2", "3"]
+      }
+    },
+    "grid": [],
+    "objects": {
+      "cityscopy": {
+        "interval": 200,
+        "gui": true,
+        "cityio": 1,
+        "tags": [
+          "1110111111111111",
+          "1100110000000000",
+          "1111111100110011",
+          "0011001111001100",
+          "1111111100000000"
+        ],
+        "cell_gap": 0,
+        "mirror_cam": 0
+      }
+    }
+  }
+}

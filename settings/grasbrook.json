@@ -28,7 +28,7 @@
       "cityscopy": {
         "cell_gap": 0,
         "cityio": 1,
-        "gui": 1,
+        "gui": true,
         "interval": 200,
         "mirror_cam": 1,
         "tags": [

@@ -3,14 +3,15 @@
     "header": {
       "name": "csepel",
       "spatial": {
-        "nrows": 40,
-        "ncols": 20,
+        "nrows": 15,
+        "ncols": 15,
         "physical_longitude": 19.050979614257812,
         "physical_latitude": 47.43630292431787,
         "longitude": 19.050979614257812,
         "latitude": 47.43630292431787,
         "cellSize": 50,
-        "rotation": 260
+        "rotation": 260,
+        "projection": 3836
       },
       "owner": {
         "name": "Ariel Noyman",
@@ -26,9 +27,20 @@
     "grid": [],
     "objects": {
       "cityscopy": {
-        "interval": 50,
-        "gui": 1,
-        "cityio": 1,
+        "makeGrid": false,
+        "scan": false,
+        "grid_full_table": {
+          "longitude": 19.050979614257812,
+          "latitude": 47.43630292431787,
+          "cellSize": 50,
+          "rotation": 260,
+          "nrows": 20,
+          "ncols": 50,
+          "projection": 3836
+        },
+        "interval": 250,
+        "gui": true,
+        "cityio": true,
         "tags": [
           "0000000000000000",
           "1111111111111111",
@@ -36,15 +48,8 @@
           "1000000000000000"
         ],
         "cell_gap": 0,
-        "mirror_cam": 0
+        "mirror_cam": 1
       }
-    },
-    "table_extents": [
-      [19.050979614257812, 47.43630292431787],
-      [19.068617820739746, 47.435577210715834],
-      [19.063854217529297, 47.40990954349756],
-      [19.044928550720215, 47.41107124673388],
-      [19.050979614257812, 47.43630292431787]
-    ]
+    }
   }
 }
