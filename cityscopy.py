@@ -25,26 +25,24 @@ class Cityscopy:
     def __init__(self):
         # load info from json file
         self.SETTINGS_PATH = 'cityio.json'
-        # get the table settings
+        # get the table settings. This is used bu many metohds
         self.table_settings = self.parse_json_file('table')
         print('getting settings for CityScopy')
 
-        if self.table_settings['objects']['cityscopy']['makeGrid'] == True:
-            # make geojson grid
-            self.gridMaker()
+        # init corners variables
+        self.selected_corner = None
+        self.corner_direction = None
 
-        if self.table_settings['objects']['cityscopy']['scan'] == True:
-            # get init keystones
-            self.init_keystone = self.get_init_keystone()
-            # init corners
-            self.selected_corner = None
-            self.corner_direction = None
-            # start the multi proccess
-            self.start_multiproccess()
+        # init keystone variables
+        self.FRAME = None
+        self.POINT_INDEX = None
+        self.POINTS = None
+        self.MOUSE_POSITION = None
 
     ##################################################
 
-    def start_multiproccess(self):
+    def scan(self):
+
         # define global list manager
         MANAGER = Manager()
         # create shared global list to work with both processes
@@ -87,7 +85,8 @@ class Cityscopy:
     ##################################################
 
     def scanner_function(self, multiprocess_shared_dict):
-
+        # get init keystones
+        self.init_keystone = self.get_init_keystone()
         # define the table params
         grid_dimensions_x = self.table_settings['header']['spatial']['nrows']
         grid_dimensions_y = self.table_settings['header']['spatial']['ncols']
@@ -156,7 +155,7 @@ class Cityscopy:
     # run the video loop forever
         while True:
             # get a new matrix transformation every frame
-            KEY_STONE_DATA = self.keystone(
+            KEY_STONE_DATA = self.transfrom_matrix(
                 video_resolution_x, video_resolution_y, self.listen_to_UI_interaction(self.init_keystone))
 
             # zero an array to collect the scanners
@@ -415,8 +414,6 @@ class Cityscopy:
         Returns 4x2 array of points location for key-stoning
         """
 
-        # selected_corner = self.selected_corner
-        # corner_direction = self.corner_direction
         # INTERACTION
         corner_keys = ['1', '2', '3', '4']
         move_keys = ['w', 'a', 's', 'd']
@@ -499,7 +496,7 @@ class Cityscopy:
 
     ##################################################
 
-    def keystone(self, video_resolution_x, video_resolution_y, keyStonePts):
+    def transfrom_matrix(self, video_resolution_x, video_resolution_y, keyStonePts):
         '''
         NOTE: Aspect ratio must be flipped
         so that aspectRat[0,1] will be aspectRat[1,0]
@@ -654,7 +651,7 @@ class Cityscopy:
 
     ##################################################
 
-    def udf_listener(self):
+    def udp_listener(self):
         UDP_IP = "127.0.0.1"
         UDP_PORT = 5000
 
@@ -666,3 +663,75 @@ class Cityscopy:
         while True:
             data, _ = sock.recvfrom(1024)  # buffer size is 1024 bytes
             print('\n', data.decode())
+
+    ##################################################
+
+    def keystone(self):
+        # file path to save
+        self.KEYSTONE_PATH = self.get_folder_path() + '/'+"keystone.txt"
+        print('keystone path:', self.KEYSTONE_PATH)
+        # define the video stream
+        try:
+            # try from a device 1 in list, not default webcam
+            WEBCAM = cv2.VideoCapture(1)
+            print('no camera in pos 0')
+            time.sleep(1)
+            # if not exist, use device 0
+            if not WEBCAM.isOpened():
+                WEBCAM = cv2.VideoCapture(0)
+                time.sleep(1)
+        finally:
+            print('got video at:', WEBCAM)
+
+        # video winodw
+        cv2.namedWindow('canvas', cv2.WINDOW_NORMAL)
+
+        # top left, top right, bottom left, bottom right
+        self.POINTS = [(0, 0), (0, 0), (0, 0), (0, 0)]
+        self.POINT_INDEX = 0
+        self.MOUSE_POSITION = (0, 0)
+
+        def selectFourPoints():
+            # let users select 4 points on WEBCAM GUI
+            print("select 4 points, by double clicking on each of them in the order: \n\
+            up right, up left, bottom right, bottom left.")
+
+            # loop until 4 clicks
+            while self.POINT_INDEX != 4:
+                key = cv2.waitKey(20) & 0xFF
+                if key == 27:
+                    return False
+                # wait for clicks
+                cv2.setMouseCallback('canvas', save_this_point)
+                # read the WEBCAM frames
+                _, self.FRAME = WEBCAM.read()
+                if self.table_settings['objects']['cityscopy']['mirror_cam'] is 1:
+                    self.FRAME = cv2.flip(self.FRAME, 1)
+                # draw mouse pos
+                cv2.circle(self.FRAME, self.MOUSE_POSITION, 10, (0, 0, 255), 1)
+                cv2.circle(self.FRAME, self.MOUSE_POSITION, 1, (0, 0, 255), 2)
+                # draw clicked points
+                for thisPnt in self.POINTS:
+                    cv2.circle(self.FRAME, thisPnt, 10, (255, 0, 0), 1)
+                # show the video
+                cv2.imshow('canvas', self.FRAME)
+            # when done selecting 4 pnts return
+            return True
+
+        def save_this_point(event, x, y, flags, param):
+            # mouse callback function
+            if event == cv2.EVENT_MOUSEMOVE:
+                self.MOUSE_POSITION = (x, y)
+            elif event == cv2.EVENT_LBUTTONUP:
+                # draw a ref. circle
+                print('point  # ', self.POINT_INDEX, (x, y))
+                # save this point to the array pts
+                self.POINTS[self.POINT_INDEX] = (x, y)
+                self.POINT_INDEX = self.POINT_INDEX + 1
+        # checks if finished selecting the 4 corners
+        if selectFourPoints():
+            np.savetxt(self.KEYSTONE_PATH, self.POINTS)
+            print("keystone initial points were saved")
+
+        WEBCAM.release()
+        cv2.destroyAllWindows()

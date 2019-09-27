@@ -64,3 +64,7 @@ of uniquely tagged LEGO array
     )
     # init cityscopy class
     cityscopy = Cityscopy()
+    # cityscopy.keystone()
+    # cityscopy.gridMaker()
+    cityscopy.scan()
+    # cityscopy.udp_listener()
