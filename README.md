@@ -1,40 +1,78 @@
 # CityScoPy
+
 ### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
 
+## Table Initiation, Scanning & Networking Module for MIT CityScope Project in Python
 
-## Scanning and Networking Module for MIT CityScope Project in Python
+CityScoPy is a tool for initiating a CityScope instance for any arbitrary geolocated area in the world. CityScoPy can create a GeoJSON grid, capture, key-stone, scan and send uniquely tagged arrays of 2-dimension physical bricks. This is the main compom MIT CityScope.
 
-This tool is for capturing, key-stoning, scanning and sending uniquely tagged arrays of 2-dimension physical Lego bricks. CityScope Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color arrays will be compared to list of `tags` attribute of a given `cityio.json` file. At last, the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list is then converted to cityIO acceptable JSON format and can be sent using POST request.
+---
 
-## Quick-Run
+## Usage
 
-- From terminal, run the tool using `$ run.py`
-- Tool will start scanning using whatever keystone data was stored in `keystone.txt`
-- make corrections to the key stone using the sliders or keyboard using `1,2,3,4` to select a corner and `[w,a,s,d]` to move `[up,left,down,right]` the selected corner. Press `k` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
+- install python 3.4^, clone this repo, install packages.
+- tweak `__settings__.json` to fit your cityIO table setup. Read [cityIO documentation](https://github.com/cityscope/cs_cityio_backend/wiki) for proper data structure
+- setup a path to your settings file
 
-Note: Running the tool in this way will involve some fail safe mechanisms that will auto-restart the tool when it crashes [such as camera disconnect, slider failure or networking issue]
+```
+cityscopy_settings_path = "__path__/__settings__.json"
+```
 
-## Setup and Calibration On First Time Usage | Full Setup
+- initiate the `Cityscopy` class
 
-- get python 3.4 and above, clone this repo, install relevant libs [see `main.py`]
-- tweek `cityio.json` to fit your cityIO table setup [read https://github.com/CityScope/CS_CityIO_Backend/wiki to understand cityIO data structure]
-- Run with `$ python[3] main.py`.
-- Tool will start scanning using the key stone data created with`keystone.py`
-- make corrections to the key stone using the sliders. Press `s` to save changes to file and `ctrl-c` to close program
+```
+cityscopy = Cityscopy(cityscopy_settings_path)
+```
 
-### options in `cityio.json` , `objects` field
-  - `gui` 0 or 1 -- turn on or of webcam display
-  - `interval` 0 to inf -- send rate to UDP/HTTP in ms
-- `cityio` 0 or 1 -- send to UDP [0] or HTTP cityIO[1]
-- `tags` ["1000000100000000"] -- 16 digit strings, repesenting of the types of being scanned  
+- use one or more of the main methods
 
-## Optional
+| Method                     | Usage                                 | Blocking? |
+| -------------------------- | ------------------------------------- | --------- |
+| `cityscopy.keystone()`     | initial keystone and save to file     | x         |
+| `cityscopy.gridMaker()`    | make GeoJSON grids and sent to CityIO |           |
+| `cityscopy.scan()`         | main scanning and sending method      | x         |
+| `cityscopy.udp_listener()` | emulate local UDP server listener     | x         |
 
-- Run `keystone` with: `$ python[3] keystone.py`
-- the tool will start, assuming a webcam is connected and working
+- in terminal run the tool using `$ run.py`
+
+---
+
+## Class methods
+
+### `Cityscopy.keystone()`
+
+##### Initial keystone and save to file
+
+- the tool will start given a cam is connected and working
 - Select 4 corners [up right, up left, bottom right, bottom left, at this order] of keystone region
-  Note: no need to exactly select the corners, as these are only initial guides for `scanner` tool
-- `keystone.py` will create `keystone.txt` and close
+  Note: no need to exactly select the corners, as these are only initial guides for `scanner` method
+- `keystone.txt` and close
+
+### `Cityscopy.gridMaker()`
+
+##### make GeoJSON grids and sent to CityIO
+
+### `Cityscopy.scan()`
+
+##### main scanning and sending method
+
+Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color arrays will be compared to list of `tags` attribute of a given `__settings__.json` file. Then the tool will return a list of `type` and `rotation` for each of the scanned arrays. This list is then converted to cityIO acceptable JSON format and can be sent using POST request.
+
+##### options in `__settings__.json`
+
+- `gui` turn on or of webcam display
+- `interval` send rate to UDP/HTTP in ms
+- `cityio` send to UDP or HTTP cityIO
+- `tags` 16 digit strings of types being scanned [`1000000100000000`]
+
+Tool will start scanning using whatever keystone data was stored in `keystone.txt`
+make corrections to the key stone using the sliders or keyboard using `1,2,3,4` to select a corner and `[w,a,s,d]` to move `[up,left,down,right]` the selected corner. Press `k` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
+
+### `Cityscopy.udp_listener()`
+
+##### emulates local UDP server listener
+
+---
 
 ## License
 
