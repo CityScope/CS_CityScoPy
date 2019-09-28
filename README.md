@@ -24,7 +24,7 @@ cityscopy_settings_path = "__path__/__settings__.json"
 cityscopy = Cityscopy(cityscopy_settings_path)
 ```
 
-- use one or more of the main methods
+- use one or more of the main methods. 'Blocking' means the method will run forever (while true loop). Advanced users can parallel blocking methods using multithreading. 
 
 | Method                     | Usage                                 | Blocking? |
 | -------------------------- | ------------------------------------- | --------- |
