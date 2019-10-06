@@ -1,8 +1,9 @@
 # CityScoPy
+## CityScope Table Initiation, Scanning & Networking Module for MIT CityScope Project in Python
+
 
 ### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
 
-## Table Initiation, Scanning & Networking Module for MIT CityScope Project in Python
 
 CityScoPy is a tool for initiating a CityScope instance for any arbitrary geolocated area in the world. CityScoPy can create a GeoJSON grid, capture, key-stone, scan and send uniquely tagged arrays of 2-dimension physical bricks. This is a key component of the MIT CityScope platform for interaction.
 
