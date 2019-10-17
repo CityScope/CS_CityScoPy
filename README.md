@@ -1,7 +1,5 @@
 # CityScoPy
 
-## CityScope Table Initiation, Scanning & Networking Module for MIT CityScope Project in Python
-
 ### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
 
 ## A tool for bootstrapping, scanning and networking MIT CityScope Projects in Python
