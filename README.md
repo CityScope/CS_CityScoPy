@@ -1,5 +1,7 @@
 # CityScoPy
 
+## CityScope Table Initiation, Scanning & Networking Module for MIT CityScope Project in Python
+
 ### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
 
 ## A tool for bootstrapping, scanning and networking MIT CityScope Projects in Python
@@ -25,7 +27,7 @@ cityscopy_settings_path = "__path__/__settings__.json"
 cityscopy = Cityscopy(cityscopy_settings_path)
 ```
 
-- use one or more of the main methods ["blocking" methods run forever and thus occupy the entire thread]
+- use one or more of the main methods. 'Blocking' means the method will run forever (while true loop). Advanced users can parallel blocking methods using multithreading.
 
 | Method                     | Usage                                 | Blocking? |
 | -------------------------- | ------------------------------------- | --------- |
