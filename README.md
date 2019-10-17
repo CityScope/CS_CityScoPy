@@ -2,9 +2,10 @@
 
 ### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
 
-## Table Initiation, Scanning & Networking Module for MIT CityScope Project in Python
+## A tool for bootstrapping, scanning and networking MIT CityScope Projects in Python
 
-CityScoPy is a tool for initiating a CityScope instance for any arbitrary geolocated area in the world. CityScoPy can create a GeoJSON grid, capture, key-stone, scan and send uniquely tagged arrays of 2-dimension physical bricks. This is the main compom MIT CityScope.
+CityScoPy is the main component of an interactive MIT CityScope table.
+It is used for initiating and later run a interactive CityScope instance in any arbitrary geolocated area in the world. CityScoPy can create a GeoJSON grid, capture, key-stone, scan and send uniquely tagged arrays of 2-dimension physical bricks.
 
 ---
 
@@ -24,7 +25,7 @@ cityscopy_settings_path = "__path__/__settings__.json"
 cityscopy = Cityscopy(cityscopy_settings_path)
 ```
 
-- use one or more of the main methods
+- use one or more of the main methods ["blocking" methods run forever and thus occupy the entire thread]
 
 | Method                     | Usage                                 | Blocking? |
 | -------------------------- | ------------------------------------- | --------- |
@@ -51,6 +52,8 @@ cityscopy = Cityscopy(cityscopy_settings_path)
 ### `Cityscopy.gridMaker()`
 
 ##### make GeoJSON grids and sent to CityIO
+
+Method for creating a GeoJSON grid. This grid represent the abstraction ('LEGO-tizing') of an area in the world. This grid also corresponds to the dimensions of the tangible CityScope table. `gridMaker` should be ran once upon starting a new CityScope instance. It will push the created grid into `cityIO` endpoint so that front-end and analysis modules could make use of it.
 
 ### `Cityscopy.scan()`
 
