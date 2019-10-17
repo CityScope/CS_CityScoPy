@@ -105,12 +105,12 @@ class Cityscopy:
         # define the video stream
         try:
             # try from a device 1 in list, not default webcam
-            video_capture = cv2.VideoCapture(1)
+            video_capture = cv2.VideoCapture(0)
             print('no camera in pos 0')
             time.sleep(1)
             # if not exist, use device 0
             if not video_capture.isOpened():
-                video_capture = cv2.VideoCapture(0)
+                video_capture = cv2.VideoCapture(1)
                 time.sleep(1)
 
         finally:
@@ -673,12 +673,12 @@ class Cityscopy:
         # define the video stream
         try:
             # try from a device 1 in list, not default webcam
-            WEBCAM = cv2.VideoCapture(1)
+            WEBCAM = cv2.VideoCapture(0)
             print('no camera in pos 0')
             time.sleep(1)
             # if not exist, use device 0
             if not WEBCAM.isOpened():
-                WEBCAM = cv2.VideoCapture(0)
+                WEBCAM = cv2.VideoCapture(1)
                 time.sleep(1)
         finally:
             print('got video at:', WEBCAM)
