@@ -11,7 +11,16 @@ It is used for initiating and later run a interactive CityScope instance in any 
 
 ## Usage
 
-- install python 3.4^, clone this repo, install packages.
+- install python 3.4 or higher
+- clone this repo **recursively** to get submodules. Follow https://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules or just: 
+
+```
+$ git clone https://github.com/CityScope/CS_CityScoPy.git
+$ cd CS_CityScoPy
+$ git submodule update --init --recursive
+```
+
+- install packages. To produce a list of needed packages, use `pipreqs`, follow istructions https://github.com/bndr/pipreqs. Or, simply run the app and install packages as they appear in errors. 
 - tweak `__settings__.json` to fit your cityIO table setup. Read [cityIO documentation](https://github.com/cityscope/cs_cityio_backend/wiki) for proper data structure
 - setup a path to your settings file
 
