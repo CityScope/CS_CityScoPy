@@ -27,10 +27,10 @@
     "objects": {
       "cityscopy": {
         "cell_gap": 0,
-        "cityio": 1,
+        "cityio": true,
         "gui": true,
         "interval": 200,
-        "mirror_cam": 1,
+        "mirror_cam": true,
         "tags": [
           "0000000000000000",
           "0011001100000000",

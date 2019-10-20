@@ -164,7 +164,7 @@ class Cityscopy:
             # read video frames
             _, THIS_FRAME = video_capture.read()
             # mirror camera
-            if self.table_settings['objects']['cityscopy']['mirror_cam'] is 1:
+            if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
                 THIS_FRAME = cv2.flip(THIS_FRAME, 1)
 
             # warp the video based on keystone info
@@ -705,7 +705,7 @@ class Cityscopy:
                 cv2.setMouseCallback('canvas', save_this_point)
                 # read the WEBCAM frames
                 _, self.FRAME = WEBCAM.read()
-                if self.table_settings['objects']['cityscopy']['mirror_cam'] is 1:
+                if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
                     self.FRAME = cv2.flip(self.FRAME, 1)
                 # draw mouse pos
                 cv2.circle(self.FRAME, self.MOUSE_POSITION, 10, (0, 0, 255), 1)

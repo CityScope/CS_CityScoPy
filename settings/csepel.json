@@ -48,7 +48,7 @@
           "1000000000000000"
         ],
         "cell_gap": 0,
-        "mirror_cam": 1
+        "mirror_cam": true
       }
     }
   }

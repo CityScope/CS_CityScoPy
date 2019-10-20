@@ -37,7 +37,7 @@
           "0000000000000000"
         ],
         "cell_gap": 0,
-        "mirror_cam": 0
+        "mirror_cam": false
       }
     }
   }
