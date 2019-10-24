@@ -63,11 +63,11 @@ of uniquely tagged LEGO array
 '''
     )
 
-    cityscopy_settings_path = "settings/csepel.json"
+    cityscopy_settings_path = "settings/cityscopy.json"
     # init cityscopy class
     cityscopy = Cityscopy(cityscopy_settings_path)
     # run CityScopy main methods
     # cityscopy.keystone()
     # cityscopy.gridMaker()
     # cityscopy.scan()
-    # cityscopy.udp_listener()
+    # # cityscopy.udp_listener()
