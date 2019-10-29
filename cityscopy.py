@@ -162,18 +162,16 @@ class Cityscopy:
             CELL_COLORS_ARRAY = []
 
             # read video frames
-            _, THIS_FRAME = video_capture.read()
-            # mirror camera
-            if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
-                THIS_FRAME = cv2.flip(THIS_FRAME, 1)
-
-            # ! try catch to fix https://github.com/CityScope/CS_CityScoPy/issues/9
-            try:
-                 # warp the video based on keystone info
+            RET, THIS_FRAME = video_capture.read()
+            if RET is False:
+                pass
+            else:
+                # mirror camera
+                if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
+                    THIS_FRAME = cv2.flip(THIS_FRAME, 1)
+                    # warp the video based on keystone info
                 DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
                     THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
-            except (BrokenPipeError, IOError):
-                pass
 
             # cell counter
             count = 0
