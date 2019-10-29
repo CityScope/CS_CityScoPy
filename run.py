@@ -69,5 +69,5 @@ of uniquely tagged LEGO array
     # run CityScopy main methods
     # cityscopy.keystone()
     # cityscopy.gridMaker()
-    # cityscopy.scan()
+    cityscopy.scan()
     # # cityscopy.udp_listener()
