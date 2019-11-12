@@ -1,14 +1,14 @@
 {
   "table": {
     "header": {
-      "name": "urbam",
+      "name": "cityscope_hanoi",
       "spatial": {
         "nrows": 15,
         "ncols": 15,
         "physical_longitude": -71.1009981,
         "physical_latitude": 42.3582145,
-        "longitude": 21.028511,
-        "latitude": 105.804817
+        "longitude": -71.1009981,
+        "latitude": 42.3582145,
         "cellSize": 100,
         "rotation": 0
       },
