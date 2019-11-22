@@ -51,15 +51,10 @@ https://github.com/RELNO]
 
 
 ##################################################
-
 CityScope Python Scanner
 Keystone, decode and send over UDP/HTTTP a 2d array
 of uniquely tagged LEGO array
-# 
-'grid_geojson' module by Ronan Doorley @doorleyr
-# 
 ##################################################
-
 '''
     )
 
@@ -68,6 +63,5 @@ of uniquely tagged LEGO array
     cityscopy = Cityscopy(cityscopy_settings_path)
     # run CityScopy main methods
     # cityscopy.keystone()
-    # cityscopy.gridMaker()
     cityscopy.scan()
     # # cityscopy.udp_listener()

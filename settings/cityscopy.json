@@ -27,7 +27,6 @@
     "grid": [],
     "objects": {
       "cityscopy": {
-        "makeGrid": false,
         "scan": false,
         "interval": 250,
         "gui": true,

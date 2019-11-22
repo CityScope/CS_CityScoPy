@@ -1,5 +1,55 @@
+'''
+>>>>>>>>>>>>> Starting CityScope Scanner >>>>>>>>>>>>
 
-# grid maker imports
+
+                    |||||||||||                        
+                    |||||||||||                         
+                            |||                           
+                            |||                           
+                            |||                       
+                    |||      ||||||||||||   
+                    |||      ||||||||||||    
+                    |||               |||      
+                    |||               ||| 
+                    |||               |||                  
+                    ||||||||||||      |||        
+                    ||||||||||||      |||   
+
+
+>>>>>>>>>>>>> Starting CityScope Scanner >>>>>>>>>>>>
+
+Copyright (C) {{ 2018 }}  {{ Ariel Noyman }}
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+"@context": "https://github.com/CityScope/", "@type": "Person", "address": {
+"@type": "75 Amherst St, Cambridge, MA 02139", "addressLocality":
+"Cambridge", "addressRegion": "MA",},
+"jobTitle": "Research Scientist", "name": "Ariel Noyman",
+"alumniOf": "MIT", "url": "http://arielnoyman.com",
+"https://www.linkedin.com/", "http://twitter.com/relno",
+https://github.com/RELNO]
+
+
+##################################################
+CityScope Python Scanner
+Keystone, decode and send over UDP/HTTTP a 2d array
+of uniquely tagged LEGO array
+##################################################
+'''
+
+
 import requests
 import cv2
 import numpy as np
@@ -15,14 +65,15 @@ import socket
 from multiprocessing import Process, Manager
 from subprocess import Popen
 import random
-from grid_geojson.module import grid_geojson
 
 
 class Cityscopy:
+    '''sacnner for CityScope'''
 
     ##################################################
 
     def __init__(self, path):
+        '''init function '''
         # load info from json file
         self.SETTINGS_PATH = path
         # get the table settings. This is used bu many metohds
@@ -217,8 +268,7 @@ class Cityscopy:
                     cv2.rectangle(DISTORTED_VIDEO_STREAM,
                                   (x+scanner_reduction,
                                    y+scanner_reduction),
-                                  (x_red,
-                                      y_red),
+                                  (x_red, y_red),
                                   thisColor, 1)
                 # cell counter
                 count = count + 1
@@ -591,65 +641,6 @@ class Cityscopy:
                 # if no rotation was found go to next tag
                 # in tag list
                 tags_array_counter = tags_array_counter+1
-
-    ##################################################
-
-    #  method to create a geojson grid on init
-
-    def gridMaker(self):
-        print('\n', '______making GeoJson active and full table grids_______', '\n')
-        # make full table grid
-        top_left_lon = self.table_settings['objects']['cityscopy']['grid_full_table']['longitude']
-        top_left_lat = self.table_settings['objects']['cityscopy']['grid_full_table']['latitude']
-        nrows = self.table_settings['objects']['cityscopy']['grid_full_table']['nrows']
-        ncols = self.table_settings['objects']['cityscopy']['grid_full_table']['ncols']
-        rotation = self.table_settings['objects']['cityscopy']['grid_full_table']['rotation']
-        cell_size = self.table_settings['objects']['cityscopy']['grid_full_table']['cellSize']
-        crs_epsg = str(self.table_settings['objects']
-                       ['cityscopy']['grid_full_table']['projection'])
-        properties = {
-            'id': [i for i in range(nrows*ncols)],
-            'usage': [0 for i in range(nrows*ncols)],
-            'height': [-100 for i in range(nrows*ncols)],
-            'pop_density': [2 for i in range(nrows*ncols)]
-        }
-        results_grid = grid_geojson.Grid(top_left_lon, top_left_lat, rotation,
-                                         crs_epsg, cell_size, nrows, ncols)
-        grid_geo = results_grid.get_grid_geojson(properties)
-        grid_interactive_area = json.dumps(grid_geo)
-        API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
-            self.table_settings['header']['name'] + "/grid_full_table/"
-        self.sendGrid(grid_interactive_area, API_ENDPOINT)
-
-        # make interactive grid
-        top_left_lon = self.table_settings['header']['spatial']['longitude']
-        top_left_lat = self.table_settings['header']['spatial']['latitude']
-        nrows = self.table_settings['header']['spatial']['nrows']
-        ncols = self.table_settings['header']['spatial']['ncols']
-        rotation = self.table_settings['header']['spatial']['rotation']
-        cell_size = self.table_settings['header']['spatial']['cellSize']
-        crs_epsg = str(self.table_settings['header']['spatial']['projection'])
-        properties = {
-            'id': [i for i in range(nrows*ncols)],
-            'usage': [0 for i in range(nrows*ncols)],
-            'height': [-100 for i in range(nrows*ncols)],
-            'pop_density': [2 for i in range(nrows*ncols)]
-        }
-        results_grid = grid_geojson.Grid(top_left_lon, top_left_lat, rotation,
-                                         crs_epsg, cell_size, nrows, ncols)
-        grid_geo = results_grid.get_grid_geojson(properties)
-        grid_interactive_area = json.dumps(grid_geo)
-        API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
-            self.table_settings['header']['name'] + "/grid_interactive_area/"
-        self.sendGrid(grid_interactive_area, API_ENDPOINT)
-    ##################################################
-
-    #  send geojson grid  to cityIO
-    def sendGrid(self, data, API_ENDPOINT):
-        req = requests.post(url=API_ENDPOINT, data=data)
-        if req.status_code != 200:
-            print("cityIO might be down. so sad.")
-        print(req)
 
     ##################################################
 

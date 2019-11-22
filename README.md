@@ -1,26 +1,25 @@
 # CityScoPy
 
-### [=> Download latest release here <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
+### [=> Download latest release <=](https://github.com/CityScope/CS_Scanner_Python/releases/)
 
-## A tool for bootstrapping, scanning and networking MIT CityScope Projects in Python
+#### A tool for bootstrapping, scanning and networking MIT CityScope Projects in Python
 
 CityScoPy is the main component of an interactive MIT CityScope table.
-It is used for initiating and later run a interactive CityScope instance in any arbitrary geolocated area in the world. CityScoPy can create a GeoJSON grid, capture, key-stone, scan and send uniquely tagged arrays of 2-dimension physical bricks.
+It is used for initiating and later run a interactive CityScope instance in any arbitrary geolocated area in the world. CityScoPy can capture, key-stone, scan and send uniquely tagged arrays of 2-dimension physical bricks.
 
 ---
 
 ## Usage
 
 - install python 3.4 or higher
-- clone this repo **recursively** to get submodules. Follow https://stackoverflow.com/questions/3796927/how-to-git-clone-including-submodules or just: 
+- clone this repo
 
 ```
 $ git clone https://github.com/CityScope/CS_CityScoPy.git
 $ cd CS_CityScoPy
-$ git submodule update --init --recursive
 ```
 
-- install packages. To produce a list of needed packages, use `pipreqs`, follow istructions https://github.com/bndr/pipreqs. Or, simply run the app and install packages as they appear in errors. 
+- install packages. To produce a list of needed packages, use `pipreqs`, follow instructions https://github.com/bndr/pipreqs. Or, simply run the app and install packages as they appear in errors.
 - tweak `__settings__.json` to fit your cityIO table setup. Read [cityIO documentation](https://github.com/cityscope/cs_cityio_backend/wiki) for proper data structure
 - setup a path to your settings file
 
@@ -28,7 +27,7 @@ $ git submodule update --init --recursive
 cityscopy_settings_path = "__path__/__settings__.json"
 ```
 
-- initiate the `Cityscopy` class
+- initiate the `Cityscopy` class (see `run.py` example)
 
 ```
 cityscopy = Cityscopy(cityscopy_settings_path)
@@ -36,12 +35,11 @@ cityscopy = Cityscopy(cityscopy_settings_path)
 
 - use one or more of the main methods. 'Blocking' means the method will run forever (while true loop). Advanced users can parallel blocking methods using multithreading.
 
-| Method                     | Usage                                 | Blocking? |
-| -------------------------- | ------------------------------------- | --------- |
-| `cityscopy.keystone()`     | initial keystone and save to file     | x         |
-| `cityscopy.gridMaker()`    | make GeoJSON grids and sent to CityIO |           |
-| `cityscopy.scan()`         | main scanning and sending method      | x         |
-| `cityscopy.udp_listener()` | emulate local UDP server listener     | x         |
+| Method                     | Usage                             | Blocking? |
+| -------------------------- | --------------------------------- | --------- |
+| `cityscopy.keystone()`     | initial keystone and save to file | x         |
+| `cityscopy.scan()`         | main scanning and sending method  | x         |
+| `cityscopy.udp_listener()` | emulate local UDP server listener | x         |
 
 - in terminal run the tool using `$ run.py`
 
@@ -57,12 +55,6 @@ cityscopy = Cityscopy(cityscopy_settings_path)
 - Select 4 corners [up right, up left, bottom right, bottom left, at this order] of keystone region
   Note: no need to exactly select the corners, as these are only initial guides for `scanner` method
 - `keystone.txt` and close
-
-### `Cityscopy.gridMaker()`
-
-##### make GeoJSON grids and sent to CityIO
-
-Method for creating a GeoJSON grid. This grid represent the abstraction ('LEGO-tizing') of an area in the world. This grid also corresponds to the dimensions of the tangible CityScope table. `gridMaker` should be ran once upon starting a new CityScope instance. It will push the created grid into `cityIO` endpoint so that front-end and analysis modules could make use of it.
 
 ### `Cityscopy.scan()`
 
