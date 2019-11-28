@@ -2,18 +2,18 @@
 >>>>>>>>>>>>> Starting CityScope Scanner >>>>>>>>>>>>
 
 
-                    |||||||||||                        
-                    |||||||||||                         
-                            |||                           
-                            |||                           
-                            |||                       
-                    |||      ||||||||||||   
-                    |||      ||||||||||||    
-                    |||               |||      
-                    |||               ||| 
-                    |||               |||                  
-                    ||||||||||||      |||        
-                    ||||||||||||      |||   
+                    |||||||||||
+                    |||||||||||
+                            |||
+                            |||
+                            |||
+                    |||      ||||||||||||
+                    |||      ||||||||||||
+                    |||               |||
+                    |||               |||
+                    |||               |||
+                    ||||||||||||      |||
+                    ||||||||||||      |||
 
 
 >>>>>>>>>>>>> Starting CityScope Scanner >>>>>>>>>>>>
@@ -206,23 +206,24 @@ class Cityscopy:
     # run the video loop forever
         while True:
             # get a new matrix transformation every frame
-            KEY_STONE_DATA = self.transfrom_matrix(
+            keystone_data = self.transfrom_matrix(
                 video_resolution_x, video_resolution_y, self.listen_to_UI_interaction(self.init_keystone))
 
             # zero an array to collect the scanners
             CELL_COLORS_ARRAY = []
 
             # read video frames
-            RET, THIS_FRAME = video_capture.read()
+            RET, this_frame = video_capture.read()
             if RET is False:
                 pass
+            # else if camera capture is ok
             else:
                 # mirror camera
                 if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
-                    THIS_FRAME = cv2.flip(THIS_FRAME, 1)
+                    this_frame = cv2.flip(this_frame, 1)
                     # warp the video based on keystone info
-                DISTORTED_VIDEO_STREAM = cv2.warpPerspective(
-                    THIS_FRAME, KEY_STONE_DATA, (video_resolution_x, video_resolution_y))
+                keystoned_video = cv2.warpPerspective(
+                    this_frame, keystone_data, (video_resolution_x, video_resolution_y))
 
             # cell counter
             count = 0
@@ -243,8 +244,8 @@ class Cityscopy:
                 # set scanner crop box size and position
                 # at x,y + crop box size
 
-                this_scanner_size = DISTORTED_VIDEO_STREAM[y+scanner_reduction:y_red,
-                                                           x+scanner_reduction:x_red]
+                this_scanner_size = keystoned_video[y+scanner_reduction:y_red,
+                                                    x+scanner_reduction:x_red]
 
                 # draw rects with mean value of color
                 mean_color = cv2.mean(this_scanner_size)
@@ -265,12 +266,13 @@ class Cityscopy:
                 # ? only draw vis if settings has 1 in gui
                 if self.table_settings['objects']['cityscopy']['gui'] is True:
                     # draw rects with frame colored by range result
-                    cv2.rectangle(DISTORTED_VIDEO_STREAM,
+                    cv2.rectangle(keystoned_video,
                                   (x+scanner_reduction,
                                    y+scanner_reduction),
                                   (x_red, y_red),
                                   thisColor, 1)
-                # cell counter
+
+                    # cell counter
                 count = count + 1
 
             # reduce unnecessary scan analysis and sending by comparing
@@ -294,12 +296,48 @@ class Cityscopy:
                 pass
 
             if self.table_settings['objects']['cityscopy']['gui'] is True:
+                # draw arrow to interaction area
+                self.ui_selected_corner(
+                    video_resolution_x, video_resolution_y, keystoned_video)
                 # draw the video to screen
-                cv2.imshow("scanner_gui_window", DISTORTED_VIDEO_STREAM)
+                cv2.imshow("scanner_gui_window", keystoned_video)
 
         # close opencv
         video_capture.release()
         cv2.destroyAllWindows()
+
+    ##################################################
+
+    def ui_selected_corner(self, x, y, vid):
+        """prints text on video window"""
+
+        mid = (int(x/2), int(y/2))
+        if self.selected_corner is None:
+            # font
+            font = cv2.FONT_HERSHEY_SIMPLEX
+
+            # fontScale
+            fontScale = 1.2
+            # Blue color in BGR
+            color = (0, 0, 255)
+            # Line thickness of 2 px
+            thickness = 2
+            cv2.putText(vid, 'select corners using 1,2,3,4 and move using A/W/S/D',
+                        (5, int(y/2)), font,
+                        fontScale, color, thickness, cv2.LINE_AA)
+        else:
+            case = {
+                '1': [(0, 0), mid],
+                '2':  [(x, 0), mid],
+                '3':  [(0, y), mid],
+                '4':  [(x, y), mid],
+            }
+
+            # print(type(self.selected_corner))
+            cv2.arrowedLine(
+                vid, case[self.selected_corner][0],
+                case[self.selected_corner][1],
+                (0, 0, 255), 2)
 
     ##################################################
 
@@ -517,6 +555,8 @@ class Cityscopy:
                     init_keystone[7] = init_keystone[7] - 1
         #  saves to file
         elif chr(KEY_STROKE & 255) == 'k':
+            # reset selected corner
+            self.selected_corner = None
             self.save_keystone_to_file(
                 self.listen_to_UI_interaction(init_keystone))
 
