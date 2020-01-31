@@ -141,7 +141,6 @@ class Cityscopy:
         # define the table params
         grid_dimensions_x = self.table_settings['header']['spatial']['nrows']
         grid_dimensions_y = self.table_settings['header']['spatial']['ncols']
-
         array_of_tags_from_json = self.np_string_tags(
             self.table_settings['objects']['cityscopy']['tags'])
 
@@ -153,19 +152,11 @@ class Cityscopy:
         # holder of old cell colors array to check for new scan
         OLD_CELL_COLORS_ARRAY = []
 
-        # define the video stream
-        try:
-            # try from a device 1 in list, not default webcam
-            video_capture = cv2.VideoCapture(0)
-            print('no camera in pos 0')
-            time.sleep(1)
-            # if not exist, use device 0
-            if not video_capture.isOpened():
-                video_capture = cv2.VideoCapture(1)
-                time.sleep(1)
-
-        finally:
-            print('got video at: ', video_capture)
+        # serial num of camera, to switch between cameras
+        camPos = self.table_settings['objects']['cityscopy']['camId']
+        # try from a device 1 in list, not default webcam
+        video_capture = cv2.VideoCapture(camPos)
+        time.sleep(1)
 
         if grid_dimensions_y < grid_dimensions_x:
             # get the smaller of two grid ratio x/y or y/x
@@ -703,18 +694,12 @@ class Cityscopy:
         # file path to save
         self.KEYSTONE_PATH = self.get_folder_path() + '/'+"keystone.txt"
         print('keystone path:', self.KEYSTONE_PATH)
-        # define the video stream
-        try:
-            # try from a device 1 in list, not default webcam
-            WEBCAM = cv2.VideoCapture(0)
-            print('no camera in pos 0')
-            time.sleep(1)
-            # if not exist, use device 0
-            if not WEBCAM.isOpened():
-                WEBCAM = cv2.VideoCapture(1)
-                time.sleep(1)
-        finally:
-            print('got video at:', WEBCAM)
+
+        # serial num of camera, to switch between cameras
+        camPos = self.table_settings['objects']['cityscopy']['camId']
+        # try from a device 1 in list, not default webcam
+        WEBCAM = cv2.VideoCapture(camPos)
+        time.sleep(1)
 
         # video winodw
         cv2.namedWindow('canvas', cv2.WINDOW_NORMAL)
