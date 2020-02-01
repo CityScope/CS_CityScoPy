@@ -27,7 +27,7 @@
         "objects": {
             "cityscopy": {
                 "interval": 200,
-                "camId": 3,
+                "camId": 0,
 
                 "gui": true,
                 "cityio": 1,

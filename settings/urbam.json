@@ -28,7 +28,7 @@
             "cityscopy": {
                 "interval": 250,
                 "gui": true,
-                "camId": 3,
+                "camId": 0,
 
                 "cityio": true,
                 "tags": [

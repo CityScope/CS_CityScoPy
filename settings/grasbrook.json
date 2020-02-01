@@ -33,7 +33,7 @@
         "objects": {
             "cityscopy": {
                 "cell_gap": 0,
-                "camId": 3,
+                "camId": 0,
 
                 "cityio": true,
                 "gui": true,

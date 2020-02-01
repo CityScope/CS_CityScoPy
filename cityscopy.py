@@ -53,17 +53,13 @@ of uniquely tagged LEGO array
 import requests
 import cv2
 import numpy as np
-import math
-from datetime import date
 from datetime import timedelta
 from datetime import datetime
 import time
 import json
-import sys
 import os
 import socket
 from multiprocessing import Process, Manager
-from subprocess import Popen
 import random
 
 

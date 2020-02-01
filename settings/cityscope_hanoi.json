@@ -29,7 +29,7 @@
                 "interval": 250,
                 "gui": true,
                 "cityio": true,
-                "camId": 3,
+                "camId": 0,
 
                 "tags": [
                     "1100110000000000",
