@@ -395,23 +395,17 @@ class Cityscopy:
         old_scan_results = [-1]
         SEND_INTERVAL = timedelta(milliseconds=SEND_INTERVAL)
         last_sent = datetime.now()
-
         while True:
             scan_results = multiprocess_shared_dict['scan']
             from_last_sent = datetime.now() - last_sent
             if (scan_results != old_scan_results) and from_last_sent > SEND_INTERVAL:
                 try:
-                    # convert to json
-                    json_struct = self.table_settings
-                    json_struct['grid'] = scan_results
                     if self.table_settings['objects']['cityscopy']['cityio'] is True:
-                        cityIO_json = json.dumps(json_struct)
-                        self.send_json_to_cityIO(cityIO_json)
+                        self.send_json_to_cityIO(json.dumps(scan_results))
                     else:
                         self.send_json_to_UDP(scan_results)
-                except Exception as e:
-                    print(e)
-
+                except Exception as ERR:
+                    print(ERR)
                 # match the two grid after send
                 old_scan_results = scan_results
                 last_sent = datetime.now()
@@ -422,6 +416,23 @@ class Cityscopy:
     ##################################################
 
     def send_json_to_cityIO(self, cityIO_json):
+        '''
+        sends the grid to cityIO 
+        '''
+        # defining the api-endpoint
+        API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
+            self.table_settings['header']['name'] + "/grid/"
+        # sending post request and saving response as response object
+        req = requests.post(url=API_ENDPOINT, data=cityIO_json)
+        if req.status_code != 200:
+            print("cityIO might be down. so sad.")
+        print("sending grid to", API_ENDPOINT,  req)
+
+    ##################################################
+
+    def init_table(self):
+        json_struct = self.table_settings
+        cityIO_json = json.dumps(json_struct)
         # defining the api-endpoint
         API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
             self.table_settings['header']['name']
@@ -429,7 +440,7 @@ class Cityscopy:
         req = requests.post(url=API_ENDPOINT, data=cityIO_json)
         if req.status_code != 200:
             print("cityIO might be down. so sad.")
-        print(req)
+        print("init table on cityIO", req)
 
     ##################################################
 

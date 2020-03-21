@@ -62,6 +62,12 @@ of uniquely tagged LEGO array
     # init cityscopy class
     cityscopy = Cityscopy(cityscopy_settings_path)
     # run CityScopy main methods
+
+    # keystone the scanned area
     # cityscopy.keystone()
+    # create new table instance on cityIO
+    cityscopy.init_table()
+    # scan the grid and send to cityIO
     cityscopy.scan()
+    # start local UDP comms
     # # cityscopy.udp_listener()
