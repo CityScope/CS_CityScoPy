@@ -19,18 +19,18 @@ $ git clone https://github.com/CityScope/CS_CityScoPy.git
 $ cd CS_CityScoPy
 ```
 
--   install packages. To produce a list of needed packages, use `pipreqs`, follow instructions https://github.com/bndr/pipreqs. Or, simply run the app and install packages as they appear in errors.
+-   install packages. To produce a list of needed packages, use `pipreqs`, follow instructions https://github.com/bndr/pipreqs. Or, simply run the app and install packages as they appear as missing.
 -   tweak `__settings__.json` to fit your cityIO table setup. Read [cityIO documentation](https://github.com/cityscope/cs_cityio_backend/wiki) for proper data structure
--   setup a path to your settings file
+-   in `run.py` setup a path to your settings file
 
 ```
-cityscopy_settings_path = "__path__/__settings__.json"
+CITYSCOPY_SETTINGS_PATH = "__path__/__settings__.json"
 ```
 
 -   initiate the `Cityscopy` class (see `run.py` example)
 
 ```
-cityscopy = Cityscopy(cityscopy_settings_path)
+cityscopy = Cityscopy(CITYSCOPY_SETTINGS_PATH)
 ```
 
 -   use one or more of the main methods. 'Blocking' means the method will run forever (while true loop). Advanced users can parallel blocking methods using multithreading.
@@ -72,9 +72,35 @@ Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color array
 Tool will start scanning using whatever keystone data was stored in `keystone.txt`
 make corrections to the key stone using the sliders or keyboard using `1,2,3,4` to select a corner and `[w,a,s,d]` to move `[up,left,down,right]` the selected corner. Press `k` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
 
+#### output
+
+the app will attempt sending the resulted scan to cityIO server. If successful, the following JSON format data will appear on the cityIO endpoint defined in `settings.json`
+
+```
+
+{
+    "grid": [
+        [1, 0],
+        [1, 0],
+        [0, 0],
+        [4, 0],
+        [-1, -1],
+        [-1, -1], // no type was found will return -1 as type and -1 as rotation
+        ...
+    ],
+
+    ...
+    other cityIO data
+    ...
+}
+
+```
+
 ### `Cityscopy.udp_listener()`
 
 ##### emulates local UDP server listener
+
+simple helper method to emulate what a local UDP client might see if `cityscopy` would send scan over localhost
 
 ## Errors
 

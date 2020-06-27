@@ -73,7 +73,7 @@ class Cityscopy:
         # load info from json file
         self.SETTINGS_PATH = path
         # get the table settings. This is used bu many metohds
-        self.table_settings = self.parse_json_file('table')
+        self.table_settings = self.parse_json_file('cityscopy')
         print('getting settings for CityScopy...')
 
         # init corners variables
@@ -135,12 +135,12 @@ class Cityscopy:
         # get init keystones
         self.init_keystone = self.get_init_keystone()
         # define the table params
-        grid_dimensions_x = self.table_settings['header']['spatial']['nrows']
-        grid_dimensions_y = self.table_settings['header']['spatial']['ncols']
+        grid_dimensions_x = self.table_settings['nrows']
+        grid_dimensions_y = self.table_settings['ncols']
         array_of_tags_from_json = self.np_string_tags(
-            self.table_settings['objects']['cityscopy']['tags'])
+            self.table_settings['tags'])
 
-        array_of_maps_form_json = self.table_settings['header']['mapping']['type']
+        array_of_maps_form_json = self.table_settings['type']
 
         # init type list array
         TYPES_LIST = []
@@ -149,7 +149,7 @@ class Cityscopy:
         OLD_CELL_COLORS_ARRAY = []
 
         # serial num of camera, to switch between cameras
-        camPos = self.table_settings['objects']['cityscopy']['camId']
+        camPos = self.table_settings['camId']
         # try from a device 1 in list, not default webcam
         video_capture = cv2.VideoCapture(camPos)
         time.sleep(1)
@@ -206,7 +206,7 @@ class Cityscopy:
             # else if camera capture is ok
             else:
                 # mirror camera
-                if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
+                if self.table_settings['mirror_cam'] is True:
                     this_frame = cv2.flip(this_frame, 1)
                     # warp the video based on keystone info
                 keystoned_video = cv2.warpPerspective(
@@ -251,7 +251,7 @@ class Cityscopy:
                 thisColor = DICTIONARY_COLORS[scannerCol]
 
                 # ? only draw vis if settings has 1 in gui
-                if self.table_settings['objects']['cityscopy']['gui'] is True:
+                if self.table_settings['gui'] is True:
                     # draw rects with frame colored by range result
                     cv2.rectangle(keystoned_video,
                                   (x+scanner_reduction,
@@ -282,7 +282,7 @@ class Cityscopy:
                 # else don't do it
                 pass
 
-            if self.table_settings['objects']['cityscopy']['gui'] is True:
+            if self.table_settings['gui'] is True:
                 # draw arrow to interaction area
                 self.ui_selected_corner(
                     video_resolution_x, video_resolution_y, keystoned_video)
@@ -356,7 +356,7 @@ class Cityscopy:
         pixel_coordinates_list = []
 
         # define a cell gap for grided cases [plexi table setup]
-        cells_gap = self.table_settings['objects']['cityscopy']['cell_gap']
+        cells_gap = self.table_settings['cell_gap']
 
         # create the 4x4 sub grid cells
         for y in range(0, grid_dimensions_y):
@@ -389,8 +389,8 @@ class Cityscopy:
 
     # 2nd proccess to
     def create_data_json(self, multiprocess_shared_dict):
-        self.table_settings = self.parse_json_file('table')
-        SEND_INTERVAL = self.table_settings['objects']['cityscopy']['interval']
+        self.table_settings = self.parse_json_file('cityscopy')
+        SEND_INTERVAL = self.table_settings['interval']
         # initial dummy value for old grid
         old_scan_results = [-1]
         SEND_INTERVAL = timedelta(milliseconds=SEND_INTERVAL)
@@ -400,7 +400,7 @@ class Cityscopy:
             from_last_sent = datetime.now() - last_sent
             if (scan_results != old_scan_results) and from_last_sent > SEND_INTERVAL:
                 try:
-                    if self.table_settings['objects']['cityscopy']['cityio'] is True:
+                    if self.table_settings['cityio'] is True:
                         self.send_json_to_cityIO(json.dumps(scan_results))
                     else:
                         self.send_json_to_UDP(scan_results)
@@ -421,26 +421,12 @@ class Cityscopy:
         '''
         # defining the api-endpoint
         API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
-            self.table_settings['header']['name'] + "/grid/"
+            self.table_settings['cityscope_project_name'] + "/grid/"
         # sending post request and saving response as response object
         req = requests.post(url=API_ENDPOINT, data=cityIO_json)
         if req.status_code != 200:
             print("cityIO might be down. so sad.")
         print("sending grid to", API_ENDPOINT,  req)
-
-    ##################################################
-
-    def init_table(self):
-        json_struct = self.table_settings
-        cityIO_json = json.dumps(json_struct)
-        # defining the api-endpoint
-        API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
-            self.table_settings['header']['name']
-        # sending post request and saving response as response object
-        req = requests.post(url=API_ENDPOINT, data=cityIO_json)
-        if req.status_code != 200:
-            print("cityIO might be down. so sad.")
-        print("init table on cityIO", req)
 
     ##################################################
 
@@ -703,7 +689,7 @@ class Cityscopy:
         print('keystone path:', self.KEYSTONE_PATH)
 
         # serial num of camera, to switch between cameras
-        camPos = self.table_settings['objects']['cityscopy']['camId']
+        camPos = self.table_settings['camId']
         # try from a device 1 in list, not default webcam
         WEBCAM = cv2.VideoCapture(camPos)
         time.sleep(1)
@@ -730,7 +716,7 @@ class Cityscopy:
                 cv2.setMouseCallback('canvas', save_this_point)
                 # read the WEBCAM frames
                 _, self.FRAME = WEBCAM.read()
-                if self.table_settings['objects']['cityscopy']['mirror_cam'] is True:
+                if self.table_settings['mirror_cam'] is True:
                     self.FRAME = cv2.flip(self.FRAME, 1)
                 # draw mouse pos
                 cv2.circle(self.FRAME, self.MOUSE_POSITION, 10, (0, 0, 255), 1)
