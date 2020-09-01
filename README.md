@@ -64,10 +64,29 @@ Scanner will detect colors in arrays of 2d-pixel arrays. Than, these color array
 
 ##### options in `__settings__.json`
 
--   `gui` turn on or of webcam display
--   `interval` send rate to UDP/HTTP in ms
--   `cityio` send to UDP or HTTP cityIO
--   `tags` 16 digit strings of types being scanned [`1000000100000000`]
+```
+{
+    "cityscopy": {
+        "cityscope_project_name": "cityscopy", // table name
+        "type": ["0", "1", "2", ...], // types names
+        "rotation": ["0", "1", "2", "3"], // default rotations (0, 90, 180, 270)
+        "nrows": 10, // number of columns to scan
+        "ncols": 10, // number of rows to scan
+        "camId": 0, // openCV will pick `camID` camera (usually 0)
+        "interval": 250, // in ms, how many time should this send the packet
+        "gui": true, // toggle GUI display
+        "cityio": true, // toggle UDP or cityIO delivery
+        "tags": [ // 16 digit strings of types being scanned [`1000000100000000`]
+            "0000000000000000",
+            "1111111111111111",
+            "1111111100000000",
+            ...
+        ],
+        "mirror_cam": false
+    }
+}
+
+```
 
 Tool will start scanning using whatever keystone data was stored in `keystone.txt`
 make corrections to the key stone using the sliders or keyboard using `1,2,3,4` to select a corner and `[w,a,s,d]` to move `[up,left,down,right]` the selected corner. Press `k` to save change to file and `ctrl-c` twice [in the terminal window] to exit program
