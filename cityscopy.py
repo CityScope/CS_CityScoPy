@@ -355,15 +355,12 @@ class Cityscopy:
         # create the list of points
         pixel_coordinates_list = []
 
-        # define a cell gap for grided cases [plexi table setup]
-        cells_gap = self.table_settings['cell_gap']
-
         # create the 4x4 sub grid cells
         for y in range(0, grid_dimensions_y):
             for x in range(0, grid_dimensions_x):
 
-                x_positions = x * ((scanner_square_size*4)+cells_gap)
-                y_positions = y * ((scanner_square_size*4)+cells_gap)
+                x_positions = x * (scanner_square_size*4)
+                y_positions = y * (scanner_square_size*4)
 
                 # make the actual location for the 4x4 scanner points
                 for i in range(0, 4):
