@@ -16,3 +16,4 @@ yarn-error.log*
 __pycache__/**
 *.pyc
 pythonenv3.8/
+venv/
