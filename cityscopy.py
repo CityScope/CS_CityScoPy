@@ -142,6 +142,9 @@ class Cityscopy:
 
         array_of_maps_form_json = self.table_settings['type']
 
+        cell_gap = self.table_settings['cell_gap']
+
+
         # init type list array
         TYPES_LIST = []
 
@@ -187,8 +190,12 @@ class Cityscopy:
 
         # create the location  array of scanners
         array_of_scanner_points_locations = self.get_scanner_pixel_coordinates(
-            grid_dimensions_x, grid_dimensions_y, video_resolution_x,
+            grid_dimensions_x, grid_dimensions_y, cell_gap, video_resolution_x,
             video_resolution_y, scanner_square_size)
+
+        # resize video resolution if cell gaps are used:
+        video_resolution_x = video_resolution_x + grid_dimensions_x * cell_gap
+        video_resolution_y = video_resolution_y + grid_dimensions_y * cell_gap
 
     # run the video loop forever
         while True:
@@ -328,7 +335,7 @@ class Cityscopy:
 
     ##################################################
 
-    def get_scanner_pixel_coordinates(self, grid_dimensions_x, grid_dimensions_y, video_res_x, video_res_y, scanner_square_size):
+    def get_scanner_pixel_coordinates(self, grid_dimensions_x, grid_dimensions_y, cell_gap, video_res_x, video_res_y, scanner_square_size):
         """Creates list of pixel coordinates for scanner.
 
         Steps:
@@ -359,8 +366,8 @@ class Cityscopy:
         for y in range(0, grid_dimensions_y):
             for x in range(0, grid_dimensions_x):
 
-                x_positions = x * scanner_square_size*4
-                y_positions = y * scanner_square_size*4
+                x_positions = x * (scanner_square_size*4+cell_gap)
+                y_positions = y * (scanner_square_size*4+cell_gap)
 
                 # make the actual location for the 4x4 scanner points
                 for i in range(0, 4):

@@ -5,10 +5,11 @@
         "rotation": ["0", "1", "2", "3"],
         "nrows": 10,
         "ncols": 10,
-        "camId": 0,
+        "cell_gap": 10,
+        "camId": 2,
         "interval": 250,
         "gui": true,
-        "cityio": true,
+        "cityio": false,
         "tags": [
             "0000000000000000",
             "1111111111111111",
