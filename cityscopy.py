@@ -405,7 +405,8 @@ class Cityscopy:
             if (scan_results != old_scan_results) and from_last_sent > SEND_INTERVAL:
                 try:
                     if self.table_settings['cityio'] is True:
-                        self.send_json_to_cityIO(json.dumps(scan_results))
+                        cityio_data_dump = json.dumps({"cityscopy":scan_results})
+                        self.send_json_to_cityIO(cityio_data_dump)
                     else:
                         self.send_json_to_UDP(scan_results)
                 except Exception as ERR:
@@ -423,11 +424,13 @@ class Cityscopy:
         '''
         sends the grid to cityIO 
         '''
+        print(cityIO_json)
         # defining the api-endpoint
-        API_ENDPOINT = "https://cityio.media.mit.edu/api/table/update/" + \
-            self.table_settings['cityscope_project_name'] + "/grid/"
+        API_ENDPOINT = "https://cityio.media.mit.edu/api/table/" + \
+            self.table_settings['cityscope_project_name'] + "/" 
         # sending post request and saving response as response object
-        req = requests.post(url=API_ENDPOINT, data=cityIO_json)
+        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        req = requests.post(url=API_ENDPOINT, data=cityIO_json, headers=headers)
         if req.status_code != 200:
             print("cityIO might be down. so sad.")
         print("sending grid to", API_ENDPOINT,  req)
