@@ -85,7 +85,7 @@ class Cityscopy:
         self.POINT_INDEX = None
         self.POINTS = None
         self.MOUSE_POSITION = None
-
+        self.threshold = 100
     ##################################################
 
     def scan(self):
@@ -608,7 +608,7 @@ class Cityscopy:
         convert color to hsv for oclidian distance
         '''
         bgr_to_grayscale = cv2.cvtColor(mean_color_RGB, cv2.COLOR_BGR2GRAY)
-        if int(bgr_to_grayscale) < 125:
+        if int(bgr_to_grayscale) < self.threshold:
             this_color = 0
         else:
             this_color = 1
@@ -628,7 +628,7 @@ class Cityscopy:
         Args:
         Returns an array of found types
         """
-        scan_results_array = []
+        scan_results_array = ''
         # create np colors array with table struct
         np_array_of_scanned_colors = np.reshape(
             cellColorsArray, (grid_dimensions_x * grid_dimensions_y, 16))
@@ -639,9 +639,11 @@ class Cityscopy:
                 this_16_bits, tagsArray, mapArray)
             # if no results were found
             if result_tag == None:
-                result_tag = [-1, -1]
+                result_tag = ['x', 'x']
             # add a list of results to the array
-            scan_results_array.append(result_tag)
+            # scan_results_array.append(result_tag)
+            scan_results_array= scan_results_array+str(result_tag[0])+str(result_tag[1])
+            #scan_results_array.append(result_tag[1])
         # finally, return this list to main program for UDP
         return scan_results_array
 
