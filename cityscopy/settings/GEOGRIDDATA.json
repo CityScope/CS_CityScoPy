@@ -1,0 +1,76 @@
+[
+  {
+    "cityscopy_id": 0,
+    "cityscopy_pattern": "0000000000000000",
+    "color": [171, 143, 57],
+    "height": [0, 15, 30],
+    "name": "Campus"
+  },
+  {
+    "cityscopy_id": 0,
+    "cityscopy_pattern": "0000000000000000",
+    "color": [171, 143, 57],
+    "height": [0, 15, 30],
+    "name": "Campus"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  },
+  {
+    "cityscopy_id": -1,
+    "color": [0, 0, 0, 10],
+    "height": [0, 1, 1],
+    "name": "Err"
+  }
+]
