@@ -12,7 +12,7 @@ import numpy as np
 import time
 from multiprocessing import Process, Manager
 from ..helpers import parse_json_file, create_data_json, get_init_keystone, np_string_tags, get_folder_path
-from ..ui_tools import listen_to_UI_interaction, ui_selected_corner
+from .ui_tools import listen_to_UI_interaction, ui_selected_corner
 import json
 
 
