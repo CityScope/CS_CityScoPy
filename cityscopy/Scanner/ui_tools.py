@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
-from ..helpers import save_settings_to_file
-
+from ..utils import save_settings_to_file
 
 ############################################
+
 
 def save_keystone_to_file(self, keystone_data_from_user_interaction):
     '''saves the keystone data from user interaction to the setting file as string'''
@@ -111,37 +111,6 @@ def listen_to_UI_interaction(self, init_keystone):
 ##################################################
 
 
-# def ui_selected_corner(self, x, y, vid):
-#     """prints text on video window"""
-
-#     mid = (int(x/2), int(y/2))
-#     if self.selected_corner is None:
-#         # font
-#         font = cv2.FONT_HERSHEY_SIMPLEX
-
-#         # fontScale
-#         fontScale = 1
-#         # Blue color in BGR
-#         color = (0, 0, 255)
-#         # Line thickness of 2 px
-#         thickness = 2
-#         cv2.putText(vid, 'select corners using 1,2,3,4 and move using A/W/S/D',
-#                     (5, int(y/2)), font,
-#                     fontScale, color, thickness, cv2.LINE_AA)
-#     else:
-#         case = {
-#             '1': [(0, 0), mid],
-#             '2':  [(x, 0), mid],
-#             '3':  [(0, y), mid],
-#             '4':  [(x, y), mid],
-#         }
-
-#         # print(type(self.selected_corner))
-#         cv2.arrowedLine(
-#             vid, case[self.selected_corner][0],
-#             case[self.selected_corner][1],
-#             (0, 0, 255), 2)
-
 def ui_selected_corner(self, x, y, vid):
     """Draws UI elements on the video window."""
 
@@ -189,4 +158,24 @@ def ui_selected_corner(self, x, y, vid):
         cv2.putText(vid, instructions, (text_x, text_y), font,
                     font_scale, (0, 255, 0), 2, cv2.LINE_AA)
 
+##################################################
+
+
+def get_init_keystone(self):
+    # get init keystone from the setting file and return it as a matrix
+    keystone_points_list = np.matrix(self.keystone_points_list).reshape(4, 2)
+    # convert to np array
+    keystone_points_list = np.array(keystone_points_list)
+    # break it to points
+    ulx = keystone_points_list[0][0]
+    uly = keystone_points_list[0][1]
+    urx = keystone_points_list[1][0]
+    ury = keystone_points_list[1][1]
+    blx = keystone_points_list[2][0]
+    bly = keystone_points_list[2][1]
+    brx = keystone_points_list[3][0]
+    bry = keystone_points_list[3][1]
+    # init keystone
+    init_keystone = [ulx, uly, urx, ury, blx, bly, brx, bry]
+    return init_keystone
 ##################################################

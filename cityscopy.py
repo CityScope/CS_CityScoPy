@@ -9,7 +9,6 @@ import datetime
 import pretty_errors
 
 
-
 def main():
 
     parser = argparse.ArgumentParser(
@@ -23,7 +22,7 @@ def main():
                         required=True,
                         const='all',
                         nargs='?',
-                        choices=['scan', 'keystone', 'setup'],
+                        choices=['setup', 'scan'],
                         help='list servers, storage, or both (default: %(default)s)')
 
     parser.add_argument('--table_name', '-t',

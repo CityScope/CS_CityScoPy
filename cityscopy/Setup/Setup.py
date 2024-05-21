@@ -4,7 +4,7 @@
 # of uniquely tagged LEGO array
 ##################################################
 
-from ..helpers import parse_json_file, save_settings_to_file, get_folder_path
+from ..utils import parse_json_file, save_settings_to_file, get_folder_path
 import requests
 import json
 
