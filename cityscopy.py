@@ -5,6 +5,9 @@ from cityscopy.Scanner.Scanner import Scanner
 from cityscopy.Setup.Setup import Setup
 import sys
 import os
+import datetime
+import pretty_errors
+
 
 
 def main():
@@ -51,8 +54,10 @@ def main():
 
 if __name__ == '__main__':
     os.system('clear')
+    # get this year
+    year = str(datetime.datetime.now().year)
     print(
-        '''
+        f'''
         >>>>>> CityScoPY: A Scanner for MIT CityScope >>>>>>>>
 
 
@@ -69,9 +74,10 @@ if __name__ == '__main__':
                             ||||||||||||      |||
                             ||||||||||||      |||
 
+                            MIT Media Lab CityScope
 
 
-        Copyright (C) {{ 2018 - 2023 }}  {{ Ariel Noyman }}
+        Copyright (C) 2018 - {year} | Ariel Noyman 
 
         Ariel Noyman
         https://github.com/CityScope/
